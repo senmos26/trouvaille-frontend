@@ -7,14 +7,11 @@ import { Facebook, Twitter, Linkedin, ArrowRight } from "lucide-react"
 import { useTeamMembers } from "@/lib/hooks/use-team"
 
 export default function TeamPage() {
-  const { data: teamData, isLoading, error } = useTeamMembers()
-  
-  // Utiliser uniquement les données Supabase
-  const teamMembers = teamData?.data || []
+  const { data: teamMembers, isLoading, error } = useTeamMembers()
   const [displayCount, setDisplayCount] = useState(6)
   
-  const visibleMembers = teamMembers.slice(0, displayCount)
-  const hasMore = teamMembers.length > displayCount
+  const visibleMembers = (teamMembers || []).slice(0, displayCount)
+  const hasMore = (teamMembers || []).length > displayCount
 
   // Gestion des états de chargement et d'erreur
   if (isLoading) {
