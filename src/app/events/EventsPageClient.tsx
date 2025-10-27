@@ -46,9 +46,17 @@ function EventsPageContent() {
 
   // Type pour les événements avec propriétés étendues
   type EventWithTime = {
+    id: string
+    title?: string
+    description?: string
+    image?: string
+    location?: string
+    participants?: number
     time?: string
     date?: string
     category?: { name: string } | string
+    rubrique?: { name: string } | string
+    tags?: Array<{ name?: string; tag?: { name: string } } | string>
     [key: string]: unknown
   }
 
