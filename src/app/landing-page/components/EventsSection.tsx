@@ -148,10 +148,10 @@ export default function EventsSection() {
                     {event.tags.slice(0, 3).map((tag: { tag?: { name: string }; name?: string }, idx: number) => (
                       <Link
                         key={idx}
-                        href={`/events?tag=${encodeURIComponent(tag.tag?.name || tag.name)}`}
+                        href={`/events?tag=${encodeURIComponent(tag.tag?.name || tag.name || '')}`}
                         className="px-2 py-1 bg-[#0A1128]/5 text-[#0A1128] text-xs font-medium rounded hover:bg-[#0A1128] hover:text-white transition-all"
                       >
-                        #{tag.tag?.name || tag.name}
+                        #{tag.tag?.name || tag.name || ''}
                       </Link>
                     ))}
                   </div>
