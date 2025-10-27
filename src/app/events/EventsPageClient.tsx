@@ -62,7 +62,7 @@ function EventsPageContent() {
   }
 
   // Filtrer les événements
-  const filteredEvents = eventsData?.filter((event: EventWithTime) => {
+  const filteredEvents = eventsData?.data?.filter((event: EventWithTime) => {
     const matchesCategory = !selectedCategory || getCategoryName(event.category) === selectedCategory
     const matchesRubrique = selectedRubrique === "Toutes" || getRubriqueName(event.rubrique) === selectedRubrique
     const matchesTag = !selectedTag || event.tags?.some((tag: { name?: string; tag?: { name: string } } | string) => {
