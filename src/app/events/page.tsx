@@ -8,6 +8,29 @@ import { motion } from "framer-motion"
 import { ArrowRight, MapPin, Clock, UserCheck, Search, Filter, Calendar, CalendarX, X, ChevronDown, Check } from "lucide-react"
 import { useEvents } from "@/lib/hooks/use-events"
 import { useEventCategories, useEventRubriques } from "@/lib/hooks/use-categories"
+import type { Metadata } from "next"
+
+export const metadata: Metadata = {
+  title: "Événements | La Trouvaille - Découvrez nos formations et conférences",
+  description: "Découvrez tous nos événements, formations et conférences. Participez à des sessions d'apprentissage et de networking avec La Trouvaille.",
+  openGraph: {
+    title: "Événements | La Trouvaille - Découvrez nos formations et conférences",
+    description: "Découvrez tous nos événements, formations et conférences. Participez à des sessions d'apprentissage et de networking avec La Trouvaille.",
+    images: [
+      {
+        url: '/images/la_trouvaille.png',
+        width: 1200,
+        height: 630,
+        alt: 'La Trouvaille - Événements',
+      },
+    ],
+  },
+  twitter: {
+    title: "Événements | La Trouvaille - Découvrez nos formations et conférences",
+    description: "Découvrez tous nos événements, formations et conférences. Participez à des sessions d'apprentissage et de networking.",
+    images: ['/images/la_trouvaille.png'],
+  },
+}
 
 function EventsPageContent() {
   const searchParams = useSearchParams()
