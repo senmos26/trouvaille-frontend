@@ -10,7 +10,7 @@ export default function TeamPage() {
   const { data: teamData, isLoading, error } = useTeamMembers()
   
   // Utiliser uniquement les données Supabase
-  const teamMembers = teamData || []
+  const teamMembers = teamData?.data || []
   const [displayCount, setDisplayCount] = useState(6)
   
   const visibleMembers = teamMembers.slice(0, displayCount)
