@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, Suspense } from "react"
 import Link from "next/link"
 import Image from "next/image"
 import { useSearchParams } from "next/navigation"
@@ -9,7 +9,7 @@ import { ArrowRight, MapPin, Clock, UserCheck, Search, Filter, Calendar, Calenda
 import { useEvents } from "@/lib/hooks/use-events"
 import { useEventCategories, useEventRubriques } from "@/lib/hooks/use-categories"
 
-export default function EventsPage() {
+function EventsPageContent() {
   const searchParams = useSearchParams()
   const tagFromUrl = searchParams.get('tag')
 
@@ -703,5 +703,21 @@ export default function EventsPage() {
         </div>
       </section>
     </div>
+  )
+}
+
+export default function EventsPage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen bg-white">
+        <div className="container mx-auto px-4 py-20">
+          <div className="flex items-center justify-center">
+            <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-[#FFD700]"></div>
+          </div>
+        </div>
+      </div>
+    }>
+      <EventsPageContent />
+    </Suspense>
   )
 }
