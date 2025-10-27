@@ -97,11 +97,11 @@ export async function likeBlogPost(postId: string, userIp: string = 'anonymous')
         console.warn('Failed to update likes count:', updateError)
       }
 
-      return { success: true, data: null, action: 'unliked' }
+      return { success: true, data: { liked: false, likes_count: 0 }, action: 'unliked' }
     }
 
     // Ajouter le like
-    const { data, error } = await supabase
+    const { error } = await supabase
       .from('blog_likes')
       .insert({
         post_id: postId,
@@ -119,7 +119,7 @@ export async function likeBlogPost(postId: string, userIp: string = 'anonymous')
       console.warn('Failed to update likes count:', updateError)
     }
 
-    return { success: true, data, action: 'liked' }
+    return { success: true, data: { liked: true, likes_count: 0 }, action: 'liked' }
   } catch (error) {
     console.error('Error liking blog post:', error)
     throw error
