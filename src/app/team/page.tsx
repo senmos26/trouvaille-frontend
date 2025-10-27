@@ -99,7 +99,7 @@ export default function TeamPage() {
                   
                   {member.skills && (
                     <div className="flex flex-wrap gap-2 mb-4">
-                      {member.skills.slice(0, 3).map((skill, idx) => (
+                      {member.skills.slice(0, 3).map((skill: string, idx: number) => (
                         <span key={idx} className="px-3 py-1 bg-gray-100 text-[#0A1128] text-xs font-semibold rounded-full">
                           {skill}
                         </span>
