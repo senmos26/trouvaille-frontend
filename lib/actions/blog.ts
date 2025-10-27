@@ -100,7 +100,7 @@ export const blogActions = {
       return { data, success: true }
     } catch (error) {
       return { 
-        data: null, 
+        data: { liked: false, likes_count: 0 }, 
         error: error instanceof Error ? error.message : 'Une erreur est survenue', 
         success: false 
       }
@@ -123,7 +123,7 @@ export const blogActions = {
       return { data, success: true }
     } catch (error) {
       return { 
-        data: null, 
+        data: { id: '', created_at: '' }, 
         error: error instanceof Error ? error.message : 'Une erreur est survenue', 
         success: false 
       }
