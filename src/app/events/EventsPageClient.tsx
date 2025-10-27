@@ -42,7 +42,7 @@ function EventsPageContent() {
   }, [tagFromUrl])
 
   const categories = categoriesData || []
-  const rubriques = ["Toutes", ...(rubriquesData || [])]
+  const rubriques = ["Toutes", ...(rubriquesData?.map((rubrique: { name: string }) => rubrique.name) || [])]
 
   // Type pour les événements avec propriétés étendues
   type EventWithTime = {
