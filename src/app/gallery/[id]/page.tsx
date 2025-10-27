@@ -1,7 +1,8 @@
 "use client"
 
-import { useState, useEffect, useId, useRef } from "react"
+import { useState, useEffect, useId, useRef, useCallback } from "react"
 import Link from "next/link"
+import Image from "next/image"
 import { motion, AnimatePresence } from "framer-motion"
 import { Calendar, MapPin, Users, X, ArrowLeft, ChevronLeft, ChevronRight, Camera, Grid3x3, Grid2x2 } from "lucide-react"
 import { useOutsideClick } from "@/hooks/use-outside-click"
@@ -103,14 +104,72 @@ export default function EventGalleryPage({ params }: { params: { id: string } })
   const ref = useRef<HTMLDivElement | null>(null)
   const id = useId()
 
+  // Type pour les événements avec toutes les propriétés nécessaires
+  type GalleryEventItem = {
+    id: string | number
+    title: string
+    photos?: Array<{ id: string; image_url: string; alt_text?: string }> | string[]
+    event_images?: Array<{ id: string; image_url: string; alt_text?: string }>
+    category?: string | { name: string }
+    rubrique?: string | { name: string }
+    created_at?: string
+    date?: string
+    location?: string
+    participants?: number
+  }
+
   // Utiliser les données Supabase ou les données de fallback
-  const event = eventData || galleryEvents.find(e => e.id === parseInt(params.id))
+  const eventItem: GalleryEventItem | undefined = eventData || galleryEvents.find(e => e.id === parseInt(params.id))
   
   // Helper functions pour accéder aux données de manière sécurisée
-  const getPhotos = (item: any) => item?.photos || item?.event_images || []
-  const getCategoryName = (item: any) => typeof item?.category === 'string' ? item.category : item?.category?.name || ''
-  const getRubriqueName = (item: any) => typeof item?.rubrique === 'string' ? item.rubrique : item?.rubrique?.name || ''
-  const getDate = (item: any) => item?.created_at || item?.date || ''
+  const getPhotos = useCallback((item: GalleryEventItem | undefined): Array<{ id: string; image_url: string; alt_text?: string }> => {
+    if (!item) return []
+    
+    // Si photos est un tableau de strings (données de fallback)
+    if (Array.isArray(item.photos) && item.photos.length > 0 && typeof item.photos[0] === 'string') {
+      return (item.photos as string[]).map((url, index) => ({
+        id: `fallback-${index}`,
+        image_url: url,
+        alt_text: `${item.title} - Photo ${index + 1}`
+      }))
+    }
+    
+    // Si photos est un tableau d'objets (données Supabase)
+    return (item.photos as Array<{ id: string; image_url: string; alt_text?: string }>) || item.event_images || []
+  }, [])
+  const getCategoryName = (item: GalleryEventItem | undefined) => {
+    if (!item?.category) return ''
+    return typeof item.category === 'string' ? item.category : item.category.name || ''
+  }
+  const getRubriqueName = (item: GalleryEventItem | undefined) => {
+    if (!item?.rubrique) return ''
+    return typeof item.rubrique === 'string' ? item.rubrique : item.rubrique.name || ''
+  }
+  const getDate = (item: GalleryEventItem | undefined) => item?.created_at || item?.date || ''
+
+  // Navigation avec clavier et gestion du scroll
+  useEffect(() => {
+    function onKeyDown(e: KeyboardEvent) {
+      if (e.key === "Escape") {
+        setActivePhotoIndex(null)
+      } else if (e.key === "ArrowLeft" && activePhotoIndex !== null && activePhotoIndex > 0) {
+        setActivePhotoIndex(activePhotoIndex - 1)
+      } else if (e.key === "ArrowRight" && activePhotoIndex !== null && eventItem && activePhotoIndex < getPhotos(eventItem).length - 1) {
+        setActivePhotoIndex(activePhotoIndex + 1)
+      }
+    }
+
+    if (activePhotoIndex !== null) {
+      document.body.style.overflow = "hidden"
+    } else {
+      document.body.style.overflow = "auto"
+    }
+
+    window.addEventListener("keydown", onKeyDown)
+    return () => window.removeEventListener("keydown", onKeyDown)
+  }, [activePhotoIndex, eventItem, getPhotos])
+
+  useOutsideClick(ref, () => setActivePhotoIndex(null))
 
   // Gestion des états de chargement et d'erreur
   if (isLoading) {
@@ -124,12 +183,12 @@ export default function EventGalleryPage({ params }: { params: { id: string } })
     )
   }
 
-  if (error || !event) {
+  if (error || !eventItem) {
     return (
       <div className="bg-white min-h-screen flex items-center justify-center">
         <div className="text-center">
           <p className="text-red-500 mb-4">Galerie non trouvée</p>
-          <p className="text-gray-600 mb-6">La galerie que vous recherchez n'existe pas</p>
+          <p className="text-gray-600 mb-6">La galerie que vous recherchez n&apos;existe pas</p>
           <Link href="/gallery" className="px-6 py-3 bg-[#FFD700] text-[#0A1128] rounded-lg font-semibold hover:bg-[#E6C200] transition-all">
             Retour à la galerie
           </Link>
@@ -138,42 +197,6 @@ export default function EventGalleryPage({ params }: { params: { id: string } })
     )
   }
 
-  // Navigation avec clavier et gestion du scroll
-  useEffect(() => {
-    function onKeyDown(e: KeyboardEvent) {
-      if (e.key === "Escape") {
-        setActivePhotoIndex(null)
-      } else if (e.key === "ArrowLeft" && activePhotoIndex !== null && activePhotoIndex > 0) {
-        setActivePhotoIndex(activePhotoIndex - 1)
-      } else if (e.key === "ArrowRight" && activePhotoIndex !== null && event && activePhotoIndex < getPhotos(event).length - 1) {
-        setActivePhotoIndex(activePhotoIndex + 1)
-      }
-    }
-
-    if (activePhotoIndex !== null) {
-      document.body.style.overflow = "hidden"
-    } else {
-      document.body.style.overflow = "auto"
-    }
-
-    window.addEventListener("keydown", onKeyDown)
-    return () => window.removeEventListener("keydown", onKeyDown)
-  }, [activePhotoIndex, event])
-
-  useOutsideClick(ref, () => setActivePhotoIndex(null))
-
-  if (!event) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="text-center">
-          <h1 className="text-2xl font-bold mb-4">Événement non trouvé</h1>
-          <Link href="/gallery" className="text-[#FFD700] hover:underline">
-            Retour à la galerie
-          </Link>
-        </div>
-      </div>
-    )
-  }
 
   return (
     <div className="min-h-screen bg-white">
@@ -195,22 +218,22 @@ export default function EventGalleryPage({ params }: { params: { id: string } })
           >
             <div className="flex items-center gap-3 mb-4 flex-wrap">
               <span className="px-3 py-1.5 bg-[#FFD700] text-[#0A1128] rounded-full font-semibold text-sm">
-                {getCategoryName(event)}
+                {getCategoryName(eventItem)}
               </span>
-              {getCategoryName(event) === "Webinaire" && getRubriqueName(event) && (
+              {getCategoryName(eventItem) === "Webinaire" && getRubriqueName(eventItem) && (
                 <span className="px-3 py-1.5 bg-white/20 text-white rounded-full font-semibold text-sm backdrop-blur-sm">
-                  {getRubriqueName(event)}
+                  {getRubriqueName(eventItem)}
                 </span>
               )}
              
             </div>
 
-            <h1 className="text-4xl md:text-5xl font-bold mb-6">{event.title}</h1>
+            <h1 className="text-4xl md:text-5xl font-bold mb-6">{eventItem.title}</h1>
             
             <div className="flex flex-wrap gap-6 text-white/90">
               <div className="flex items-center gap-2">
                 <Calendar size={20} />
-                <span>{new Date(getDate(event)).toLocaleDateString('fr-FR', { 
+                <span>{new Date(getDate(eventItem)).toLocaleDateString('fr-FR', { 
                   day: 'numeric', 
                   month: 'long', 
                   year: 'numeric' 
@@ -218,11 +241,11 @@ export default function EventGalleryPage({ params }: { params: { id: string } })
               </div>
               <div className="flex items-center gap-2">
                 <MapPin size={20} />
-                <span>{event.location}</span>
+                <span>{eventItem.location}</span>
               </div>
               <div className="flex items-center gap-2">
                 <Users size={20} />
-                <span>{event.participants || 0} participants</span>
+                <span>{eventItem.participants || 0} participants</span>
               </div>
             </div>
           </motion.div>
@@ -238,7 +261,7 @@ export default function EventGalleryPage({ params }: { params: { id: string } })
               <div className="flex items-center gap-2 text-[#0A1128]">
                
                 
-                  <div className="text-2xl font-bold">{getPhotos(event).length}</div>
+                  <div className="text-2xl font-bold">{getPhotos(eventItem).length}</div>
                   <div className="text-xl font-bold">Photos</div>
               
               </div>
@@ -291,7 +314,7 @@ export default function EventGalleryPage({ params }: { params: { id: string } })
             gridSize === "3" ? "grid-cols-2 md:grid-cols-3" : 
             "grid-cols-2 md:grid-cols-3 lg:grid-cols-4"
           }`}>
-            {getPhotos(event).map((photo: any, index: number) => (
+            {getPhotos(eventItem).map((photo: { id: string; image_url: string; alt_text?: string }, index: number) => (
               <motion.div
                 layoutId={`photo-${index}-${id}`}
                 key={index}
@@ -303,8 +326,8 @@ export default function EventGalleryPage({ params }: { params: { id: string } })
               >
                 <motion.img 
                   layoutId={`image-${index}-${id}`}
-                  src={photo} 
-                  alt={`${event.title} - Photo ${index + 1}`}
+                  src={photo.image_url} 
+                  alt={`${eventItem.title} - Photo ${index + 1}`}
                   className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-110"
                 />
                 <div className="absolute inset-0 bg-[#0A1128]/0 group-hover:bg-[#0A1128]/40 transition-colors duration-300 flex items-center justify-center">
@@ -356,9 +379,11 @@ export default function EventGalleryPage({ params }: { params: { id: string } })
                   layoutId={`image-${activePhotoIndex}-${id}`}
                   className="relative"
                 >
-                  <img
-                    src={getPhotos(event)[activePhotoIndex] || ''}
-                    alt={`${event.title} - Photo ${activePhotoIndex + 1}`}
+                  <Image
+                    src={getPhotos(eventItem)[activePhotoIndex]?.image_url || ''}
+                    alt={`${eventItem.title} - Photo ${activePhotoIndex + 1}`}
+                    width={800}
+                    height={600}
                     className="w-full h-[50vh] md:h-[60vh] lg:h-[70vh] sm:rounded-tr-3xl sm:rounded-tl-3xl object-contain bg-gray-100"
                   />
                   
@@ -375,7 +400,7 @@ export default function EventGalleryPage({ params }: { params: { id: string } })
                     </button>
                   )}
                   
-                  {activePhotoIndex < getPhotos(event).length - 1 && (
+                  {activePhotoIndex < getPhotos(eventItem).length - 1 && (
                     <button
                       onClick={(e) => {
                         e.stopPropagation()
@@ -399,7 +424,7 @@ export default function EventGalleryPage({ params }: { params: { id: string } })
                         exit={{ opacity: 0 }}
                         className="text-2xl font-bold text-[#0A1128] mb-2"
                       >
-                        {event.title}
+                        {eventItem.title}
                       </motion.h3>
                       <motion.p
                         layout
@@ -408,15 +433,15 @@ export default function EventGalleryPage({ params }: { params: { id: string } })
                         exit={{ opacity: 0 }}
                         className="text-muted-foreground mb-3"
                       >
-                        Photo {activePhotoIndex + 1} sur {getPhotos(event).length}
+                        Photo {activePhotoIndex + 1} sur {getPhotos(eventItem).length}
                       </motion.p>
                       <div className="flex flex-wrap gap-2 items-center">
                         <span className="px-3 py-1.5 bg-[#FFD700] text-[#0A1128] rounded-full font-semibold text-sm">
-                          {getCategoryName(event)}
+                          {getCategoryName(eventItem)}
                         </span>
-                        {getCategoryName(event) === "Webinaire" && getRubriqueName(event) && (
+                        {getCategoryName(eventItem) === "Webinaire" && getRubriqueName(eventItem) && (
                           <span className="px-3 py-1.5 bg-[#0A1128] text-white rounded-full font-semibold text-sm">
-                            {getRubriqueName(event)}
+                            {getRubriqueName(eventItem)}
                           </span>
                         )}
                       </div>
@@ -441,7 +466,7 @@ export default function EventGalleryPage({ params }: { params: { id: string } })
                   >
                     <div className="flex items-center gap-2">
                       <Calendar size={16} className="text-[#0A1128]" />
-                      <span>{new Date(getDate(event)).toLocaleDateString('fr-FR', { 
+                      <span>{new Date(getDate(eventItem)).toLocaleDateString('fr-FR', { 
                         day: 'numeric', 
                         month: 'long', 
                         year: 'numeric' 
@@ -449,11 +474,11 @@ export default function EventGalleryPage({ params }: { params: { id: string } })
                     </div>
                     <div className="flex items-center gap-2">
                       <MapPin size={16} className="text-[#0A1128]" />
-                      <span>{event.location}</span>
+                      <span>{eventItem.location}</span>
                     </div>
                     <div className="flex items-center gap-2">
                       <Users size={16} className="text-[#0A1128]" />
-                      <span>{event.participants || 0} participants</span>
+                      <span>{eventItem.participants || 0} participants</span>
                     </div>
                   </motion.div>
 

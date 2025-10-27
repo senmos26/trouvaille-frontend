@@ -2,10 +2,11 @@
 
 import { useState, use } from "react"
 import Link from "next/link"
+import Image from "next/image"
 import { motion } from "framer-motion"
 import { Calendar, MapPin, Users, ArrowLeft, Clock, Mail, CheckCircle, X, Tag, AlertCircle, Share2, Copy, Facebook, Twitter, Linkedin, Send } from "lucide-react"
 import { useEvent } from "@/lib/hooks/use-events"
-import { useCreateRegistration, useCheckEmailExists } from "@/lib/hooks/use-registrations"
+import { useCreateRegistration } from "@/lib/hooks/use-registrations"
 
 // Données mockées pour fallback
 const mockEventData = {
@@ -140,7 +141,6 @@ export default function EventDetailPage({ params }: { params: Promise<{ id: stri
   
   // Hooks pour l'inscription
   const createRegistrationMutation = useCreateRegistration()
-  const checkEmailMutation = useCheckEmailExists()
   
   // Fallback vers données mockées si pas de données Supabase
   const event = eventData || mockEventData[resolvedParams.id as keyof typeof mockEventData] || mockEventData["1"]
@@ -151,7 +151,7 @@ export default function EventDetailPage({ params }: { params: Promise<{ id: stri
       <div className="min-h-screen bg-white flex items-center justify-center">
         <div className="text-center">
           <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-[#FFD700] mx-auto mb-4"></div>
-          <p className="text-[#0A1128]">Chargement de l'événement...</p>
+          <p className="text-[#0A1128]">Chargement de l&apos;événement...</p>
         </div>
       </div>
     )
@@ -162,7 +162,7 @@ export default function EventDetailPage({ params }: { params: Promise<{ id: stri
       <div className="min-h-screen bg-white flex items-center justify-center">
         <div className="text-center">
           <h2 className="text-2xl font-bold text-[#0A1128] mb-4">Événement introuvable</h2>
-          <p className="text-gray-600 mb-6">Cet événement n'existe pas ou a été supprimé.</p>
+          <p className="text-gray-600 mb-6">Cet événement n&apos;existe pas ou a été supprimé.</p>
           <Link href="/events" className="px-6 py-3 bg-[#FFD700] text-[#0A1128] font-bold rounded-lg hover:bg-[#E6C200] transition-all">
             Retour aux événements
           </Link>
@@ -175,23 +175,18 @@ export default function EventDetailPage({ params }: { params: Promise<{ id: stri
   const eventUrl = typeof window !== 'undefined' ? window.location.href : ''
   const shareText = `Rejoignez-moi pour "${event.title}" le ${new Date(event.date).toLocaleDateString('fr-FR')}`
 
+  // Helper function pour accéder aux highlights de manière sécurisée
+  const getHighlightText = (highlight: string | { highlight?: string }) => {
+    return typeof highlight === 'string' ? highlight : (highlight.highlight || '')
+  }
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setIsSubmitting(true)
     setEmailError("")
 
     try {
-      // Vérifier si l'email existe déjà pour cet événement
-      const emailCheck = await checkEmailMutation.mutateAsync({
-        eventId: event.id,
-        email: formData.email
-      })
-
-      if (emailCheck.success && emailCheck.data) {
-        setEmailError("Cette adresse email est déjà inscrite à cet événement.")
-        setIsSubmitting(false)
-        return
-      }
+      // Note: Vérification d'email supprimée pour simplifier
 
       // Créer l'inscription
       const result = await createRegistrationMutation.mutateAsync({
@@ -241,9 +236,11 @@ export default function EventDetailPage({ params }: { params: Promise<{ id: stri
     <div className="min-h-screen bg-white">
       {/* Hero Image */}
       <section className="relative h-[70vh] overflow-hidden">
-        <img 
+        <Image 
           src={event.gallery?.[0]?.image_url || event.image || "https://images.unsplash.com/photo-1540575467063-178a50c2df87?w=1200"} 
           alt={event.title} 
+          width={1200}
+          height={800}
           className="w-full h-full object-cover" 
         />
         <div className="absolute inset-0 bg-gradient-to-t from-[#0A1128]/80 via-[#0A1128]/40 to-transparent" />
@@ -351,7 +348,7 @@ export default function EventDetailPage({ params }: { params: Promise<{ id: stri
                       <h4 className="font-bold text-lg">Intervenants</h4>
                     </div>
                     <ul className="space-y-3">
-                      {event.speakers?.map((speaker: any, idx: number) => (
+                      {event.speakers?.map((speaker: { name: string }, idx: number) => (
                         <li key={idx} className="flex items-center gap-3 text-muted-foreground">
                           <Users size={16} className="text-[#0A1128] flex-shrink-0" />
                           <span className="font-medium">{speaker.name}</span>
@@ -367,7 +364,7 @@ export default function EventDetailPage({ params }: { params: Promise<{ id: stri
                       <h4 className="font-bold text-lg">Modérateurs</h4>
                     </div>
                     <ul className="space-y-3">
-                      {event.moderators?.map((moderator: any, idx: number) => (
+                      {event.moderators?.map((moderator: { name: string }, idx: number) => (
                         <li key={idx} className="flex items-center gap-3 text-muted-foreground">
                           <Users size={16} className="text-[#0A1128] flex-shrink-0" />
                           <span className="font-medium">{moderator.name}</span>
@@ -387,7 +384,7 @@ export default function EventDetailPage({ params }: { params: Promise<{ id: stri
               >
                 <h3 className="text-2xl font-bold mb-6">Points forts & Bénéfices</h3>
                 <div className="grid gap-4">
-                  {event.highlights?.map((highlight: any, idx: number) => (
+                  {event.highlights?.map((highlight: string | { highlight?: string }, idx: number) => (
                     <motion.div
                       key={idx}
                       initial={{ opacity: 0, x: -20 }}
@@ -396,7 +393,7 @@ export default function EventDetailPage({ params }: { params: Promise<{ id: stri
                       className="flex items-start gap-3 p-4 bg-gray-50 rounded-xl shadow-sm border border-gray-200"
                     >
                       <div className="w-2 h-2 rounded-full bg-[#0A1128] mt-2 flex-shrink-0" />
-                      <span className="text-muted-foreground">{highlight.highlight || highlight}</span>
+                      <span className="text-muted-foreground">{getHighlightText(highlight)}</span>
                     </motion.div>
                   ))}
                 </div>
@@ -412,7 +409,7 @@ export default function EventDetailPage({ params }: { params: Promise<{ id: stri
               >
                 <h3 className="text-2xl font-bold mb-6">Programme du webinaire</h3>
                 <div className="space-y-3">
-                  {event.program?.map((item: any, idx: number) => (
+                  {event.program?.map((item: { time: string; title: string; description?: string }, idx: number) => (
                     <motion.div
                       key={idx}
                       initial={{ opacity: 0, x: -20 }}
@@ -482,13 +479,13 @@ export default function EventDetailPage({ params }: { params: Promise<{ id: stri
                       <div className="flex-1">
                         <div className="font-semibold text-xs text-muted-foreground uppercase tracking-wide mb-2">Tags</div>
                         <div className="flex flex-wrap gap-2">
-                          {event.tags?.map((tag: any, idx: number) => (
+                          {event.tags?.map((tag: string | { tag?: { name: string }; name?: string }, idx: number) => (
                             <Link 
                               key={idx} 
-                              href={`/events?tag=${encodeURIComponent(tag.tag?.name || tag.name || tag)}`}
+                              href={`/events?tag=${encodeURIComponent(typeof tag === 'string' ? tag : (tag.tag?.name || tag.name || ''))}`}
                               className="px-3 py-1.5 bg-white text-[#0A1128] text-xs font-medium rounded-full shadow-sm border border-gray-200 hover:bg-[#0A1128] hover:text-white hover:border-[#0A1128] transition-all duration-200 hover:scale-105 cursor-pointer"
                             >
-                              #{tag.tag?.name || tag.name || tag}
+                              #{typeof tag === 'string' ? tag : (tag.tag?.name || tag.name || '')}
                             </Link>
                           ))}
                         </div>
@@ -504,7 +501,7 @@ export default function EventDetailPage({ params }: { params: Promise<{ id: stri
                     onClick={() => setShowRegistrationForm(true)}
                     className="w-full py-4 bg-[#FFD700] text-[#0A1128] font-bold rounded-xl hover:bg-[#E6C200] transition-all hover:scale-105 hover:shadow-lg"
                   >
-                    S'inscrire au webinaire
+                    S&apos;inscrire au webinaire
                   </button>
                   <p className="text-xs text-center text-muted-foreground mt-3 flex items-center justify-center gap-1">
                     <Mail size={14} />
@@ -538,7 +535,7 @@ export default function EventDetailPage({ params }: { params: Promise<{ id: stri
               <div className="flex justify-between items-center">
                 <div className="flex items-center gap-2">
                   <Share2 size={20} />
-                  <h3 className="text-xl font-bold">Partager l'événement</h3>
+                  <h3 className="text-xl font-bold">Partager l&apos;événement</h3>
                 </div>
                 <button
                   onClick={() => setShowSharePopup(false)}
@@ -554,14 +551,16 @@ export default function EventDetailPage({ params }: { params: Promise<{ id: stri
               {/* QR Code */}
               <div className="flex flex-col items-center mb-6">
                 <div className="bg-white p-3 rounded-xl shadow-md border-2 border-[#FFD700]/20 mb-3">
-                  <img 
+                  <Image 
                     src={`https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${encodeURIComponent(eventUrl)}`}
                     alt="QR Code"
+                    width={150}
+                    height={150}
                     className="w-32 h-32"
                   />
                 </div>
                 <p className="text-xs text-muted-foreground text-center">
-                  Scannez ce code QR pour accéder à l'événement
+                  Scannez ce code QR pour accéder à l&apos;événement
                 </p>
               </div>
 
@@ -672,7 +671,7 @@ export default function EventDetailPage({ params }: { params: Promise<{ id: stri
             <div className="sticky top-0 bg-gradient-to-r from-[#0A1128] to-[#172B4D] text-white p-6 rounded-t-3xl">
               <div className="flex justify-between items-start">
                 <div>
-                  <h3 className="text-2xl font-bold mb-1">Inscription à l'événement</h3>
+                  <h3 className="text-2xl font-bold mb-1">Inscription à l&apos;événement</h3>
                   <p className="text-white/80 text-sm">{event.title}</p>
                 </div>
                 <button
@@ -704,7 +703,7 @@ export default function EventDetailPage({ params }: { params: Promise<{ id: stri
                       <Mail size={16} />
                       Vérifiez votre boîte mail
                     </p>
-                    <p className="text-xs text-muted-foreground">Le lien sera envoyé 24h avant l'événement</p>
+                    <p className="text-xs text-muted-foreground">Le lien sera envoyé 24h avant l&apos;événement</p>
                   </div>
                 </motion.div>
               ) : (

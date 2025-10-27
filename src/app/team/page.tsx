@@ -2,6 +2,7 @@
 
 import { useState } from "react"
 import Link from "next/link"
+import Image from "next/image"
 import { Facebook, Twitter, Linkedin, ArrowRight } from "lucide-react"
 import { useTeamMembers } from "@/lib/hooks/use-team"
 
@@ -34,7 +35,7 @@ export default function TeamPage() {
         <div className="container mx-auto px-4 py-20">
           <div className="text-center">
             <h2 className="text-2xl font-bold text-[#0A1128] mb-4">Erreur de chargement</h2>
-            <p className="text-gray-600">Impossible de charger l'équipe. Veuillez réessayer plus tard.</p>
+            <p className="text-gray-600">Impossible de charger l&apos;équipe. Veuillez réessayer plus tard.</p>
           </div>
         </div>
       </div>
@@ -68,9 +69,11 @@ export default function TeamPage() {
                 className="bg-white rounded-xl overflow-hidden shadow-md hover:shadow-xl transition-all duration-300 hover:-translate-y-2"
               >
                 <div className="relative h-64 overflow-hidden group">
-                  <img 
+                  <Image 
                     src={member.image} 
                     alt={member.name} 
+                    width={400}
+                    height={256}
                     className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-[#0A1128]/80 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />

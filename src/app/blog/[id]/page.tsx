@@ -2,6 +2,7 @@
 
 import { useMemo, useState, useEffect } from "react"
 import Link from "next/link"
+import Image from "next/image"
 import { useRouter } from "next/navigation"
 import { motion } from "framer-motion"
 import {
@@ -23,7 +24,6 @@ import {
   Mail,
   MessageCircle,
   ThumbsUp,
-  User,
 } from "lucide-react"
 import { useBlogPost } from "../../../../lib/hooks/use-blog"
 
@@ -149,14 +149,6 @@ const initialComments = {
   ],
 }
 
-const fadeItem = {
-  hidden: { opacity: 0, y: 24 },
-  visible: { 
-    opacity: 1, 
-    y: 0,
-    transition: { duration: 0.5 }
-  },
-}
 
 function formatDate(date?: string) {
   if (!date) return "Date inconnue"
@@ -206,7 +198,7 @@ export default function BlogDetailPage({ params }: { params: { id: string } }) {
   const [copied, setCopied] = useState(false)
   const [liked, setLiked] = useState(false)
   const [likeCount, setLikeCount] = useState(0)
-  const [comments, setComments] = useState<any[]>([])
+  const [comments, setComments] = useState<Array<{ id: number; author: string; date: string; content: string; avatar: string }>>([])
   const [newComment, setNewComment] = useState({ name: "", email: "", content: "" })
   const [showCommentForm, setShowCommentForm] = useState(false)
   
@@ -214,18 +206,26 @@ export default function BlogDetailPage({ params }: { params: { id: string } }) {
   const displayPost = post || blogPosts.find((item) => item.id === numericId)
   
   // Helper functions pour accéder aux données de manière sécurisée
-  const getCategoryName = (item: any) => typeof item?.category === 'string' ? item.category : item?.category?.name || ''
-  const getAuthorName = (item: any) => item?.author_name || item?.author || ''
-  const getDate = (item: any) => item?.created_at || item?.date || ''
-  const getLikes = (item: any) => item?.likes_count || item?.likes || 0
+  const getCategoryName = (item: { category?: string | { name: string } }) => typeof item?.category === 'string' ? item.category : item?.category?.name || ''
+  const getAuthorName = (item: { author_name?: string; author?: string }) => item?.author_name || item?.author || ''
+  const getDate = (item: { created_at?: string; date?: string }) => item?.created_at || item?.date || ''
+  const getLikes = (item: { likes_count?: number; likes?: number }) => item?.likes_count || item?.likes || 0
 
   const relatedPosts = useMemo(
     () =>
       blogPosts
-        .filter((item) => item.id !== numericId && getCategoryName(item) === getCategoryName(displayPost))
+        .filter((item) => item.id !== numericId && displayPost && getCategoryName(item) === getCategoryName(displayPost))
         .slice(0, 3),
     [numericId, displayPost]
   )
+
+  // Initialiser les likes et commentaires
+  useEffect(() => {
+    if (displayPost) {
+      setLikeCount(getLikes(displayPost))
+      setComments(initialComments[numericId as keyof typeof initialComments] || [])
+    }
+  }, [displayPost, numericId])
 
   // Gestion des états de chargement et d'erreur
   if (isLoading) {
@@ -233,7 +233,7 @@ export default function BlogDetailPage({ params }: { params: { id: string } }) {
       <div className="bg-white min-h-screen flex items-center justify-center">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#FFD700] mx-auto mb-4"></div>
-          <p className="text-[#0A1128]">Chargement de l'article...</p>
+          <p className="text-[#0A1128]">Chargement de l&apos;article...</p>
         </div>
       </div>
     )
@@ -244,7 +244,7 @@ export default function BlogDetailPage({ params }: { params: { id: string } }) {
       <div className="bg-white min-h-screen flex items-center justify-center">
         <div className="text-center">
           <p className="text-red-500 mb-4">Article non trouvé</p>
-          <p className="text-gray-600 mb-6">L'article que vous recherchez n'existe pas ou a été supprimé</p>
+          <p className="text-gray-600 mb-6">L&apos;article que vous recherchez n&apos;existe pas ou a été supprimé</p>
           <Link href="/blog" className="px-6 py-3 bg-[#FFD700] text-[#0A1128] rounded-lg font-semibold hover:bg-[#E6C200] transition-all">
             Retour au blog
           </Link>
@@ -252,14 +252,6 @@ export default function BlogDetailPage({ params }: { params: { id: string } }) {
       </div>
     )
   }
-
-  // Initialiser les likes et commentaires
-  useEffect(() => {
-    if (displayPost) {
-      setLikeCount(getLikes(displayPost))
-      setComments(initialComments[numericId as keyof typeof initialComments] || [])
-    }
-  }, [displayPost, numericId])
 
   const handleLike = () => {
     if (liked) {
@@ -480,7 +472,7 @@ export default function BlogDetailPage({ params }: { params: { id: string } }) {
                   </div>
                   <div className="flex items-center gap-3">
                     <Share2 className="h-4 w-4 text-[#FFD700]" />
-                    <span className="text-gray-800 font-medium">Diffuser l'idée autour de vous</span>
+                    <span className="text-gray-800 font-medium">Diffuser l&apos;idée autour de vous</span>
                   </div>
                 </div>
               </div>
@@ -490,10 +482,10 @@ export default function BlogDetailPage({ params }: { params: { id: string } }) {
                   Recevez nos insights
                 </h3>
                 <p className="opacity-85 mb-4">
-                  Une veille mensuelle sur l'entrepreneuriat, l'innovation et le leadership africain.
+                  Une veille mensuelle sur l&apos;entrepreneuriat, l&apos;innovation et le leadership africain.
                 </p>
                 <button className="w-full px-6 py-3 border-2 border-[#0A1128] bg-white text-[#0A1128] font-bold rounded-xl hover:bg-[#0A1128] hover:text-white transition-all">
-                  S'abonner à la newsletter
+                  S&apos;abonner à la newsletter
                 </button>
               </div>
             </motion.aside>
@@ -518,9 +510,11 @@ export default function BlogDetailPage({ params }: { params: { id: string } }) {
                     }}
                   >
                     <div className="h-48 overflow-hidden">
-                      <img
+                      <Image
                         src={related.image || HERO_PLACEHOLDER}
                         alt={related.title}
+                        width={400}
+                        height={300}
                         className="w-full h-full object-cover hover:scale-110 transition-transform duration-300"
                       />
                     </div>
@@ -551,7 +545,7 @@ export default function BlogDetailPage({ params }: { params: { id: string } }) {
                   }`}
                 >
                   <ThumbsUp size={20} className={liked ? 'fill-current' : ''} />
-                  <span>J'aime ({likeCount})</span>
+                  <span>J&apos;aime ({likeCount})</span>
                 </button>
                 <div className="flex items-center gap-2 text-gray-600">
                   <MessageCircle size={20} />
@@ -700,7 +694,7 @@ export default function BlogDetailPage({ params }: { params: { id: string } }) {
               <div className="flex justify-between items-center">
                 <div className="flex items-center gap-2">
                   <Share2 size={20} />
-                  <h3 className="text-xl font-bold">Partager l'article</h3>
+                  <h3 className="text-xl font-bold">Partager l&apos;article</h3>
                 </div>
                 <button
                   onClick={() => setShowSharePopup(false)}
@@ -716,14 +710,16 @@ export default function BlogDetailPage({ params }: { params: { id: string } }) {
               {/* QR Code */}
               <div className="flex flex-col items-center mb-6">
                 <div className="bg-white p-3 rounded-xl shadow-md border-2 border-[#FFD700]/20 mb-3">
-                  <img 
+                  <Image 
                     src={`https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${encodeURIComponent(shareUrl)}`}
                     alt="QR Code"
+                    width={150}
+                    height={150}
                     className="w-32 h-32"
                   />
                 </div>
                 <p className="text-xs text-muted-foreground text-center">
-                  Scannez ce code QR pour accéder à l'article
+                  Scannez ce code QR pour accéder à l&apos;article
         </p>
       </div>
 

@@ -1,5 +1,5 @@
 import { supabase } from '../supabase'
-import type { TeamMember, ApiResponse } from '../types'
+import type { TeamMember } from '../types'
 
 // ============================================================================
 // ACTIONS POUR L'ÉQUIPE (FRONTEND)

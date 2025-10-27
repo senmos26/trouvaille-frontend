@@ -1,6 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { blogActions } from '../actions/blog'
-import type { BlogPost, BlogFilters, CommentFormData } from '../types'
+import type { BlogFilters, CommentFormData } from '../types'
 
 // ============================================================================
 // HOOKS POUR LES ARTICLES DE BLOG (FRONTEND)

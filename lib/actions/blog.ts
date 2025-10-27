@@ -67,7 +67,7 @@ export const blogActions = {
 
   // Rechercher des articles
   async search(filters: BlogFilters): Promise<PaginatedResponse<BlogPost>> {
-    const { data, error, count } = await supabase
+    const { data, error } = await supabase
       .rpc('search_blog_posts', {
         search_query: filters.search,
         category_filter: filters.category_id,
@@ -87,7 +87,7 @@ export const blogActions = {
   },
 
   // Liker un article
-  async like(postId: string, userIp: string): Promise<ApiResponse<any>> {
+  async like(postId: string, userIp: string): Promise<ApiResponse<{ liked: boolean; likes_count: number }>> {
     try {
       const { data, error } = await supabase
         .rpc('like_blog_post', {
@@ -108,7 +108,7 @@ export const blogActions = {
   },
 
   // Ajouter un commentaire
-  async addComment(postId: string, commentData: CommentFormData): Promise<ApiResponse<any>> {
+  async addComment(postId: string, commentData: CommentFormData): Promise<ApiResponse<{ id: string; created_at: string }>> {
     try {
       const { data, error } = await supabase
         .rpc('add_blog_comment', {

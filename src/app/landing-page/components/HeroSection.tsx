@@ -46,7 +46,7 @@ export default function HeroSection() {
           <h1 className="text-5xl md:text-6xl lg:text-7xl font-bold mb-6 text-white">
             Des idées pour bâtir
             <br />
-            <span className="text-[#FFD700]">l'Afrique de demain</span>
+            <span className="text-[#FFD700]">l&apos;Afrique de demain</span>
           </h1>
         </motion.div>
         

@@ -13,10 +13,10 @@ export default function ArticlesSection() {
   const [likedPosts, setLikedPosts] = useState<number[]>([])
   
   // Utiliser uniquement les données Supabase, limiter à 3 articles
-  const displayArticles = (blogData || []).slice(0, 3)
+  const displayArticles = (blogData?.data || []).slice(0, 3)
   
   const [postLikes, setPostLikes] = useState<Record<number, number>>(
-    displayArticles.reduce((acc, post) => ({ ...acc, [post.id]: post.likes || 0 }), {})
+    displayArticles.reduce((acc: Record<number, number>, post: { id: number; likes?: number }) => ({ ...acc, [post.id]: post.likes || 0 }), {})
   )
 
   const handleLike = (postId: number) => {
@@ -50,12 +50,12 @@ export default function ArticlesSection() {
         <motion.div variants={itemVariants} className="text-center mb-12">
           <h2 className="text-4xl md:text-5xl font-bold mb-4">Derniers Articles</h2>
           <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-            Découvrez nos réflexions sur les enjeux qui façonnent l'avenir de l'Afrique.
+            Découvrez nos réflexions sur les enjeux qui façonnent l&apos;avenir de l&apos;Afrique.
           </p>
         </motion.div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-12">
-          {displayArticles.map((article) => (
+          {displayArticles.map((article: { id: number; title: string; excerpt: string; image: string; category?: { name: string }; author_name: string; published_at: string; likes: number; comments_count: number }) => (
             <motion.article
               key={article.id}
               variants={itemVariants}
@@ -95,7 +95,7 @@ export default function ArticlesSection() {
                 <div className="flex items-center justify-between text-sm text-muted-foreground gap-4 flex-wrap">
                   <span className="inline-flex items-center gap-1.5">
                     <Calendar size={16} />
-                    {new Date(article.published_at || article.created_at).toLocaleDateString('fr-FR')}
+                    {new Date(article.published_at).toLocaleDateString('fr-FR')}
                   </span>
                   <span className="inline-flex items-center gap-1.5">
                     <PenSquare size={16} />

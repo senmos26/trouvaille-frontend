@@ -1,6 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { eventActions } from '../actions/events'
-import type { Event, EventFilters, RegistrationFormData } from '../types'
+import type { EventFilters, RegistrationFormData } from '../types'
 
 // ============================================================================
 // HOOKS POUR LES ÉVÉNEMENTS (FRONTEND)

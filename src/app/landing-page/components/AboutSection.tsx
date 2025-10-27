@@ -4,6 +4,7 @@ import { useRef } from "react"
 import Link from "next/link"
 import { motion, useScroll, useTransform } from "framer-motion"
 import { Globe, Users, Lightbulb, TrendingUp } from "lucide-react"
+import Image from "next/image"
 import { sectionVariants } from "@/lib/animations"
 import { HoverEffect } from "@/components/ui/card-hover-effect"
 
@@ -72,13 +73,13 @@ export default function AboutSection() {
               style={{ y: descriptionY, opacity }}
             >
               <p>
-                <strong className="text-foreground">La Trouvaille</strong> est plus qu'une organisation : c'est un mouvement 
+                <strong className="text-foreground">La Trouvaille</strong> est plus qu&apos;une organisation : c&apos;est un mouvement 
                 de jeunes africains déterminés à transformer leur continent.
               </p>
               <p>
                 Notre mission est de créer une plateforme où chaque jeune peut 
                 exprimer ses idées et contribuer activement à la construction 
-                d'une Afrique prospère, unie et respectée.
+                d&apos;une Afrique prospère, unie et respectée.
               </p>
             </motion.div>
 
@@ -96,9 +97,11 @@ export default function AboutSection() {
             style={{ y: africaY, opacity }}
           >
             <div className="relative w-4/5 md:w-3/4 aspect-square flex items-center justify-center">
-              <img 
+              <Image 
                 src="/images/afrique2.png" 
                 alt="Carte de l'Afrique avec jeunes engagés" 
+                width={800}
+                height={800}
                 className="w-full h-full object-contain drop-shadow-2xl"
               />
             </div>

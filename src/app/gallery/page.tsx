@@ -2,6 +2,7 @@
 
 import { useState } from "react"
 import Link from "next/link"
+import Image from "next/image"
 import { motion } from "framer-motion"
 import { Calendar, MapPin, Users, Filter, Camera, Search, X, ChevronDown, Check } from "lucide-react"
 import { useEvents } from "../../../lib/hooks/use-events"
@@ -20,39 +21,63 @@ export default function GalleryPage() {
   
   // Utiliser uniquement les données Supabase
   const displayEvents = eventsData?.data || []
-  const categories = ["Tous", ...(categoriesData?.map((cat: any) => cat.name) || [])]
-  const rubriques = ["Toutes", ...(rubriquesData?.map((rub: any) => rub.name) || [])]
+  const categories = ["Tous", ...(categoriesData?.map((cat: { name: string }) => cat.name) || [])]
+  const rubriques = ["Toutes", ...(rubriquesData?.map((rub: { name: string }) => rub.name) || [])]
+
+  // Type pour les événements avec toutes les propriétés nécessaires
+  type GalleryEvent = {
+    id: string
+    title: string
+    photos?: Array<{ image_url: string }>
+    category?: { name: string } | string
+    rubrique?: { name: string } | string
+    created_at?: string
+    date?: string
+    location?: string
+    participants?: number
+  }
+
+  // Helper functions pour accéder aux propriétés de manière sécurisée
+  const getCategoryName = (category?: { name: string } | string) => {
+    return typeof category === 'string' ? category : category?.name || ''
+  }
+
+  const getRubriqueName = (rubrique?: { name: string } | string) => {
+    return typeof rubrique === 'string' ? rubrique : rubrique?.name || ''
+  }
 
   // Filtrage par catégorie
-  let filteredEvents = selectedCategory === "Tous" 
+  let filteredEvents: GalleryEvent[] = selectedCategory === "Tous" 
     ? displayEvents 
-    : displayEvents.filter((event: any) => (event.category?.name || event.category) === selectedCategory)
+    : displayEvents.filter((event: GalleryEvent) => getCategoryName(event.category) === selectedCategory)
 
   // Si Webinaire est sélectionné, filtrer aussi par rubrique
   if (selectedCategory === "Webinaire" && selectedRubrique !== "Toutes") {
-    filteredEvents = filteredEvents.filter((event: any) => (event.rubrique?.name || event.rubrique) === selectedRubrique)
+    filteredEvents = filteredEvents.filter((event: GalleryEvent) => getRubriqueName(event.rubrique) === selectedRubrique)
   }
 
   // Recherche
   if (searchQuery) {
-    filteredEvents = filteredEvents.filter((event: any) => 
+    filteredEvents = filteredEvents.filter((event: GalleryEvent) => 
       event.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
       (event.location || '').toLowerCase().includes(searchQuery.toLowerCase()) ||
-      (event.category?.name || event.category || '').toLowerCase().includes(searchQuery.toLowerCase())
+      getCategoryName(event.category).toLowerCase().includes(searchQuery.toLowerCase())
     )
   }
 
   // Tri
   if (sortBy === "date") {
-    filteredEvents = [...filteredEvents].sort((a: any, b: any) => new Date(b.created_at || b.date).getTime() - new Date(a.created_at || a.date).getTime())
+    filteredEvents = [...filteredEvents].sort((a: GalleryEvent, b: GalleryEvent) => 
+      new Date(b.created_at || b.date || '').getTime() - new Date(a.created_at || a.date || '').getTime()
+    )
   } else if (sortBy === "title") {
-    filteredEvents = [...filteredEvents].sort((a: any, b: any) => a.title.localeCompare(b.title))
+    filteredEvents = [...filteredEvents].sort((a: GalleryEvent, b: GalleryEvent) => a.title.localeCompare(b.title))
   } else if (sortBy === "photos") {
-    filteredEvents = [...filteredEvents].sort((a: any, b: any) => (b.photos?.length || 0) - (a.photos?.length || 0))
+    filteredEvents = [...filteredEvents].sort((a: GalleryEvent, b: GalleryEvent) => (b.photos?.length || 0) - (a.photos?.length || 0))
   }
 
   const totalEvents = filteredEvents.length
-  const totalPhotos = filteredEvents.reduce((sum: number, event: any) => sum + (event.photos?.length || 0), 0)
+  const totalPhotos = filteredEvents.reduce((sum: number, event: GalleryEvent) => sum + (event.photos?.length || 0), 0)
 
   // Gestion des états de chargement et d'erreur
   if (eventsLoading) {
@@ -96,7 +121,7 @@ export default function GalleryPage() {
                 en <span className="text-[#FFD700]">Images</span>
               </h1>
               <p className="text-lg md:text-xl text-white/90 leading-relaxed">
-                Revivez les moments forts de nos événements qui façonnent l'avenir de l'Afrique. 
+                Revivez les moments forts de nos événements qui façonnent l&apos;avenir de l&apos;Afrique. 
                 Découvrez les rencontres, les échanges et les projets qui transforment notre continent.
               </p>
             </motion.div>
@@ -247,7 +272,7 @@ export default function GalleryPage() {
               <span className="text-sm font-semibold text-gray-700 mr-2">
                 Catégories :
               </span>
-              {categories.map((cat: any) => (
+              {categories.map((cat: string) => (
                 <button
                   key={cat}
                   onClick={() => {
@@ -301,7 +326,7 @@ export default function GalleryPage() {
           </div>
           {filteredEvents.length > 0 ? (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-              {filteredEvents.map((event: any) => (
+              {filteredEvents.map((event: GalleryEvent) => (
               <Link key={event.id} href={`/gallery/${event.id}`}>
                 <motion.div
                   initial={{ opacity: 0, y: 20 }}
@@ -311,18 +336,20 @@ export default function GalleryPage() {
                   className="bg-white rounded-2xl overflow-hidden shadow-md hover:shadow-xl transition-all duration-300 cursor-pointer"
                 >
                 <div className="relative h-48 overflow-hidden">
-                  <img 
-                    src={event.photos?.[0] || 'https://images.unsplash.com/photo-1507842217343-583bb7270b66?w=800'} 
+                  <Image 
+                    src={event.photos?.[0]?.image_url || 'https://images.unsplash.com/photo-1507842217343-583bb7270b66?w=800'} 
                     alt={event.title}
+                    width={400}
+                    height={192}
                     className="w-full h-full object-cover"
                   />
                   <div className="absolute top-4 left-4 flex gap-2">
                     <span className="px-3 py-1.5 bg-[#FFD700] text-[#0A1128] rounded-full font-semibold text-xs">
-                      {event.category?.name || event.category}
+                      {getCategoryName(event.category)}
                     </span>
-                    {(event.category?.name || event.category) === "Webinaire" && event.rubrique && (
+                    {getCategoryName(event.category) === "Webinaire" && event.rubrique && (
                       <span className="px-3 py-1.5 bg-[#0A1128] text-white rounded-full font-semibold text-xs">
-                        {event.rubrique?.name || event.rubrique}
+                        {getRubriqueName(event.rubrique)}
                       </span>
                     )}
                   </div>
@@ -337,7 +364,7 @@ export default function GalleryPage() {
                   <div className="space-y-2 text-sm text-muted-foreground">
                     <div className="flex items-center gap-2">
                       <Calendar size={16} className="text-[#0A1128]" />
-                      {new Date(event.created_at || event.date).toLocaleDateString('fr-FR', { 
+                      {new Date(event.created_at || event.date || '').toLocaleDateString('fr-FR', { 
                         day: 'numeric', 
                         month: 'long', 
                         year: 'numeric' 
@@ -354,12 +381,12 @@ export default function GalleryPage() {
                   </div>
 
                   <div className="mt-4 grid grid-cols-4 gap-2">
-                    {(event.photos || []).slice(1, 5).map((photo: any, idx: number) => (
+                    {(event.photos || []).slice(1, 5).map((photo: { image_url: string }, idx: number) => (
                       <div 
                         key={idx} 
                         className="aspect-square rounded-lg overflow-hidden relative group"
                       >
-                        <img src={photo} alt="" className="w-full h-full object-cover" />
+                        <Image src={photo.image_url} alt="" width={100} height={100} className="w-full h-full object-cover" />
                         {/* Indicateur "+X photos" sur la dernière miniature */}
                         {idx === 3 && (event.photos?.length || 0) > 5 && (
                           <div className="absolute inset-0 bg-[#0A1128]/80 flex items-center justify-center">

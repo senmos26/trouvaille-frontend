@@ -2,10 +2,11 @@
 
 import { useState, useEffect } from "react"
 import Link from "next/link"
+import Image from "next/image"
 import { useSearchParams } from "next/navigation"
 import { motion } from "framer-motion"
-import { ArrowRight, MapPin, Clock, UserCheck, Search, Filter, Sparkles, Camera, Calendar, CalendarX, X, ChevronDown, Check } from "lucide-react"
-import { useEvents, useSearchEvents } from "@/lib/hooks/use-events"
+import { ArrowRight, MapPin, Clock, UserCheck, Search, Filter, Calendar, CalendarX, X, ChevronDown, Check } from "lucide-react"
+import { useEvents } from "@/lib/hooks/use-events"
 import { useEventCategories, useEventRubriques } from "@/lib/hooks/use-categories"
 
 export default function EventsPage() {
@@ -42,6 +43,35 @@ export default function EventsPage() {
 
   const categories = categoriesData || []
   const rubriques = ["Toutes", ...(rubriquesData || [])]
+
+  // Type pour les événements avec propriétés étendues
+  type EventWithTime = {
+    time?: string
+    date?: string
+    category?: { name: string } | string
+    [key: string]: unknown
+  }
+
+  // Helper functions pour accéder aux propriétés de manière sécurisée
+  const getCategoryName = (category?: { name: string } | string) => {
+    return typeof category === 'string' ? category : category?.name || ''
+  }
+
+  const getRubriqueName = (rubrique?: { name: string } | string) => {
+    return typeof rubrique === 'string' ? rubrique : rubrique?.name || ''
+  }
+
+  const getEventTime = (event: EventWithTime) => {
+    return event.time || ''
+  }
+
+  const getEventDate = (event: EventWithTime) => {
+    return event.date || ''
+  }
+
+  const getEventCategory = (event: EventWithTime) => {
+    return event.category
+  }
   
   // Gestion des états de chargement et d'erreur
   if (eventsLoading) {
@@ -74,14 +104,14 @@ export default function EventsPage() {
   
   // Filtrage local supplémentaire si nécessaire
   if (selectedTag) {
-    filteredEvents = filteredEvents.filter((event: any) => 
-      event.tags?.some((tag: any) => tag.tag?.name?.toLowerCase() === selectedTag.toLowerCase())
+    filteredEvents = filteredEvents.filter((event: { tags?: Array<{ tag?: { name?: string } }> }) => 
+      event.tags?.some((tag: { tag?: { name?: string } }) => tag.tag?.name?.toLowerCase() === selectedTag.toLowerCase())
     )
   }
 
   // Filtrage par rubrique (local car l'API ne gère pas encore ce filtre)
   if (selectedRubriqueId) {
-    filteredEvents = filteredEvents.filter((event: any) => 
+    filteredEvents = filteredEvents.filter((event: { rubrique?: { id: string } }) => 
       event.rubrique?.id === selectedRubriqueId
     )
   }
@@ -107,7 +137,7 @@ export default function EventsPage() {
   }
 
   // Fonction pour gérer la sélection de catégorie
-  const handleCategorySelect = (category: any) => {
+  const handleCategorySelect = (category: { name: string; id: string }) => {
     setSelectedCategory(category.name)
     setSelectedCategoryId(category.id)
     setSelectedRubrique("Toutes")
@@ -116,7 +146,7 @@ export default function EventsPage() {
   }
 
   // Fonction pour gérer la sélection de rubrique
-  const handleRubriqueSelect = (rubrique: any) => {
+  const handleRubriqueSelect = (rubrique: { name: string; id: string }) => {
     setSelectedRubrique(rubrique.name)
     setSelectedRubriqueId(rubrique.id)
     resetDisplayCount()
@@ -135,8 +165,7 @@ export default function EventsPage() {
 
   // Statistiques dynamiques
   const totalEvents = eventsData?.total || 0
-  const totalParticipants = filteredEvents.reduce((sum: number, event: any) => sum + (event.participants || 0), 0)
-  const uniqueLocations = [...new Set(filteredEvents.map((event: any) => event.location).filter(Boolean))].length
+  const totalParticipants = filteredEvents.reduce((sum: number, event: { participants?: number }) => sum + (event.participants || 0), 0)
 
   return (
     <div className="min-h-screen bg-white">
@@ -160,7 +189,7 @@ export default function EventsPage() {
               </h1>
               <p className="text-lg md:text-xl text-white/90 leading-relaxed">
                 Rejoignez-nous lors de nos événements pour échanger, apprendre et construire 
-                ensemble l'avenir de l'Afrique. Chaque rencontre est une opportunité de créer 
+                ensemble l&apos;avenir de l&apos;Afrique. Chaque rencontre est une opportunité de créer 
                 des liens durables et de développer des projets concrets.
               </p>
             </motion.div>
@@ -353,7 +382,7 @@ export default function EventsPage() {
               >
                 Tous
               </button>
-              {categories.map((category: any) => (
+              {categories.map((category: { id: string; name: string }) => (
                 <button
                   key={category.id}
                   onClick={() => handleCategorySelect(category)}
@@ -388,7 +417,7 @@ export default function EventsPage() {
                 >
                   Toutes
                 </button>
-                {rubriques.filter(rubrique => typeof rubrique !== 'string').map((rubrique: any) => (
+                {rubriques.filter(rubrique => typeof rubrique !== 'string').map((rubrique: { id: string; name: string }) => (
                   <button
                     key={rubrique.id}
                     onClick={() => handleRubriqueSelect(rubrique)}
@@ -408,7 +437,7 @@ export default function EventsPage() {
           {/* Événements Grid */}
           {visibleEvents.length > 0 ? (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-              {visibleEvents.map((event: any, index: number) => (
+              {visibleEvents.map((event: { id: string; image: string; title: string; date: string; location?: string; participants?: number; category?: { name: string }; rubrique?: { name: string }; speakers?: Array<{ name: string }>; moderators?: Array<{ name: string }>; description?: string; highlights?: Array<string>; tags?: Array<{ tag?: { name: string } }> }, index: number) => (
                 <motion.div
                   key={event.id}
                   initial={{ opacity: 0, y: 20 }}
@@ -418,29 +447,31 @@ export default function EventsPage() {
                 >
                   {/* Image */}
                   <div className="relative h-56 overflow-hidden">
-                    <img 
+                    <Image 
                       src={event.image} 
                       alt={event.title}
+                      width={400}
+                      height={224}
                       className="w-full h-full object-cover"
                     />
                     <div className="absolute inset-0 bg-gradient-to-t from-[#0A1128]/60 to-transparent" />
                     <div className="absolute top-4 left-4 flex gap-2">
                       <span className="px-3 py-1 bg-[#FFD700] text-[#0A1128] rounded-full text-xs font-bold">
-                        {event.category?.name || event.category}
+                        {getCategoryName(event.category)}
                       </span>
-                      {event.category?.name === "Webinaire" && event.rubrique && (
+                      {getCategoryName(event.category) === "Webinaire" && event.rubrique && (
                         <span className="px-3 py-1 bg-[#0A1128] text-white rounded-full text-xs font-bold">
-                          {event.rubrique?.name || event.rubrique}
+                          {getRubriqueName(event.rubrique)}
                         </span>
                       )}
                     </div>
                     {/* Date badge */}
                     <div className="absolute top-4 right-4 bg-white rounded-lg p-2 text-center shadow-lg">
                       <div className="text-2xl font-bold text-[#0A1128] leading-none">
-                        {new Date(event.date).getDate()}
+                        {new Date(event.date || '').getDate()}
                       </div>
                       <div className="text-xs font-semibold text-gray-600 uppercase">
-                        {new Date(event.date).toLocaleDateString('fr-FR', { month: 'short' })}
+                        {new Date(event.date || '').toLocaleDateString('fr-FR', { month: 'short' })}
                       </div>
                     </div>
                   </div>
@@ -452,11 +483,11 @@ export default function EventsPage() {
                       {event.title}
                     </h3>
                     
-                    {/* Thèmes (pour les webinaires) */}
-                    {event.category?.name === "Webinaire" && event.themes && (
+                    {/* Description (pour les webinaires) */}
+                    {getCategoryName(event.category) === "Webinaire" && event.description && (
                       <div className="mb-3">
-                        <h4 className="text-xs font-bold text-[#0A1128] mb-1">Thèmes :</h4>
-                        <p className="text-sm text-muted-foreground line-clamp-2">{event.themes}</p>
+                        <h4 className="text-xs font-bold text-[#0A1128] mb-1">Description :</h4>
+                        <p className="text-sm text-muted-foreground line-clamp-2">{event.description}</p>
                       </div>
                     )}
 
@@ -465,7 +496,7 @@ export default function EventsPage() {
                       <div className="mb-3 flex-1">
                         <h4 className="text-xs font-bold text-[#0A1128] mb-1">Intervenants :</h4>
                         <div className="flex flex-wrap gap-1">
-                          {event.speakers.slice(0, 2).map((speaker: any, idx: number) => (
+                          {event.speakers.slice(0, 2).map((speaker: { name: string }, idx: number) => (
                             <span key={idx} className="text-xs bg-gray-100 px-2 py-1 rounded">
                               {speaker.name}
                             </span>
@@ -483,7 +514,7 @@ export default function EventsPage() {
                     {event.category?.name === "Webinaire" && event.moderators && event.moderators.length > 0 && (
                       <div className="mb-4">
                         <h4 className="text-xs font-bold text-[#0A1128] mb-1">Modérateurs :</h4>
-                        <p className="text-xs text-muted-foreground">{event.moderators.map((m: any) => m.name).join(", ")}</p>
+                        <p className="text-xs text-muted-foreground">{event.moderators.map((m: { name: string }) => m.name).join(", ")}</p>
                       </div>
                     )}
 
@@ -500,26 +531,28 @@ export default function EventsPage() {
                         <MapPin size={16} className="text-[#0A1128]" />
                         <span>{event.location}</span>
                       </div>
-                      <div className="flex items-center gap-2 text-sm text-gray-600">
-                        <Clock size={16} className="text-[#0A1128]" />
-                        <span>{event.time}</span>
-                      </div>
+                      {getEventTime(event) && (
+                        <div className="flex items-center gap-2 text-sm text-gray-600">
+                          <Clock size={16} className="text-[#0A1128]" />
+                          <span>{getEventTime(event)}</span>
+                        </div>
+                      )}
                       <div className="flex items-center gap-2 text-sm text-gray-600">
                         <UserCheck size={16} className="text-[#0A1128]" />
-                        <span>{event.participants} inscrits</span>
+                        <span>{event.participants || 0} inscrits</span>
                       </div>
                     </div>
 
                     {/* Tags */}
                     {event.tags && event.tags.length > 0 && (
                       <div className="flex flex-wrap gap-2 mb-4">
-                        {event.tags.slice(0, 3).map((tag: any, idx: number) => (
+                        {event.tags.slice(0, 3).map((tag: { tag?: { name: string }; name?: string }, idx: number) => (
                           <Link
                             key={idx}
-                            href={`/events?tag=${encodeURIComponent(tag.tag?.name || tag.name)}`}
+                            href={`/events?tag=${encodeURIComponent(tag.tag?.name || tag.name || '')}`}
                             className="px-2 py-1 bg-[#0A1128]/5 text-[#0A1128] text-xs font-medium rounded hover:bg-[#0A1128] hover:text-white transition-all"
                           >
-                            #{tag.tag?.name || tag.name}
+                            #{tag.tag?.name || tag.name || ''}
                           </Link>
                         ))}
                       </div>
@@ -531,7 +564,7 @@ export default function EventsPage() {
                         href={`/event/${event.id}`}
                         className="flex items-center justify-center gap-2 w-full py-3 bg-[#FFD700] text-[#0A1128] font-bold rounded-xl hover:bg-[#E6C200] transition-all hover:scale-105"
                       >
-                        S'inscrire maintenant
+                        S&apos;inscrire maintenant
                         <ArrowRight size={18} />
                       </Link>
                     </div>
@@ -574,7 +607,7 @@ export default function EventsPage() {
                 onClick={handleLoadMore}
                 className="inline-flex items-center gap-2 px-8 py-4 bg-[#FFD700] text-[#0A1128] font-bold rounded-xl hover:bg-[#E6C200] hover:-translate-y-1 hover:shadow-lg transition-all"
               >
-                Voir plus d'événements
+                Voir plus d&apos;événements
                 <ArrowRight size={20} />
               </button>
               <p className="mt-4 text-muted-foreground text-sm">
@@ -595,34 +628,36 @@ export default function EventsPage() {
             </h2>
             <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
               Découvrez les moments forts de nos précédents événements et 
-              l'impact qu'ils ont eu sur notre communauté.
+              l&apos;impact qu&apos;ils ont eu sur notre communauté.
         </p>
       </div>
           
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
-            {filteredEvents.slice(0, 4).map((event: any) => (
+            {filteredEvents.slice(0, 4).map((event: { id: string; image: string; title: string }) => (
               <Link key={event.id} href="/gallery">
                 <motion.div 
                   className="relative h-48 rounded-xl overflow-hidden cursor-pointer group"
                   whileHover={{ scale: 1.05 }}
                   transition={{ duration: 0.3 }}
                 >
-                  <img 
+                  <Image 
                     src={event.image}
                     alt={event.title}
+                    width={300}
+                    height={192}
                     className="w-full h-full object-cover"
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-[#0A1128]/80 to-transparent" />
                   <div className="absolute bottom-4 left-4 right-4 text-white">
                     <div className="font-semibold text-sm mb-1">{event.title}</div>
                     <div className="text-xs opacity-80">
-                      {new Date(event.date).toLocaleDateString('fr-FR', { 
+                      {new Date(getEventDate(event)).toLocaleDateString('fr-FR', { 
                         year: 'numeric', 
                         month: 'long' 
                       })}
                     </div>
                     <div className="inline-block mt-2 px-2 py-0.5 bg-[#FFD700]/20 text-[#FFD700] text-xs rounded">
-                      {event.category?.name || event.category}
+                      {getCategoryName(getEventCategory(event))}
                     </div>
                   </div>
                 </motion.div>
@@ -636,7 +671,7 @@ export default function EventsPage() {
               className="inline-flex items-center gap-2 px-8 py-4 bg-[#FFD700] text-[#0A1128] font-bold rounded-xl shadow-lg hover:bg-[#E6C200] hover:shadow-xl hover:-translate-y-1 transition-all"
             >
               
-              Voir toute la galerie d'événements
+              Voir toute la galerie d&apos;événements
               <ArrowRight size={20} />
             </Link>
           </div>
@@ -662,7 +697,7 @@ export default function EventsPage() {
               className="flex-1 px-4 py-3 rounded-lg bg-white/10 border-2 border-white/30 text-white placeholder:text-white/60 focus:border-[#FFD700] focus:ring-2 focus:ring-[#FFD700]/20 outline-none transition-all"
             />
             <button className="px-6 py-3 bg-[#FFD700] text-[#0A1128] font-bold rounded-lg hover:bg-[#E6C200] transition-all whitespace-nowrap">
-              S'inscrire
+              S&apos;inscrire
             </button>
           </div>
         </div>

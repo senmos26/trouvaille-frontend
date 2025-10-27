@@ -16,7 +16,7 @@ export default function CtaSection() {
     >
       <div className="container text-center">
         <motion.h2 variants={itemVariants} className="text-4xl md:text-5xl font-bold mb-6">
-          Prêt à bâtir l'avenir avec nous ?
+          Prêt à bâtir l&apos;avenir avec nous ?
         </motion.h2>
         <motion.p variants={itemVariants} className="text-xl md:text-2xl mb-12 max-w-2xl mx-auto">
           Faites partie de notre famille de jeunes bâtisseurs engagés. Ensemble, transformons nos idées en actions concrètes.
@@ -37,7 +37,7 @@ export default function CtaSection() {
               whileTap={{ scale: 0.95 }} 
               className="inline-flex items-center gap-2 px-8 py-4 border-2 border-gray-900 text-gray-900 rounded-full font-semibold text-lg hover:bg-gray-900 hover:text-white transition-all"
             >
-              <Users size={20} /> Rencontrer l'équipe
+              <Users size={20} /> Rencontrer l&apos;équipe
             </motion.button>
           </Link>
         </motion.div>

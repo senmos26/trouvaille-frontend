@@ -1,15 +1,20 @@
 'use client'
 
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
-import { registrationActions } from '../actions/registrations'
-import type { EventRegistration, EventRegistrationFormData } from '../actions/registrations'
+import { 
+  createRegistration, 
+  getAllRegistrations, 
+  getRegistrationsByEvent, 
+  updateRegistrationStatus
+} from '../actions/registrations'
+import type { EventRegistrationFormData } from '../actions/registrations'
 
 // Hook pour créer une inscription
 export const useCreateRegistration = () => {
   const queryClient = useQueryClient()
 
   return useMutation({
-    mutationFn: (data: EventRegistrationFormData) => registrationActions.create(data),
+    mutationFn: (data: EventRegistrationFormData) => createRegistration(data),
     onSuccess: () => {
       // Invalider les caches des inscriptions et des événements
       queryClient.invalidateQueries({ queryKey: ['event-registrations'] })
@@ -22,7 +27,7 @@ export const useCreateRegistration = () => {
 export const useRegistrations = () => {
   return useQuery({
     queryKey: ['event-registrations'],
-    queryFn: () => registrationActions.getAll(),
+    queryFn: () => getAllRegistrations(),
     staleTime: 5 * 60 * 1000, // 5 minutes
   })
 }
@@ -31,7 +36,7 @@ export const useRegistrations = () => {
 export const useEventRegistrations = (eventId: string) => {
   return useQuery({
     queryKey: ['event-registrations', eventId],
-    queryFn: () => registrationActions.getByEvent(eventId),
+    queryFn: () => getRegistrationsByEvent(eventId),
     enabled: !!eventId,
     staleTime: 5 * 60 * 1000, // 5 minutes
   })
@@ -48,34 +53,9 @@ export const useUpdateRegistrationStatus = () => {
     }: { 
       registrationId: string
       status: 'pending' | 'confirmed' | 'cancelled' 
-    }) => registrationActions.updateStatus(registrationId, status),
+    }) => updateRegistrationStatus(registrationId, status),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['event-registrations'] })
     },
-  })
-}
-
-// Hook pour supprimer une inscription
-export const useDeleteRegistration = () => {
-  const queryClient = useQueryClient()
-
-  return useMutation({
-    mutationFn: (registrationId: string) => registrationActions.delete(registrationId),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['event-registrations'] })
-    },
-  })
-}
-
-// Hook pour vérifier si un email existe déjà
-export const useCheckEmailExists = () => {
-  return useMutation({
-    mutationFn: ({ 
-      eventId, 
-      email 
-    }: { 
-      eventId: string
-      email: string 
-    }) => registrationActions.checkEmailExists(eventId, email),
   })
 }

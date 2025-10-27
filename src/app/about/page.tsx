@@ -1,6 +1,7 @@
 "use client"
 
 import Link from "next/link"
+import Image from "next/image"
 import { motion } from "framer-motion"
 import {
   MessageSquare,
@@ -49,17 +50,21 @@ const fallbackTimelineData = [
           Naissance du mouvement
         </h3>
         <p className="text-neutral-700 text-sm md:text-base mb-8 leading-relaxed">
-          Création de La Trouvaille et lancement des premiers labs d'idées. Un groupe de jeunes visionnaires se réunit avec une mission claire : donner une voix à la jeunesse africaine.
+          Création de La Trouvaille et lancement des premiers labs d&apos;idées. Un groupe de jeunes visionnaires se réunit avec une mission claire : donner une voix à la jeunesse africaine.
         </p>
         <div className="grid grid-cols-2 gap-4">
-          <img
+          <Image
             src="https://images.unsplash.com/photo-1522071820081-009f0129c71c?w=800&h=600&fit=crop"
             alt="Lancement La Trouvaille"
+            width={800}
+            height={600}
             className="h-20 md:h-44 lg:h-60 w-full rounded-lg object-cover shadow-[0_0_24px_rgba(10,17,40,0.06)]"
           />
-          <img
+          <Image
             src="https://images.unsplash.com/photo-1517245386807-bb43f82c33c4?w=800&h=600&fit=crop"
             alt="Premiers labs"
+            width={800}
+            height={600}
             className="h-20 md:h-44 lg:h-60 w-full rounded-lg object-cover shadow-[0_0_24px_rgba(10,17,40,0.06)]"
           />
         </div>
@@ -68,7 +73,7 @@ const fallbackTimelineData = [
             <Rocket size={14} /> Lancement officiel
           </span>
           <span className="px-3 py-1 bg-[#0A1128]/10 text-[#0A1128] rounded-full text-xs font-semibold">
-            1er Labs d'idées
+            1er Labs d&apos;idées
           </span>
         </div>
       </div>
@@ -105,14 +110,18 @@ const fallbackTimelineData = [
           </div>
         </div>
         <div className="grid grid-cols-2 gap-4">
-          <img
+          <Image
             src="https://images.unsplash.com/photo-1531482615713-2afd69097998?w=800&h=600&fit=crop"
             alt="Tournées régionales"
+            width={800}
+            height={600}
             className="h-20 md:h-44 lg:h-60 w-full rounded-lg object-cover shadow-[0_0_24px_rgba(10,17,40,0.06)]"
           />
-          <img
+          <Image
             src="https://images.unsplash.com/photo-1552664730-d307ca884978?w=800&h=600&fit=crop"
             alt="Partenariats"
+            width={800}
+            height={600}
             className="h-20 md:h-44 lg:h-60 w-full rounded-lg object-cover shadow-[0_0_24px_rgba(10,17,40,0.06)]"
           />
         </div>
@@ -131,7 +140,7 @@ const fallbackTimelineData = [
           Impact démultiplié
         </h3>
         <p className="text-neutral-700 text-sm md:text-base mb-6 leading-relaxed">
-          Plus de 30 projets accompagnés et un réseau de mentors confirmés. L'année de la consolidation et de l'expansion de notre impact.
+          Plus de 30 projets accompagnés et un réseau de mentors confirmés. L&apos;année de la consolidation et de l&apos;expansion de notre impact.
         </p>
         <div className="mb-8">
           <h4 className="font-semibold text-[#0A1128] mb-4">Réalisations majeures</h4>
@@ -154,24 +163,32 @@ const fallbackTimelineData = [
           </div>
         </div>
         <div className="grid grid-cols-2 gap-4">
-          <img
+          <Image
             src="https://images.unsplash.com/photo-1556761175-5973dc0f32e7?w=800&h=600&fit=crop"
             alt="Projets accompagnés"
+            width={800}
+            height={600}
             className="h-20 md:h-44 lg:h-60 w-full rounded-lg object-cover shadow-[0_0_24px_rgba(10,17,40,0.06)]"
           />
-          <img
+          <Image
             src="https://images.unsplash.com/photo-1524178232363-1fb2b075b655?w=800&h=600&fit=crop"
             alt="Formations"
+            width={800}
+            height={600}
             className="h-20 md:h-44 lg:h-60 w-full rounded-lg object-cover shadow-[0_0_24px_rgba(10,17,40,0.06)]"
           />
-          <img
+          <Image
             src="https://images.unsplash.com/photo-1511578314322-379afb476865?w=800&h=600&fit=crop"
             alt="Événements"
+            width={800}
+            height={600}
             className="h-20 md:h-44 lg:h-60 w-full rounded-lg object-cover shadow-[0_0_24px_rgba(10,17,40,0.06)]"
           />
-          <img
+          <Image
             src="https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=800&h=600&fit=crop"
             alt="Réseau mentors"
+            width={800}
+            height={600}
             className="h-20 md:h-44 lg:h-60 w-full rounded-lg object-cover shadow-[0_0_24px_rgba(10,17,40,0.06)]"
           />
         </div>
@@ -186,17 +203,21 @@ const fallbackTimelineData = [
           Accélération & Innovation
         </h3>
         <p className="text-neutral-700 text-sm md:text-base mb-8 leading-relaxed">
-          Lancement du programme Youth Voices et expansion dans 5 nouveaux pays africains. Une année marquée par l'innovation et la scalabilité de nos programmes.
+          Lancement du programme Youth Voices et expansion dans 5 nouveaux pays africains. Une année marquée par l&apos;innovation et la scalabilité de nos programmes.
         </p>
         <div className="grid grid-cols-2 gap-4 mb-8">
-          <img
+          <Image
             src="https://images.unsplash.com/photo-1559136555-9303baea8ebd?w=800&h=600&fit=crop"
             alt="Youth Voices"
+            width={800}
+            height={600}
             className="h-20 md:h-44 lg:h-60 w-full rounded-lg object-cover shadow-[0_0_24px_rgba(10,17,40,0.06)]"
           />
-          <img
+          <Image
             src="https://images.unsplash.com/photo-1515187029135-18ee286d815b?w=800&h=600&fit=crop"
             alt="Expansion"
+            width={800}
+            height={600}
             className="h-20 md:h-44 lg:h-60 w-full rounded-lg object-cover shadow-[0_0_24px_rgba(10,17,40,0.06)]"
           />
         </div>
@@ -306,7 +327,7 @@ export default function AboutPage() {
         <div className="container">
           <div className="grid md:grid-cols-2 gap-12 items-center">
             <motion.div variants={itemVariants} className="relative rounded-2xl overflow-hidden shadow-2xl">
-              <img src="https://images.unsplash.com/photo-1517245386807-bb43f82c33c4?auto=format&fit=crop&w=1200&q=80" alt="Jeunes réunis" className="w-full h-full object-cover" />
+              <Image src="https://images.unsplash.com/photo-1517245386807-bb43f82c33c4?auto=format&fit=crop&w=1200&q=80" alt="Jeunes réunis" width={1200} height={800} className="w-full h-full object-cover" />
               <div className="absolute bottom-6 left-6 flex items-center gap-3 bg-[#0A1128]/80 backdrop-blur-sm text-white px-4 py-3 rounded-lg">
                 <Globe size={28} />
                 <div>
@@ -319,7 +340,7 @@ export default function AboutPage() {
             <motion.div variants={itemVariants}>
               <h2 className="text-4xl font-bold mb-6">Une organisation portée par la jeunesse africaine</h2>
               <p className="text-lg text-muted-foreground mb-8">
-                La Trouvaille est née de l'impulsion de jeunes passionnés qui refusent de laisser les défis du continent
+                La Trouvaille est née de l&apos;impulsion de jeunes passionnés qui refusent de laisser les défis du continent
                 sans réponses. Notre communauté accompagne la jeunesse à chaque étape : idéation, structuration, financement
                 et déploiement de projets à impact.
               </p>
@@ -384,7 +405,7 @@ export default function AboutPage() {
             <h2 className="text-4xl font-bold mb-4">Ce que nous faisons au quotidien</h2>
             <p className="text-lg text-muted-foreground">
               Au-delà des discours, nous accompagnons les jeunes leaders avec des programmes pragmatiques, une communauté bienveillante
-              et un réseau d'experts mobilisés.
+              et un réseau d&apos;experts mobilisés.
             </p>
           </motion.div>
 
@@ -430,7 +451,7 @@ export default function AboutPage() {
                 <h2 className="text-4xl font-bold mb-4">Des talents engagés au service de la jeunesse</h2>
                 <p className="text-white/80 text-lg">
                   La Trouvaille réunit des profils variés, tous partageant la même
-                  envie d'accompagner la relève africaine et de créer des opportunités durables.
+                  envie d&apos;accompagner la relève africaine et de créer des opportunités durables.
                 </p>
               </div>
               <div className="flex flex-wrap gap-4">

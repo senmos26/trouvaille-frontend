@@ -2,6 +2,7 @@
 
 import { useState } from "react"
 import Link from "next/link"
+import Image from "next/image"
 import { motion } from "framer-motion"
 import {
   Calendar,
@@ -20,11 +21,10 @@ import {
   Twitter,
   Linkedin,
 } from "lucide-react"
-import { useBlogPosts, useBlogCategories, useLikeBlogPost } from "@/lib/hooks/use-blog"
+import { useBlogPosts, useLikeBlogPost } from "@/lib/hooks/use-blog"
 
 export default function BlogPage() {
   const { data: blogData, isLoading: blogLoading, error: blogError } = useBlogPosts()
-  const { data: categoriesData } = useBlogCategories()
   const likeBlogPostMutation = useLikeBlogPost()
   
   const [searchQuery, setSearchQuery] = useState("")
@@ -35,7 +35,6 @@ export default function BlogPage() {
 
   // Utiliser uniquement les données Supabase
   const displayPosts = blogData?.data || []
-  const categories = categoriesData || []
 
   const filteredPosts = displayPosts.filter(post =>
     post.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -118,12 +117,12 @@ export default function BlogPage() {
           <h1 className="text-5xl md:text-6xl font-extrabold mb-6 drop-shadow-lg leading-tight">
             Nos <span className="text-[#FFD700]">Réflexions</span>
             <br />
-            sur l'Afrique
+            sur l&apos;Afrique
           </h1>
           
           <p className="text-xl mb-12 text-white/90 leading-relaxed max-w-2xl mx-auto">
             Découvrez nos analyses approfondies, témoignages inspirants et solutions innovantes 
-            pour les défis contemporains de l'Afrique. Chaque article est une invitation à 
+            pour les défis contemporains de l&apos;Afrique. Chaque article est une invitation à 
             réfléchir et à agir pour un continent prospère.
           </p>
 
@@ -328,7 +327,7 @@ export default function BlogPage() {
               className="flex-1 min-w-[250px] px-4 py-3 bg-white border-2 border-[#0A1128] text-[#0A1128] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#0A1128]"
             />
             <button className="px-6 py-3 bg-[#0A1128] text-white font-semibold rounded-lg hover:bg-[#172B4D] transition-all whitespace-nowrap">
-              S'abonner
+              S&apos;abonner
             </button>
           </div>
         </div>
@@ -354,7 +353,7 @@ export default function BlogPage() {
             className="bg-white rounded-2xl max-w-md w-full shadow-2xl overflow-hidden"
           >
             {(() => {
-              const article = mockPosts.find(p => p.id === showShareModal)
+              const article = displayPosts.find((p: { id: string }) => p.id === showShareModal)
               if (!article) return null
               const shareLinks = getShareLinks(article.id, article.title)
               
@@ -365,7 +364,7 @@ export default function BlogPage() {
                     <div className="flex justify-between items-center">
                       <div className="flex items-center gap-2">
                         <Share2 size={20} />
-                        <h3 className="text-xl font-bold">Partager l'article</h3>
+                        <h3 className="text-xl font-bold">Partager l&apos;article</h3>
                       </div>
                       <button
                         onClick={() => {
@@ -384,14 +383,16 @@ export default function BlogPage() {
                     {/* QR Code */}
                     <div className="flex flex-col items-center mb-6">
                       <div className="bg-white p-3 rounded-xl shadow-md border-2 border-[#FFD700]/20 mb-3">
-                        <img 
+                        <Image 
                           src={`https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${encodeURIComponent(typeof window !== 'undefined' ? `${window.location.origin}/blog/${article.id}` : '')}`}
                           alt="QR Code"
+                          width={150}
+                          height={150}
                           className="w-32 h-32"
                         />
                       </div>
                       <p className="text-xs text-muted-foreground text-center">
-                        Scannez ce code QR pour accéder à l'article
+                        Scannez ce code QR pour accéder à l&apos;article
                       </p>
                     </div>
 

@@ -1,7 +1,8 @@
 "use client"
 
 import Link from "next/link"
-import { ArrowLeft, Mail, Linkedin, Twitter, Facebook, Award, Briefcase, GraduationCap, Download } from "lucide-react"
+import Image from "next/image"
+import { ArrowLeft, Mail, Linkedin, Twitter, Facebook, Award, Briefcase, GraduationCap } from "lucide-react"
 
 const teamData = {
   "1": {
@@ -23,7 +24,7 @@ const teamData = {
     ],
     achievements: [
       "Lancement de La Trouvaille et mobilisation de 5000+ jeunes",
-      "50+ projets menés avec succès à travers l'Afrique",
+      "50+ projets menés avec succès à travers l&apos;Afrique",
       "Partenariats stratégiques avec des organisations internationales"
     ],
     socials: {
@@ -36,7 +37,7 @@ const teamData = {
     id: 2,
     name: "Kofi Mensah",
     position: "Directeur Innovation",
-    bio: "Expert en technologies émergentes, Kofi pilote nos initiatives d'innovation et de transformation digitale.",
+    bio: "Expert en technologies émergentes, Kofi pilote nos initiatives d&apos;innovation et de transformation digitale.",
     image: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=800&h=800&fit=crop",
     email: "kofi.mensah@latrouvaille.org",
     skills: ["Tech", "Innovation", "IA", "Blockchain", "IoT"],
@@ -60,14 +61,14 @@ export default function TeamMemberPage({ params }: { params: { id: string } }) {
         <div className="container py-14">
           <Link href="/team" className="inline-flex items-center gap-2 text-[#0A1128]/60 hover:text-[#0A1128] mb-6 transition-colors">
             <ArrowLeft size={18} />
-            Retour à l'équipe
+            Retour à l&apos;équipe
           </Link>
 
           <div className="grid gap-8 md:grid-cols-[320px_1fr] items-start">
             {/* Sidebar profile */}
             <aside className="bg-gray-50 p-6 rounded-2xl shadow-lg border border-gray-200 sticky top-24">
               <div className="flex flex-col items-center text-center">
-                <img src={member.image} alt={member.name} className="w-48 h-48 rounded-xl object-cover shadow-xl ring-4 ring-[#FFD700]/20" />
+                <Image src={member.image} alt={member.name} width={192} height={192} className="w-48 h-48 rounded-xl object-cover shadow-xl ring-4 ring-[#FFD700]/20" />
                 <h2 className="mt-4 text-3xl md:text-4xl font-extrabold text-[#0A1128]">{member.name}</h2>
                 <p className="mt-1 text-[#0A1128]/70 font-semibold text-lg md:text-xl">{member.position}</p>
            

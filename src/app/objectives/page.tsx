@@ -1,8 +1,9 @@
 "use client"
 
+import React from "react"
 import { motion } from "framer-motion"
 import Link from "next/link"
-import { MessageSquare, BookOpen, Globe, Briefcase, Users, Leaf, Target, ArrowRight } from "lucide-react"
+import { Target, ArrowRight } from "lucide-react"
 import { useObjectives } from "@/lib/hooks/use-objectives"
 import * as LucideIcons from "lucide-react"
 
@@ -106,16 +107,16 @@ export default function ObjectivesPage() {
             </h2>
             <p className="text-lg text-gray-600 leading-relaxed">
               Chaque objectif est un engagement fondamental de notre vision pour transformer 
-              l'avenir et contribuer au rayonnement du continent.
+              l&apos;avenir et contribuer au rayonnement du continent.
             </p>
           </motion.header>
 
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {displayObjectives.map((objective: any, index: number) => {
+            {displayObjectives.map((objective: { id: string; title: string; description: string; icon: string; color: string }, index: number) => {
               // Récupérer l'icône Lucide dynamiquement
               const IconComponent = objectivesData && objectivesData.length > 0 
-                ? (LucideIcons as any)[objective.icon] || Target
-                : objective.icon
+                ? (LucideIcons as unknown as Record<string, React.ComponentType>)[objective.icon] || Target
+                : Target
               return (
                 <motion.div 
                   key={index}
@@ -201,7 +202,7 @@ export default function ObjectivesPage() {
                 Rejoignez Notre Mission
               </h2>
               <p className="text-xl text-white/80 leading-relaxed mb-10 max-w-2xl mx-auto">
-                Ensemble, construisons un avenir où chaque jeune africain peut s'épanouir, 
+                Ensemble, construisons un avenir où chaque jeune africain peut s&apos;épanouir, 
                 innover et contribuer au développement durable de notre continent.
               </p>
               

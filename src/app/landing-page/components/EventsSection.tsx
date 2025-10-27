@@ -1,6 +1,7 @@
 "use client"
 
 import Link from "next/link"
+import Image from "next/image"
 import { motion } from "framer-motion"
 import { MapPin, Clock, UserCheck, ArrowRight } from "lucide-react"
 import { sectionVariants, itemVariants } from "@/lib/animations"
@@ -39,7 +40,7 @@ export default function EventsSection() {
         </motion.div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-12">
-          {displayEvents.map((event, index) => (
+          {displayEvents.map((event) => (
             <motion.div 
               key={event.id} 
               variants={itemVariants} 
@@ -47,9 +48,11 @@ export default function EventsSection() {
             >
               {/* Image */}
               <div className="relative h-56 overflow-hidden">
-                <img 
+                <Image 
                   src={event.image} 
                   alt={event.title}
+                  width={400}
+                  height={224}
                   className="w-full h-full object-cover"
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-[#0A1128]/60 to-transparent" />
@@ -94,7 +97,7 @@ export default function EventsSection() {
                   <div className="mb-3">
                     <h4 className="text-xs font-bold text-[#0A1128] mb-1">Intervenants :</h4>
                     <div className="flex flex-wrap gap-1">
-                      {event.speakers.slice(0, 2).map((speaker: any, idx: number) => (
+                      {event.speakers.slice(0, 2).map((speaker: { name: string }, idx: number) => (
                         <span key={idx} className="text-xs bg-gray-100 px-2 py-1 rounded">
                           {speaker.name}
                         </span>
@@ -112,7 +115,7 @@ export default function EventsSection() {
                 {event.category?.name === "Webinaire" && event.moderators && event.moderators.length > 0 && (
                   <div className="mb-4">
                     <h4 className="text-xs font-bold text-[#0A1128] mb-1">Modérateurs :</h4>
-                    <p className="text-xs text-muted-foreground">{event.moderators.map((mod: any) => mod.name).join(", ")}</p>
+                    <p className="text-xs text-muted-foreground">{event.moderators.map((mod: { name: string }) => mod.name).join(", ")}</p>
                   </div>
                 )}
 
@@ -142,7 +145,7 @@ export default function EventsSection() {
                 {/* Tags */}
                 {event.tags && event.tags.length > 0 && (
                   <div className="flex flex-wrap gap-2 mb-4">
-                    {event.tags.slice(0, 3).map((tag: any, idx: number) => (
+                    {event.tags.slice(0, 3).map((tag: { tag?: { name: string }; name?: string }, idx: number) => (
                       <Link
                         key={idx}
                         href={`/events?tag=${encodeURIComponent(tag.tag?.name || tag.name)}`}
@@ -159,7 +162,7 @@ export default function EventsSection() {
                   href={`/event/${event.id}`}
                   className="flex items-center justify-center gap-2 w-full py-3 bg-[#FFD700] text-[#0A1128] font-bold rounded-xl hover:bg-[#E6C200] transition-all hover:scale-105"
                 >
-                  S'inscrire maintenant
+                  S&apos;inscrire maintenant
                   <ArrowRight size={18} />
                 </Link>
               </div>

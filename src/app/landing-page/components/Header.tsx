@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react"
 import Link from "next/link"
+import Image from "next/image"
 import { usePathname } from "next/navigation"
 import { ModernNavigation } from "@/components/modern-navigation"
 import ThemeToggle from "@/components/theme-toggle"
@@ -53,9 +54,11 @@ export default function Header() {
       <div className="container flex h-16 items-center justify-between">
         {/* Logo */}
         <Link href="/" className="flex items-center space-x-2">
-          <img 
+          <Image 
             src="/images/la_trouvaille.png" 
             alt="La Trouvaille" 
+            width={120}
+            height={40}
             className="h-10 w-auto"
           />
           <span className="font-bold text-lg tracking-tight">

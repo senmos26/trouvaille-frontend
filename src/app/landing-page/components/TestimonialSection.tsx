@@ -70,7 +70,7 @@ export default function TestimonialSection() {
                 <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-8 md:p-12 border border-white/20">
                   <Quote size={48} className="text-[#FFD700] mb-6" />
                   <blockquote className="text-xl md:text-2xl leading-relaxed mb-8 italic">
-                    "{displayTestimonials[currentIndex].quote}"
+                    &ldquo;{displayTestimonials[currentIndex].quote}&rdquo;
                   </blockquote>
                   <div className="flex items-center gap-4">
                     <div className="w-16 h-16 rounded-full bg-[#FFD700] flex items-center justify-center text-white font-bold text-xl">
@@ -98,7 +98,7 @@ export default function TestimonialSection() {
             </button>
 
             <div className="flex gap-2">
-              {displayTestimonials.map((_: any, index: number) => (
+              {displayTestimonials.map((_: { id: string }, index: number) => (
                 <button
                   key={index}
                   className={`w-3 h-3 rounded-full transition-all ${

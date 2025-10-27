@@ -60,7 +60,7 @@ export const eventActions = {
 
   // Rechercher des événements
   async search(filters: EventFilters): Promise<PaginatedResponse<Event>> {
-    const { data, error, count } = await supabase
+    const { data, error } = await supabase
       .rpc('search_events', {
         search_query: filters.search,
         category_filter: filters.category_id,
@@ -82,7 +82,7 @@ export const eventActions = {
   },
 
   // S'inscrire à un événement
-  async register(eventId: string, registrationData: RegistrationFormData): Promise<ApiResponse<any>> {
+  async register(eventId: string, registrationData: RegistrationFormData): Promise<ApiResponse<{ id: string; created_at: string } | null>> {
     try {
       const { data, error } = await supabase
         .rpc('register_to_event', {
@@ -97,7 +97,7 @@ export const eventActions = {
 
       if (error) throw error
 
-      return { data, success: true }
+      return { data: data || { id: '', created_at: '' }, success: true }
     } catch (error) {
       return { 
         data: null, 
@@ -108,7 +108,7 @@ export const eventActions = {
   },
 
   // Récupérer la galerie d'un événement
-  async getGallery(eventId: string): Promise<any> {
+  async getGallery(eventId: string): Promise<{ images: Array<{ id: string; image_url: string; alt_text?: string }> }> {
     const { data, error } = await supabase
       .rpc('get_event_gallery', {
         event_uuid: eventId
