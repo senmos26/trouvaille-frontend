@@ -17,6 +17,9 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
+const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://trouvaille-frontend-zeta.vercel.app'
+const ogImageUrl = `${siteUrl}/images/la_trouvaille.png`
+
 export const metadata: Metadata = {
   title: "La Trouvaille - Plateforme d'Innovation et d'Apprentissage",
   description: "Découvrez une plateforme innovante qui transforme votre façon de travailler, d'apprendre et de vous développer. Événements, formations, et opportunités d'innovation au Maroc.",
@@ -29,7 +32,7 @@ export const metadata: Metadata = {
     address: false,
     telephone: false,
   },
-  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || 'https://latrouvaille.ma'),
+  metadataBase: new URL(siteUrl),
   alternates: {
     canonical: '/',
     languages: {
@@ -39,13 +42,13 @@ export const metadata: Metadata = {
   openGraph: {
     type: 'website',
     locale: 'fr_FR',
-    url: '/',
+    url: siteUrl,
     title: 'La Trouvaille - Plateforme d\'Innovation et d\'Apprentissage',
     description: 'Découvrez une plateforme innovante qui transforme votre façon de travailler, d\'apprendre et de vous développer. Événements, formations, et opportunités d\'innovation au Maroc.',
     siteName: 'La Trouvaille',
     images: [
       {
-        url: '/images/la_trouvaille.png',
+        url: ogImageUrl,
         width: 1200,
         height: 630,
         alt: 'La Trouvaille - Logo',
@@ -57,7 +60,7 @@ export const metadata: Metadata = {
     card: 'summary_large_image',
     title: 'La Trouvaille - Plateforme d\'Innovation et d\'Apprentissage',
     description: 'Découvrez une plateforme innovante qui transforme votre façon de travailler, d\'apprendre et de vous développer.',
-    images: ['/images/la_trouvaille.png'],
+    images: [ogImageUrl],
     creator: '@latrouvaille',
     site: '@latrouvaille',
   },
