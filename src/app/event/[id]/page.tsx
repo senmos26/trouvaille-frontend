@@ -10,7 +10,7 @@ export async function generateMetadata(): Promise<Metadata> {
     openGraph: {
       title: `Événement | La Trouvaille`,
       description: "Découvrez cet événement exceptionnel organisé par La Trouvaille. Rejoignez-nous pour une expérience d'apprentissage unique.",
-      images: [
+    images: [
         {
           url: '/images/la_trouvaille.png',
           width: 1200,

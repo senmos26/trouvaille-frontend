@@ -26,8 +26,28 @@ const nextConfig: NextConfig = {
         hostname: 'picsum.photos',
         port: '',
         pathname: '/**',
+      },
+      {
+        protocol: 'https',
+        hostname: 'wtygekrogynrnljacwvw.supabase.co',
+        port: '',
+        pathname: '/**',
       }
     ],
+  },
+  // Configuration des headers de sécurité
+  async headers() {
+    return [
+      {
+        source: '/(.*)',
+        headers: [
+          {
+            key: 'Content-Security-Policy',
+            value: "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://wtygekrogynrnljacwvw.supabase.co; object-src 'none'; base-uri 'self';"
+          }
+        ]
+      }
+    ]
   },
 };
 

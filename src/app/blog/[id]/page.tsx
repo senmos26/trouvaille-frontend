@@ -25,7 +25,7 @@ import {
   MessageCircle,
   ThumbsUp,
 } from "lucide-react"
-import { useBlogPost } from "../../../../lib/hooks/use-blog"
+import { useBlogPost, useBlogComments, useAddComment } from "../../../../lib/hooks/use-blog"
 
 const HERO_PLACEHOLDER =
   "https://images.unsplash.com/photo-1507842217343-583bb7270b66?auto=format&fit=crop&w=1600&q=80"
@@ -131,23 +131,6 @@ const blogPosts = [
   },
 ]
 
-// Commentaires statiques pour l'exemple
-const initialComments = {
-  1: [
-    { id: 1, author: "Kofi Mensah", date: "2025-10-16", content: "Excellente analyse ! La transformation numérique est vraiment en marche en Afrique. J'aimerais voir plus d'articles sur ce sujet.", avatar: "KM" },
-    { id: 2, author: "Amina Traoré", date: "2025-10-16", content: "Merci pour cet article très instructif. Les exemples concrets sont très pertinents.", avatar: "AT" },
-    { id: 3, author: "Jean-Paul Konan", date: "2025-10-17", content: "C'est inspirant de voir comment la technologie change nos sociétés africaines !", avatar: "JK" },
-  ],
-  2: [
-    { id: 1, author: "Sarah Diop", date: "2025-10-11", content: "L'entrepreneuriat social est effectivement l'avenir ! Merci pour ces insights.", avatar: "SD" },
-    { id: 2, author: "Omar Ben", date: "2025-10-12", content: "Article très pertinent. J'ai hâte de voir plus d'exemples de startups sociales.", avatar: "OB" },
-  ],
-  3: [
-    { id: 1, author: "Fatima Ndiaye", date: "2025-10-06", content: "Merci pour cet article inspirant sur le leadership féminin en Afrique !", avatar: "FN" },
-    { id: 2, author: "Mariam Kamara", date: "2025-10-07", content: "C'est exactement ce dont nous avons besoin. Plus de visibilité pour nos femmes leaders !", avatar: "MK" },
-    { id: 3, author: "Aissatou Ba", date: "2025-10-08", content: "Bravo pour cet article ! Les réseaux de mentorat sont essentiels.", avatar: "AB" },
-  ],
-}
 
 
 function formatDate(date?: string) {
@@ -194,13 +177,16 @@ export default function BlogDetailPage({ params }: { params: { id: string } }) {
   const router = useRouter()
   const numericId = Number(params.id)
   const { data: post, isLoading, error } = useBlogPost(params.id)
+  const { data: comments = [], isLoading: commentsLoading } = useBlogComments(params.id)
+  const addCommentMutation = useAddComment()
   const [showSharePopup, setShowSharePopup] = useState(false)
   const [copied, setCopied] = useState(false)
   const [liked, setLiked] = useState(false)
   const [likeCount, setLikeCount] = useState(0)
-  const [comments, setComments] = useState<Array<{ id: number; author: string; date: string; content: string; avatar: string }>>([])
   const [newComment, setNewComment] = useState({ name: "", email: "", content: "" })
   const [showCommentForm, setShowCommentForm] = useState(false)
+  const [isSubmittingComment, setIsSubmittingComment] = useState(false)
+  const [commentMessage, setCommentMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null)
   
   // Utiliser les données Supabase ou les données de fallback
   const displayPost = post || blogPosts.find((item) => item.id === numericId)
@@ -219,13 +205,12 @@ export default function BlogDetailPage({ params }: { params: { id: string } }) {
     [numericId, displayPost]
   )
 
-  // Initialiser les likes et commentaires
+  // Initialiser les likes
   useEffect(() => {
     if (displayPost) {
       setLikeCount(getLikes(displayPost))
-      setComments(initialComments[numericId as keyof typeof initialComments] || [])
     }
-  }, [displayPost, numericId])
+  }, [displayPost])
 
   // Gestion des états de chargement et d'erreur
   if (isLoading) {
@@ -263,19 +248,37 @@ export default function BlogDetailPage({ params }: { params: { id: string } }) {
     }
   }
 
-  const handleSubmitComment = (e: React.FormEvent) => {
+  const handleSubmitComment = async (e: React.FormEvent) => {
     e.preventDefault()
-    if (newComment.name && newComment.content) {
-      const comment = {
-        id: comments.length + 1,
-        author: newComment.name,
-        date: new Date().toISOString().split('T')[0],
-        content: newComment.content,
-        avatar: newComment.name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2)
+    if (!newComment.name || !newComment.content || !displayPost) return
+
+    setIsSubmittingComment(true)
+    
+    try {
+      const result = await addCommentMutation.mutateAsync({
+        postId: displayPost.id,
+        data: {
+          author_name: newComment.name,
+          author_email: newComment.email,
+          content: newComment.content
+        }
+      })
+
+      if (result.success) {
+        setNewComment({ name: "", email: "", content: "" })
+        setShowCommentForm(false)
+        setCommentMessage({ type: 'success', text: 'Commentaire publié avec succès ! Il sera visible après modération.' })
+        setTimeout(() => setCommentMessage(null), 5000)
+        // Les commentaires seront automatiquement rechargés grâce à l'invalidation des queries
+      } else {
+        setCommentMessage({ type: 'error', text: 'Erreur lors de la publication du commentaire. Veuillez réessayer.' })
+        setTimeout(() => setCommentMessage(null), 5000)
       }
-      setComments([...comments, comment])
-      setNewComment({ name: "", email: "", content: "" })
-      setShowCommentForm(false)
+    } catch (error) {
+      setCommentMessage({ type: 'error', text: 'Erreur lors de la publication du commentaire. Veuillez réessayer.' })
+      setTimeout(() => setCommentMessage(null), 5000)
+    } finally {
+      setIsSubmittingComment(false)
     }
   }
 
@@ -549,7 +552,13 @@ export default function BlogDetailPage({ params }: { params: { id: string } }) {
                 </button>
                 <div className="flex items-center gap-2 text-gray-600">
                   <MessageCircle size={20} />
-                  <span className="font-semibold">{comments.length} commentaire{comments.length > 1 ? 's' : ''}</span>
+                  <span className="font-semibold" data-testid="comment-count">
+                    {commentsLoading ? 'Chargement...' : (() => {
+                      const approvedCount = comments.filter(c => c.status === 'approved').length
+                      const pendingCount = comments.filter(c => c.status === 'pending').length
+                      return `${approvedCount} commentaire${approvedCount > 1 ? 's' : ''}${pendingCount > 0 ? ` (${pendingCount} en attente)` : ''}`
+                    })()}
+                  </span>
                 </div>
               </div>
               <button
@@ -565,7 +574,11 @@ export default function BlogDetailPage({ params }: { params: { id: string } }) {
             <div className="bg-white rounded-2xl shadow-lg p-8 border border-gray-100">
               <div className="flex justify-between items-center mb-6">
                 <h3 className="text-2xl font-bold text-[#0A1128]">
-                  Commentaires ({comments.length})
+                  Commentaires ({commentsLoading ? '...' : (() => {
+                    const approvedCount = comments.filter(c => c.status === 'approved').length
+                    const pendingCount = comments.filter(c => c.status === 'pending').length
+                    return `${approvedCount}${pendingCount > 0 ? ` + ${pendingCount} en attente` : ''}`
+                  })()})
                 </h3>
                 <button
                   onClick={() => setShowCommentForm(!showCommentForm)}
@@ -574,6 +587,29 @@ export default function BlogDetailPage({ params }: { params: { id: string } }) {
                   {showCommentForm ? 'Annuler' : 'Ajouter un commentaire'}
                 </button>
               </div>
+
+              {/* Message de notification */}
+              {commentMessage && (
+                <motion.div
+                  initial={{ opacity: 0, y: -10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -10 }}
+                  className={`mb-6 p-4 rounded-xl border-2 ${
+                    commentMessage.type === 'success' 
+                      ? 'bg-green-50 border-green-200 text-green-800' 
+                      : 'bg-red-50 border-red-200 text-red-800'
+                  }`}
+                >
+                  <div className="flex items-center gap-2">
+                    {commentMessage.type === 'success' ? (
+                      <CheckCircle size={20} className="text-green-600" />
+                    ) : (
+                      <X size={20} className="text-red-600" />
+                    )}
+                    <span className="font-semibold">{commentMessage.text}</span>
+                  </div>
+                </motion.div>
+              )}
 
               {/* Formulaire de commentaire */}
               {showCommentForm && (
@@ -626,46 +662,79 @@ export default function BlogDetailPage({ params }: { params: { id: string } }) {
                   </div>
                   <button
                     type="submit"
-                    className="px-6 py-2.5 bg-[#FFD700] text-[#0A1128] font-bold rounded-xl hover:bg-[#E6C200] transition-all hover:scale-105"
+                    disabled={isSubmittingComment}
+                    className="px-6 py-2.5 bg-[#FFD700] text-[#0A1128] font-bold rounded-xl hover:bg-[#E6C200] transition-all hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed"
                   >
-                    Publier le commentaire
+                    {isSubmittingComment ? 'Publication...' : 'Publier le commentaire'}
                   </button>
                 </motion.form>
               )}
 
               {/* Liste des commentaires */}
               <div className="space-y-6">
-                {comments.length === 0 ? (
+                {commentsLoading ? (
+                  <div className="text-center py-12">
+                    <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#FFD700] mx-auto mb-4"></div>
+                    <p className="text-gray-500">Chargement des commentaires...</p>
+                  </div>
+                ) : comments.length === 0 ? (
                   <div className="text-center py-12">
                     <MessageCircle size={48} className="mx-auto text-gray-300 mb-4" />
                     <p className="text-gray-500 text-lg">Aucun commentaire pour le moment.</p>
                     <p className="text-gray-400">Soyez le premier à partager votre avis !</p>
                   </div>
                 ) : (
-                  comments.map((comment, idx) => (
-                    <motion.div
-                      key={comment.id}
-                      initial={{ opacity: 0, y: 20 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      transition={{ duration: 0.3, delay: idx * 0.1 }}
-                      className="flex gap-4 p-5 bg-gray-50 rounded-xl border border-gray-200 hover:shadow-md transition-all"
-                    >
-                      <div className="flex-shrink-0">
-                        <div className="w-12 h-12 bg-[#FFD700] text-[#0A1128] rounded-full flex items-center justify-center font-bold text-lg">
-                          {comment.avatar}
+                  comments.map((comment, idx) => {
+                    const avatar = comment.author_name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2)
+                    const isPending = comment.status === 'pending'
+                    return (
+                      <motion.div
+                        key={comment.id}
+                        data-testid={isPending ? "comment-pending" : "comment-item"}
+                        initial={{ opacity: 0, y: 20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ duration: 0.3, delay: idx * 0.1 }}
+                        className={`flex gap-4 p-5 rounded-xl border transition-all ${
+                          isPending 
+                            ? 'bg-yellow-50 border-yellow-200 hover:shadow-md' 
+                            : 'bg-gray-50 border-gray-200 hover:shadow-md'
+                        }`}
+                      >
+                        <div className="flex-shrink-0">
+                          <div className={`w-12 h-12 rounded-full flex items-center justify-center font-bold text-lg ${
+                            isPending 
+                              ? 'bg-yellow-400 text-yellow-900' 
+                              : 'bg-[#FFD700] text-[#0A1128]'
+                          }`}>
+                            {avatar}
+                          </div>
                         </div>
-                      </div>
-                      <div className="flex-1">
-                        <div className="flex items-center gap-3 mb-2">
-                          <h4 className="font-bold text-[#0A1128]">{comment.author}</h4>
-                          <span className="text-sm text-gray-500">
-                            {new Date(comment.date).toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' })}
-                          </span>
+                        <div className="flex-1">
+                          <div className="flex items-center gap-3 mb-2">
+                            <h4 className="font-bold text-[#0A1128]">{comment.author_name}</h4>
+                            {isPending && (
+                              <span className="px-2 py-1 bg-yellow-200 text-yellow-800 text-xs font-semibold rounded-full">
+                                En attente
+                              </span>
+                            )}
+                            <span className="text-sm text-gray-500">
+                              {new Date(comment.created_at).toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' })}
+                            </span>
+                          </div>
+                          <p className={`leading-relaxed ${
+                            isPending ? 'text-yellow-800' : 'text-gray-700'
+                          }`}>
+                            {comment.content}
+                          </p>
+                          {isPending && (
+                            <p className="text-xs text-yellow-600 mt-2 italic">
+                              Votre commentaire sera visible après modération
+                            </p>
+                          )}
                         </div>
-                        <p className="text-gray-700 leading-relaxed">{comment.content}</p>
-                      </div>
-                    </motion.div>
-                  ))
+                      </motion.div>
+                    )
+                  })
                 )}
               </div>
             </div>

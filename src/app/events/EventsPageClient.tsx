@@ -285,11 +285,13 @@ function EventsPageContent() {
                   >
                     <div className="relative h-48 overflow-hidden group">
                       <Image 
-                        src={event.image || '/images/placeholder-event.jpg'} 
+                        src={event.image || '/images/placeholder-event.jpg'}
+                        unoptimized={event.image && (event.image.includes('supabase.co/storage') || event.image.includes('storage/v1/object/public'))} 
                         alt={event.title || 'Événement'} 
                         width={400}
                         height={192}
                         className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
+                        unoptimized={event.image && (event.image.includes('supabase.co/storage') || event.image.includes('storage/v1/object/public'))}
                       />
                       <div className="absolute inset-0 bg-gradient-to-t from-[#0A1128]/80 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
                       <div className="absolute top-4 left-4 right-4 flex justify-between items-start">
@@ -396,7 +398,8 @@ function EventsPageContent() {
                   <div key={event.id} className="bg-white rounded-lg overflow-hidden shadow-md hover:shadow-lg transition-all">
                     <div className="relative h-32 overflow-hidden">
                       <Image 
-                        src={event.image || '/images/placeholder-event.jpg'} 
+                        src={event.image || '/images/placeholder-event.jpg'}
+                        unoptimized={event.image && (event.image.includes('supabase.co/storage') || event.image.includes('storage/v1/object/public'))} 
                         alt={event.title || 'Événement'} 
                         width={300}
                         height={128}

@@ -1,4 +1,4 @@
-'use server'
+'use client'
 
 import { supabase } from '../supabase'
 import type { ApiResponse, PaginatedResponse } from '../types'
@@ -150,4 +150,5 @@ export async function checkEmailExists(eventId: string, email: string): Promise<
     return { data: false, error: (error as Error).message, success: false }
   }
 }
+
 

@@ -79,20 +79,33 @@ export default function EventDetailClient({ params }: EventDetailClientProps) {
     setIsSubmitting(true)
 
     try {
-      await createRegistrationMutation.mutateAsync({
-        event_id: eventId,
-        email,
+      // Utiliser l'ID de l'événement réel (depuis Supabase si disponible)
+      const actualEventId = typeof event.id === 'string' ? event.id : event.id.toString()
+      
+      const result = await createRegistrationMutation.mutateAsync({
+        event_id: actualEventId,
         name,
+        email,
         phone: phone || undefined
       })
-      
-      setRegistrationSuccess(true)
-      setShowRegistrationForm(false)
-      setEmail("")
-      setName("")
-      setPhone("")
+
+      if (result.success) {
+        setRegistrationSuccess(true)
+        setShowRegistrationForm(false)
+        setEmail("")
+        setName("")
+        setPhone("")
+        
+        // Masquer le message de succès après 5 secondes
+        setTimeout(() => {
+          setRegistrationSuccess(false)
+        }, 5000)
+      } else {
+        alert(`Erreur: ${result.error || 'Impossible de s\'inscrire'}`)
+      }
     } catch (error) {
       console.error("Erreur lors de l'inscription:", error)
+      alert("Une erreur est survenue lors de l'inscription. Veuillez réessayer.")
     } finally {
       setIsSubmitting(false)
     }
@@ -196,11 +209,12 @@ export default function EventDetailClient({ params }: EventDetailClientProps) {
       {/* Hero Image */}
       <section className="relative h-[70vh] overflow-hidden">
         <Image 
-          src={event.gallery?.[0]?.image_url || event.image} 
+          src={event.gallery?.[0]?.image_url || event.image || '/images/placeholder-event.jpg'} 
           alt={event.title} 
           width={1200}
           height={700}
-          className="w-full h-full object-cover" 
+          className="w-full h-full object-cover"
+          unoptimized={(event.gallery?.[0]?.image_url || event.image) && ((event.gallery?.[0]?.image_url || event.image)?.includes('supabase.co/storage') || (event.gallery?.[0]?.image_url || event.image)?.includes('storage/v1/object/public'))}
         />
         <div className="absolute inset-0 bg-gradient-to-t from-[#0A1128]/80 via-[#0A1128]/40 to-transparent" />
         
@@ -387,10 +401,11 @@ export default function EventDetailClient({ params }: EventDetailClientProps) {
                         <div key={index} className="aspect-square overflow-hidden rounded-lg">
                           <Image
                             src={photo.image_url}
-                            alt={`${event.title} - Image ${index + 1}`}
+                            alt={photo.alt_text || `${event.title} - Image ${index + 1}`}
                             width={300}
                             height={300}
                             className="w-full h-full object-cover hover:scale-105 transition-transform duration-300"
+                            unoptimized={photo.image_url.includes('supabase.co/storage') || photo.image_url.includes('storage/v1/object/public')}
                           />
                         </div>
                       ))}

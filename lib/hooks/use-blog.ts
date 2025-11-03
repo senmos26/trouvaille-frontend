@@ -62,7 +62,17 @@ export const useAddComment = () => {
       blogActions.addComment(postId, data),
     onSuccess: (_, { postId }) => {
       queryClient.invalidateQueries({ queryKey: ['blog-post', postId] })
+      queryClient.invalidateQueries({ queryKey: ['blog-comments', postId] })
     },
+  })
+}
+
+export const useBlogComments = (postId: string) => {
+  return useQuery({
+    queryKey: ['blog-comments', postId],
+    queryFn: () => blogActions.getComments(postId),
+    enabled: !!postId,
+    staleTime: 2 * 60 * 1000, // 2 minutes
   })
 }
 

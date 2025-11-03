@@ -5,7 +5,8 @@ import {
   createRegistration, 
   getAllRegistrations, 
   getRegistrationsByEvent, 
-  updateRegistrationStatus
+  updateRegistrationStatus,
+  deleteRegistration
 } from '../actions/registrations'
 import type { EventRegistrationFormData } from '../actions/registrations'
 
@@ -54,6 +55,18 @@ export const useUpdateRegistrationStatus = () => {
       registrationId: string
       status: 'pending' | 'confirmed' | 'cancelled' 
     }) => updateRegistrationStatus(registrationId, status),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['event-registrations'] })
+    },
+  })
+}
+
+// Hook pour supprimer une inscription
+export const useDeleteRegistration = () => {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: (registrationId: string) => deleteRegistration(registrationId),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['event-registrations'] })
     },

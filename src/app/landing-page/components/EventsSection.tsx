@@ -47,15 +47,34 @@ export default function EventsSection() {
               className="bg-white rounded-2xl overflow-hidden shadow-lg border border-gray-200 hover:shadow-2xl hover:-translate-y-2 transition-all duration-300"
             >
               {/* Image */}
-              <div className="relative h-56 overflow-hidden">
-                <Image 
-                  src={event.image} 
-                  alt={event.title}
-                  width={400}
-                  height={224}
-                  className="w-full h-full object-cover"
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-[#0A1128]/60 to-transparent" />
+              <div className="relative h-56 overflow-hidden bg-gradient-to-br from-[#0A1128] to-[#1a2a4a]">
+                {event.image && event.image.trim() ? (
+                  <Image 
+                    src={event.image} 
+                    alt={event.title}
+                    width={400}
+                    height={224}
+                    className="w-full h-full object-cover"
+                    unoptimized={event.image.includes('supabase.co/storage') || event.image.includes('storage/v1/object/public')}
+                    onError={(e) => {
+                      // Si l'image ne charge pas, masquer l'image et afficher le fallback
+                      const target = e.target as HTMLImageElement
+                      target.style.display = 'none'
+                      const fallback = target.parentElement?.querySelector('.image-fallback') as HTMLElement
+                      if (fallback) fallback.style.display = 'flex'
+                    }}
+                  />
+                ) : null}
+                {/* Fallback si pas d'image ou erreur de chargement */}
+                <div 
+                  className={`image-fallback w-full h-full flex items-center justify-center bg-gradient-to-br from-[#FFD700]/20 to-[#FFC107]/20 ${event.image && event.image.trim() ? 'hidden' : ''}`}
+                >
+                  <div className="text-center text-white/80">
+                    <MapPin size={48} className="mx-auto mb-2 opacity-50" />
+                    <p className="text-sm font-medium">Image à venir</p>
+                  </div>
+                </div>
+                <div className="absolute inset-0 bg-gradient-to-t from-[#0A1128]/60 to-transparent pointer-events-none" />
                 <div className="absolute top-4 left-4 flex gap-2">
                   <span className="px-3 py-1 bg-[#FFD700] text-[#0A1128] rounded-full text-xs font-bold">
                     {event.category?.name}

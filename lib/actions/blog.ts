@@ -1,5 +1,5 @@
 import { supabase } from '../supabase'
-import type { BlogPost, BlogFilters, CommentFormData, ApiResponse, PaginatedResponse } from '../types'
+import type { BlogPost, BlogComment, BlogFilters, CommentFormData, ApiResponse, PaginatedResponse } from '../types'
 
 // ============================================================================
 // ACTIONS POUR LES ARTICLES DE BLOG (FRONTEND)
@@ -105,6 +105,19 @@ export const blogActions = {
         success: false 
       }
     }
+  },
+
+  // Récupérer les commentaires d'un article
+  async getComments(postId: string): Promise<BlogComment[]> {
+    const { data, error } = await supabase
+      .from('blog_comments')
+      .select('*')
+      .eq('post_id', postId)
+      .in('status', ['approved', 'pending']) // Afficher aussi les commentaires en attente pour le développement
+      .order('created_at', { ascending: false })
+
+    if (error) throw error
+    return data || []
   },
 
   // Ajouter un commentaire
