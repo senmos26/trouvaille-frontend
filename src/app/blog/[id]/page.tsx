@@ -256,8 +256,8 @@ export default function BlogDetailPage({ params }: { params: { id: string } }) {
     
     try {
       const result = await addCommentMutation.mutateAsync({
-        postId: displayPost.id,
-        data: {
+        postId: String(displayPost.id),
+        commentData: {
           author_name: newComment.name,
           author_email: newComment.email,
           content: newComment.content

@@ -54,6 +54,9 @@ export function useAddBlogComment() {
   })
 }
 
+// Alias pour compatibilité
+export const useAddComment = useAddBlogComment
+
 export function useBlogComments(postId: string) {
   return useQuery({
     queryKey: ['blog-comments', postId],
