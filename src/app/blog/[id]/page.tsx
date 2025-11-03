@@ -274,7 +274,7 @@ export default function BlogDetailPage({ params }: { params: { id: string } }) {
         setCommentMessage({ type: 'error', text: 'Erreur lors de la publication du commentaire. Veuillez réessayer.' })
         setTimeout(() => setCommentMessage(null), 5000)
       }
-    } catch (error) {
+    } catch {
       setCommentMessage({ type: 'error', text: 'Erreur lors de la publication du commentaire. Veuillez réessayer.' })
       setTimeout(() => setCommentMessage(null), 5000)
     } finally {

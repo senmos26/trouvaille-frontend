@@ -286,7 +286,6 @@ function EventsPageContent() {
                     <div className="relative h-48 overflow-hidden group">
                       <Image 
                         src={event.image || '/images/placeholder-event.jpg'}
-                        unoptimized={event.image && (event.image.includes('supabase.co/storage') || event.image.includes('storage/v1/object/public'))} 
                         alt={event.title || 'Événement'} 
                         width={400}
                         height={192}
