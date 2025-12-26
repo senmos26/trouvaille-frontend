@@ -18,8 +18,17 @@ export function getSupabaseConfigErrorMessage() {
   return 'Supabase credentials not found. Create .env.local with NEXT_PUBLIC_SUPABASE_URL and NEXT_PUBLIC_SUPABASE_ANON_KEY'
 }
 
+interface SupabaseError {
+  name?: string;
+  message?: string;
+  details?: string;
+  hint?: string;
+  code?: string;
+  status?: number;
+}
+
 export function logSupabaseError(context: string, error: unknown) {
-  const e = error as any
+  const e = error as SupabaseError
   console.error(context, {
     name: e?.name,
     message: e?.message,
@@ -33,7 +42,7 @@ export function logSupabaseError(context: string, error: unknown) {
 export function toastSupabaseError(context: string, error: unknown) {
   if (typeof window === 'undefined') return
 
-  const e = error as any
+  const e = error as SupabaseError
   const message =
     e?.message ||
     (typeof error === 'string' ? error : null) ||
