@@ -1,4 +1,4 @@
-import { supabase } from '../supabase'
+import { supabase, isSupabaseConfigured, getSupabaseConfigErrorMessage, logSupabaseError, toastSupabaseError } from '../supabase'
 
 export async function getEvents(params?: {
   limit?: number
@@ -7,6 +7,10 @@ export async function getEvents(params?: {
   search?: string
 }) {
   try {
+    if (!isSupabaseConfigured()) {
+      throw new Error(getSupabaseConfigErrorMessage() || 'Supabase is not configured')
+    }
+
     let query = supabase
       .from('events')
       .select(`
@@ -48,7 +52,8 @@ export async function getEvents(params?: {
       total: count || 0
     }
   } catch (error) {
-    console.error('Error fetching events:', error)
+    logSupabaseError('Error fetching events:', error)
+    toastSupabaseError('Error fetching events:', error)
     return {
       data: [],
       total: 0
@@ -58,6 +63,10 @@ export async function getEvents(params?: {
 
 export async function getEvent(eventId: string) {
   try {
+    if (!isSupabaseConfigured()) {
+      throw new Error(getSupabaseConfigErrorMessage() || 'Supabase is not configured')
+    }
+
     const { data, error } = await supabase
       .from('events')
       .select(`
@@ -78,13 +87,18 @@ export async function getEvent(eventId: string) {
     if (error) throw error
     return data
   } catch (error) {
-    console.error('Error fetching event:', error)
+    logSupabaseError('Error fetching event:', error)
+    toastSupabaseError('Error fetching event:', error)
     return null
   }
 }
 
 export async function searchEvents(searchQuery: string) {
   try {
+    if (!isSupabaseConfigured()) {
+      throw new Error(getSupabaseConfigErrorMessage() || 'Supabase is not configured')
+    }
+
     const { data, error } = await supabase
       .from('events')
       .select(`
@@ -103,7 +117,8 @@ export async function searchEvents(searchQuery: string) {
     if (error) throw error
     return data || []
   } catch (error) {
-    console.error('Error searching events:', error)
+    logSupabaseError('Error searching events:', error)
+    toastSupabaseError('Error searching events:', error)
     return []
   }
 }

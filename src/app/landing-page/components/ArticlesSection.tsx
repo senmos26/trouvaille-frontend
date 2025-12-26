@@ -44,7 +44,7 @@ export default function ArticlesSection() {
       initial="hidden" 
       whileInView="visible" 
       viewport={{ once: true, amount: 0.2 }} 
-      className="py-20 bg-gray-50"
+      className="py-20 bg-gray-50 dark:bg-gray-900"
     >
       <div className="container">
         <motion.div variants={itemVariants} className="text-center mb-12">
@@ -54,20 +54,43 @@ export default function ArticlesSection() {
           </p>
         </motion.div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-12">
-          {displayArticles.map((article: { id: number; title: string; excerpt: string; image: string; category?: { name: string }; author_name: string; published_at: string; likes: number; comments_count: number }) => (
-            <motion.article
-              key={article.id}
-              variants={itemVariants}
-              className="flex flex-col bg-white rounded-xl overflow-hidden border transition-all duration-300 cursor-pointer"
-              style={{
-                boxShadow: hoveredCard === article.id ? '0 18px 45px rgba(10, 17, 40, 0.18)' : '0 10px 30px rgba(10, 17, 40, 0.08)',
-                transform: hoveredCard === article.id ? 'translateY(-6px)' : 'translateY(0)',
-                borderColor: hoveredCard === article.id ? 'rgba(212, 175, 55, 0.3)' : 'rgba(17, 24, 39, 0.05)',
-              }}
-              onMouseEnter={() => setHoveredCard(article.id)}
-              onMouseLeave={() => setHoveredCard(null)}
+        {displayArticles.length === 0 ? (
+          <motion.div
+            variants={itemVariants}
+            className="mx-auto max-w-2xl rounded-2xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 p-10 text-center shadow-sm"
+          >
+            <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-[#0A1128]/5 dark:bg-[#FFD700]/10">
+              <PenSquare size={24} className="text-[#0A1128]" />
+            </div>
+            <h3 className="text-2xl font-bold text-[#0A1128] dark:text-white mb-2">
+              Aucun article pour le moment
+            </h3>
+            <p className="text-muted-foreground dark:text-gray-400 mb-6">
+              Revenez bientôt ou consultez tous nos articles.
+            </p>
+            <Link
+              href="/blog"
+              className="inline-flex items-center gap-2 px-8 py-4 bg-[#FFD700] text-[#0A1128] font-bold rounded-xl shadow-lg hover:bg-[#E6C200] hover:shadow-xl hover:-translate-y-1 transition-all dark:shadow-[#FFD700]/20"
             >
+              Voir tous les articles
+            </Link>
+          </motion.div>
+        ) : (
+          <>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-12">
+              {displayArticles.map((article: { id: number; title: string; excerpt: string; image: string; category?: { name: string }; author_name: string; published_at: string; likes: number; comments_count: number }) => (
+                <motion.article
+                  key={article.id}
+                  variants={itemVariants}
+                  className="flex flex-col bg-white dark:bg-gray-800 rounded-xl overflow-hidden border border-gray-200 dark:border-gray-700 transition-all duration-300 cursor-pointer"
+                  style={{
+                    boxShadow: hoveredCard === article.id ? '0 18px 45px rgba(10, 17, 40, 0.18)' : '0 10px 30px rgba(10, 17, 40, 0.08)',
+                    transform: hoveredCard === article.id ? 'translateY(-6px)' : 'translateY(0)',
+                    borderColor: hoveredCard === article.id ? 'rgba(212, 175, 55, 0.3)' : 'rgba(17, 24, 39, 0.05)',
+                  }}
+                  onMouseEnter={() => setHoveredCard(article.id)}
+                  onMouseLeave={() => setHoveredCard(null)}
+                >
               {/* Image */}
               <div className="relative h-52 overflow-hidden">
                 <div
@@ -169,15 +192,17 @@ export default function ArticlesSection() {
               </div>
             </motion.article>
           ))}
-        </div>
+            </div>
 
-        <motion.div variants={itemVariants} className="text-center">
-          <Link href="/blog">
-            <button className="inline-flex items-center gap-2 px-8 py-4 bg-[#FFD700] text-[#0A1128] font-bold rounded-xl shadow-lg hover:bg-[#E6C200] hover:shadow-xl hover:-translate-y-1 transition-all">
-              Voir tous les articles
-            </button>
-          </Link>
-        </motion.div>
+            <motion.div variants={itemVariants} className="text-center">
+              <Link href="/blog">
+                <button className="inline-flex items-center gap-2 px-8 py-4 bg-[#FFD700] text-[#0A1128] font-bold rounded-xl shadow-lg hover:bg-[#E6C200] hover:shadow-xl hover:-translate-y-1 transition-all dark:shadow-[#FFD700]/20">
+                  Voir tous les articles
+                </button>
+              </Link>
+            </motion.div>
+          </>
+        )}
       </div>
     </motion.section>
   )

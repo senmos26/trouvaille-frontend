@@ -56,13 +56,13 @@ export default function AboutSection() {
       initial="hidden" 
       whileInView="visible" 
       viewport={{ once: true, amount: 0.2 }} 
-      className="py-20 bg-white"
+      className="py-20 bg-white dark:bg-gray-900"
     >
       <div className="container">
         <div className="grid md:grid-cols-2 gap-16 items-center mb-4 px-8 md:px-12">
           <div>
             <motion.h2 
-              className="text-4xl md:text-5xl lg:text-6xl font-bold mb-8"
+              className="text-4xl md:text-5xl lg:text-6xl font-bold mb-8 text-foreground"
               style={{ y: titleY, opacity }}
             >
               Qui sommes-nous ?
@@ -85,7 +85,7 @@ export default function AboutSection() {
 
             <motion.div style={{ y: buttonY, opacity }} className="mt-8">
               <Link href="/about">
-                <button className="px-9 py-3.5 bg-[#FFD700] text-[#0A1128] rounded-xl font-bold text-lg hover:bg-[#E6C200] transition-all hover:scale-105 shadow-md">
+                <button className="px-9 py-3.5 bg-[#FFD700] text-[#0A1128] rounded-xl font-bold text-lg hover:bg-[#E6C200] transition-all hover:scale-105 shadow-md dark:shadow-[#FFD700]/20">
                   En savoir plus
                 </button>
               </Link>

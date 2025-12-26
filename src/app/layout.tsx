@@ -1,21 +1,11 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { ThemeProvider } from "@/components/theme-provider";
 import { QueryProvider } from "@/lib/providers/query-provider";
 import Header from "./landing-page/components/Header";
 import { PointerProvider } from "@/components/pointer-provider";
 import Footer from "./landing-page/components/Footer";
-
-const geistSans = Geist({
-  variable: "--font-geist-sans",
-  subsets: ["latin"],
-});
-
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
-});
+import { Toaster } from "sonner";
 
 const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://trouvaille-frontend-zeta.vercel.app'
 const ogImageUrl = `${siteUrl}/images/la_trouvaille.png`
@@ -103,7 +93,7 @@ export default function RootLayout({
   return (
     <html lang="fr" suppressHydrationWarning>
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+        className="antialiased"
       >
         <QueryProvider>
           <ThemeProvider
@@ -116,6 +106,8 @@ export default function RootLayout({
             <PointerProvider>
               <div className="content-wrapper flex min-h-screen flex-col">
                 <Header />
+
+                <Toaster richColors position="top-right" />
 
                 <main className="flex-grow">{children}</main>
 

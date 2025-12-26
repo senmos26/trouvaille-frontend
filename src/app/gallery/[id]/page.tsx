@@ -8,95 +8,6 @@ import { Calendar, MapPin, Users, X, ArrowLeft, ChevronLeft, ChevronRight, Camer
 import { useOutsideClick } from "@/hooks/use-outside-click"
 import { useEvent } from "../../../../lib/hooks/use-events"
 
-// Données d'événements (à synchroniser avec gallery/page.tsx)
-const galleryEvents = [
-  {
-    id: 1,
-    title: "Webinaire : Innovation en Afrique",
-    category: "Webinaire",
-    rubrique: "Innovation",
-    date: "2024-03-15",
-    location: "En ligne",
-    participants: 250,
-    photos: [
-      "https://images.unsplash.com/photo-1540575467063-178a50c2df87?w=800",
-      "https://images.unsplash.com/photo-1559136555-9303baea8ebd?w=800",
-      "https://images.unsplash.com/photo-1591115765373-5207764f72e7?w=800",
-      "https://images.unsplash.com/photo-1475721027785-f74eccf877e2?w=800",
-      "https://images.unsplash.com/photo-1531482615713-2afd69097998?w=800",
-      "https://images.unsplash.com/photo-1517245386807-bb43f82c33c4?w=800",
-      "https://images.unsplash.com/photo-1523580494863-6f3031224c94?w=800",
-      "https://images.unsplash.com/photo-1511578314322-379afb476865?w=800"
-    ]
-  },
-  {
-    id: 2,
-    title: "Webinaire : Leadership Jeunesse",
-    category: "Webinaire",
-    rubrique: "Leadership",
-    date: "2024-02-20",
-    location: "En ligne",
-    participants: 180,
-    photos: [
-      "https://images.unsplash.com/photo-1552664730-d307ca884978?w=800",
-      "https://images.unsplash.com/photo-1556761175-b413da4baf72?w=800",
-      "https://images.unsplash.com/photo-1504384308090-c894fdcc538d?w=800"
-    ]
-  },
-  {
-    id: 3,
-    title: "Webinaire : Santé Mentale",
-    category: "Webinaire",
-    rubrique: "Santé Mentale",
-    date: "2024-01-10",
-    location: "En ligne",
-    participants: 120,
-    photos: [
-      "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=800",
-      "https://images.unsplash.com/photo-1531482615713-2afd69097998?w=800"
-    ]
-  },
-  {
-    id: 4,
-    title: "Webinaire : Entrepreneuriat",
-    category: "Webinaire",
-    rubrique: "Entrepreneuriat",
-    date: "2024-04-05",
-    location: "En ligne",
-    participants: 150,
-    photos: [
-      "https://images.unsplash.com/photo-1504384308090-c894fdcc538d?w=800",
-      "https://images.unsplash.com/photo-1522071820081-009f0129c71c?w=800",
-      "https://images.unsplash.com/photo-1517245386807-bb43f82c33c4?w=800"
-    ]
-  },
-  {
-    id: 5,
-    title: "Webinaire : Technologie",
-    category: "Webinaire",
-    rubrique: "Technologie",
-    date: "2024-05-12",
-    location: "En ligne",
-    participants: 200,
-    photos: [
-      "https://images.unsplash.com/photo-1511578314322-379afb476865?w=800",
-      "https://images.unsplash.com/photo-1515187029135-18ee286d815b?w=800"
-    ]
-  },
-  {
-    id: 6,
-    title: "Forum Jeunesse Africaine 2024",
-    category: "Conférence",
-    date: "2024-06-20",
-    location: "Dakar, Sénégal",
-    participants: 300,
-    photos: [
-      "https://images.unsplash.com/photo-1591115765373-5207764f72e7?w=800",
-      "https://images.unsplash.com/photo-1475721027785-f74eccf877e2?w=800"
-    ]
-  }
-]
-
 export default function EventGalleryPage({ params }: { params: { id: string } }) {
   const { data: eventData, isLoading, error } = useEvent(params.id)
   const [activePhotoIndex, setActivePhotoIndex] = useState<number | null>(null)
@@ -110,6 +21,7 @@ export default function EventGalleryPage({ params }: { params: { id: string } })
     title: string
     photos?: Array<{ id: string; image_url: string; alt_text?: string }> | string[]
     event_images?: Array<{ id: string; image_url: string; alt_text?: string }>
+    gallery?: Array<{ id: string; image_url: string; alt_text?: string | null }>
     category?: string | { name: string }
     rubrique?: string | { name: string }
     created_at?: string
@@ -118,12 +30,23 @@ export default function EventGalleryPage({ params }: { params: { id: string } })
     participants?: number
   }
 
+  // Données d'événements (à synchroniser avec gallery/page.tsx)
+  const galleryEvents: GalleryEventItem[] = []
+
   // Utiliser les données Supabase ou les données de fallback
   const eventItem: GalleryEventItem | undefined = eventData || galleryEvents.find(e => e.id === parseInt(params.id))
   
   // Helper functions pour accéder aux données de manière sécurisée
   const getPhotos = useCallback((item: GalleryEventItem | undefined): Array<{ id: string; image_url: string; alt_text?: string }> => {
     if (!item) return []
+
+    if (Array.isArray(item.gallery) && item.gallery.length > 0) {
+      return item.gallery.map((p) => ({
+        id: p.id,
+        image_url: p.image_url,
+        alt_text: p.alt_text ?? undefined,
+      }))
+    }
     
     // Si photos est un tableau de strings (données de fallback)
     if (Array.isArray(item.photos) && item.photos.length > 0 && typeof item.photos[0] === 'string') {

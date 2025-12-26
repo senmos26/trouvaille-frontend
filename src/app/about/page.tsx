@@ -279,7 +279,31 @@ export default function AboutPage() {
   }
 
   // Utiliser les données Supabase ou les données de fallback
-  const displayTimelineData = timelineData && timelineData.length > 0 ? timelineData : fallbackTimelineData
+  const supabaseTimelineData = (timelineData || []).map((entry: { year?: string; title?: string; content?: string; images?: string[] }) => ({
+    title: entry.year || "",
+    content: (
+      <div>
+        <h3 className="text-xl md:text-2xl font-bold text-[#0A1128] mb-4">{entry.title}</h3>
+        <p className="text-neutral-700 text-sm md:text-base mb-8 leading-relaxed">{entry.content}</p>
+        {Array.isArray(entry.images) && entry.images.length > 0 && (
+          <div className="grid grid-cols-2 gap-4">
+            {entry.images.slice(0, 4).map((src, idx) => (
+              <Image
+                key={idx}
+                src={src}
+                alt=""
+                width={800}
+                height={600}
+                className="h-20 md:h-44 lg:h-60 w-full rounded-lg object-cover shadow-[0_0_24px_rgba(10,17,40,0.06)]"
+              />
+            ))}
+          </div>
+        )}
+      </div>
+    ),
+  }))
+
+  const displayTimelineData = supabaseTimelineData.length > 0 ? supabaseTimelineData : fallbackTimelineData
 
   return (
     <div className="bg-white">

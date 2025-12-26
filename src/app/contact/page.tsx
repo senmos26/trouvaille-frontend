@@ -3,6 +3,7 @@
 import { useState } from "react"
 import { motion } from "framer-motion"
 import { Mail, Phone, MapPin, Users, Send, MessageCircle, User, BookText, MessageSquare, Clock, Globe } from "lucide-react"
+import { createContact } from "@/lib/actions/contacts"
 
 export default function ContactPage() {
   const [formData, setFormData] = useState({
@@ -17,15 +18,26 @@ export default function ContactPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setIsSubmitting(true)
-    
-    // Simuler l'envoi
-    await new Promise(resolve => setTimeout(resolve, 1500))
-    
-    setIsSubmitting(false)
-    setSubmitted(true)
-    setFormData({ name: "", email: "", subject: "", message: "" })
-    
-    setTimeout(() => setSubmitted(false), 5000)
+    setSubmitted(false)
+
+    try {
+      const result = await createContact(formData)
+
+      if (!result.success) {
+        alert(`Erreur lors de l'envoi du message : ${result.error || "Veuillez réessayer plus tard."}`)
+        return
+      }
+
+      setSubmitted(true)
+      setFormData({ name: "", email: "", subject: "", message: "" })
+
+      setTimeout(() => setSubmitted(false), 5000)
+    } catch (error) {
+      console.error("Erreur lors de l'envoi du message de contact :", error)
+      alert("Une erreur est survenue lors de l'envoi du message. Veuillez réessayer.")
+    } finally {
+      setIsSubmitting(false)
+    }
   }
 
   return (

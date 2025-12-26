@@ -45,10 +45,10 @@ export default function Header() {
 
   return (
     <header 
-      className={`sticky top-0 z-50 w-full border-b backdrop-blur transition-all duration-300 ${
+      className={`sticky top-0 z-50 w-full border-b backdrop-blur-md transition-all duration-300 ${
         isScrolled 
-          ? 'bg-background/95 shadow-sm supports-[backdrop-filter]:bg-background/80' 
-          : 'bg-background/10 border-border/40'
+          ? 'bg-white/95 dark:bg-gray-900/95 shadow-sm border-gray-200 dark:border-gray-700' 
+          : 'bg-white/80 dark:bg-gray-900/80 border-gray-200/40 dark:border-gray-700/40'
       }`}
     >
       <div className="container flex h-16 items-center justify-between">
@@ -61,7 +61,7 @@ export default function Header() {
             height={40}
             className="h-10 w-auto"
           />
-          <span className="font-bold text-lg tracking-tight">
+          <span className="font-bold text-lg tracking-tight text-[#0A1128] dark:text-white">
             LA TROUVAILLE
           </span>
         </Link>
@@ -77,7 +77,7 @@ export default function Header() {
           <ThemeToggle />
           <button 
             onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-            className="inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors hover:bg-accent hover:text-accent-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring h-9 w-9"
+            className="inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors hover:bg-gray-100 dark:hover:bg-gray-800 text-[#0A1128] dark:text-white focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring h-9 w-9"
             aria-label="Toggle menu"
           >
             {isMobileMenuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
@@ -87,7 +87,7 @@ export default function Header() {
 
       {/* Mobile Navigation */}
       {isMobileMenuOpen && (
-        <div className="border-t md:hidden animate-in slide-in-from-top-5">
+        <div className="border-t border-gray-200 dark:border-gray-700 md:hidden animate-in slide-in-from-top-5 bg-white dark:bg-gray-900">
           <div className="container py-4">
             <nav className="flex flex-col space-y-3">
               {/* Main Links */}
@@ -96,10 +96,10 @@ export default function Header() {
                   key={link.href}
                   href={link.href}
                   onClick={() => setIsMobileMenuOpen(false)}
-                  className={`block px-4 py-2 rounded-md text-sm font-medium transition-colors hover:bg-accent hover:text-accent-foreground ${
+                  className={`block px-4 py-2 rounded-md text-sm font-medium transition-colors hover:bg-gray-100 dark:hover:bg-gray-800 ${
                     isActiveLink(link.href) 
-                      ? 'text-[#FFD700] font-semibold bg-accent/50' 
-                      : ''
+                      ? 'text-[#FFD700] font-semibold bg-gray-100 dark:bg-gray-800' 
+                      : 'text-[#0A1128] dark:text-gray-200'
                   }`}
                 >
                   {link.label}
@@ -108,7 +108,7 @@ export default function Header() {
               
               {/* Dropdown Sections */}
               {Object.entries(dropdownMenus).map(([menuName, menuItems]) => (
-                <div key={menuName} className="pt-3 border-t">
+                <div key={menuName} className="pt-3 border-t border-gray-200 dark:border-gray-700">
                   <div className="px-4 py-2 text-sm font-semibold text-[#FFD700]">
                     {menuName}
                   </div>
@@ -117,10 +117,10 @@ export default function Header() {
                       key={item.href}
                       href={item.href}
                       onClick={() => setIsMobileMenuOpen(false)}
-                      className={`block px-6 py-2 rounded-md text-sm transition-colors hover:bg-accent hover:text-accent-foreground ${
+                      className={`block px-6 py-2 rounded-md text-sm transition-colors hover:bg-gray-100 dark:hover:bg-gray-800 ${
                         isActiveLink(item.href) 
-                          ? 'text-[#FFD700] font-semibold bg-accent/50' 
-                          : 'text-muted-foreground'
+                          ? 'text-[#FFD700] font-semibold bg-gray-100 dark:bg-gray-800' 
+                          : 'text-gray-600 dark:text-gray-400'
                       }`}
                     >
                       {item.label}

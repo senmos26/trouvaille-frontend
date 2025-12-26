@@ -29,7 +29,7 @@ export default function EventsSection() {
       initial="hidden" 
       whileInView="visible" 
       viewport={{ once: true, amount: 0.2 }} 
-      className="py-20 bg-white"
+      className="py-20 bg-white dark:bg-gray-900"
     >
       <div className="container">
         <motion.div variants={itemVariants} className="text-center mb-12">
@@ -39,13 +39,37 @@ export default function EventsSection() {
           </p>
         </motion.div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-12">
-          {displayEvents.map((event) => (
-            <motion.div 
-              key={event.id} 
-              variants={itemVariants} 
-              className="bg-white rounded-2xl overflow-hidden shadow-lg border border-gray-200 hover:shadow-2xl hover:-translate-y-2 transition-all duration-300"
+        {displayEvents.length === 0 ? (
+          <motion.div
+            variants={itemVariants}
+            className="mx-auto max-w-2xl rounded-2xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 p-10 text-center shadow-sm"
+          >
+            <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-[#0A1128]/5 dark:bg-[#FFD700]/10">
+              <MapPin size={24} className="text-[#0A1128]" />
+            </div>
+            <h3 className="text-2xl font-bold text-[#0A1128] dark:text-white mb-2">
+              Aucun événement pour le moment
+            </h3>
+            <p className="text-muted-foreground mb-6">
+              Revenez bientôt ou consultez la liste complète des événements.
+            </p>
+            <Link
+              href="/events"
+              className="inline-flex items-center gap-2 px-8 py-4 bg-[#FFD700] text-[#0A1128] font-bold rounded-xl shadow-lg hover:bg-[#E6C200] hover:shadow-xl hover:-translate-y-1 transition-all dark:shadow-[#FFD700]/20"
             >
+              Voir tous les événements
+              <ArrowRight size={20} />
+            </Link>
+          </motion.div>
+        ) : (
+          <>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-12">
+              {displayEvents.map((event) => (
+                <motion.div 
+                  key={event.id} 
+                  variants={itemVariants} 
+                  className="bg-white dark:bg-gray-800 rounded-2xl overflow-hidden shadow-lg border border-gray-200 dark:border-gray-700 hover:shadow-2xl hover:-translate-y-2 transition-all duration-300"
+                >
               {/* Image */}
               <div className="relative h-56 overflow-hidden bg-gradient-to-br from-[#0A1128] to-[#1a2a4a]">
                 {event.image && event.image.trim() ? (
@@ -99,7 +123,7 @@ export default function EventsSection() {
               {/* Contenu */}
               <div className="p-6">
                 {/* Titre */}
-                <h3 className="text-xl font-bold text-[#0A1128] mb-3 line-clamp-2">
+                <h3 className="text-xl font-bold text-[#0A1128] dark:text-white mb-3 line-clamp-2">
                   {event.title}
                 </h3>
                 
@@ -187,16 +211,18 @@ export default function EventsSection() {
               </div>
             </motion.div>
           ))}
-        </div>
+            </div>
 
-        <motion.div variants={itemVariants} className="text-center">
-          <Link href="/events">
-            <button className="inline-flex items-center gap-2 px-8 py-4 bg-[#FFD700] text-[#0A1128] font-bold rounded-xl shadow-lg hover:bg-[#E6C200] hover:shadow-xl hover:-translate-y-1 transition-all">
-              Voir tous les événements
-              <ArrowRight size={20} />
-            </button>
-          </Link>
-        </motion.div>
+            <motion.div variants={itemVariants} className="text-center">
+              <Link href="/events">
+                <button className="inline-flex items-center gap-2 px-8 py-4 bg-[#FFD700] text-[#0A1128] font-bold rounded-xl shadow-lg hover:bg-[#E6C200] hover:shadow-xl hover:-translate-y-1 transition-all dark:shadow-[#FFD700]/20">
+                  Voir tous les événements
+                  <ArrowRight size={20} />
+                </button>
+              </Link>
+            </motion.div>
+          </>
+        )}
       </div>
     </motion.section>
   )

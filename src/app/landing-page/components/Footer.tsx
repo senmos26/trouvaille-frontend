@@ -17,12 +17,12 @@ export default function Footer() {
   ]
 
   return (
-    <footer className="bg-[#0A1128] text-white py-12 md:py-16">
+    <footer className="bg-[#0A1128] dark:bg-gray-950 text-white py-12 md:py-16">
       <div className="container">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 mb-12">
           {/* À propos */}
           <div>
-            <h3 className="text-[#FFD700] font-bold text-lg mb-4">
+            <h3 className="text-[#FFD700] dark:text-[#FFD700] font-bold text-lg mb-4">
               La Trouvaille
             </h3>
             <p className="text-sm text-white/80 leading-relaxed">
@@ -33,7 +33,7 @@ export default function Footer() {
 
           {/* Navigation */}
           <div>
-            <h4 className="text-[#FFD700] font-bold mb-4">
+            <h4 className="text-[#FFD700] dark:text-[#FFD700] font-bold mb-4">
               Navigation
             </h4>
             <ul className="space-y-2">
@@ -52,7 +52,7 @@ export default function Footer() {
 
           {/* Ressources */}
           <div>
-            <h4 className="text-[#FFD700] font-bold mb-4">
+            <h4 className="text-[#FFD700] dark:text-[#FFD700] font-bold mb-4">
               Ressources
             </h4>
             <ul className="space-y-2">
@@ -71,7 +71,7 @@ export default function Footer() {
 
           {/* Contact */}
           <div>
-            <h4 className="text-[#FFD700] font-bold mb-4">
+            <h4 className="text-[#FFD700] dark:text-[#FFD700] font-bold mb-4">
               Contact
             </h4>
             <div className="space-y-3 text-sm text-white/80">

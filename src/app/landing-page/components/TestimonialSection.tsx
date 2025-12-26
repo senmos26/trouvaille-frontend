@@ -48,7 +48,7 @@ export default function TestimonialSection() {
       initial="hidden" 
       whileInView="visible" 
       viewport={{ once: true, amount: 0.2 }} 
-      className="py-20 bg-gradient-to-br from-gray-900 to-gray-800 text-white"
+      className="py-20 bg-gradient-to-br from-gray-900 to-gray-800 dark:from-gray-950 dark:to-gray-900 text-white"
     >
       <div className="container">
         <motion.div variants={itemVariants} className="text-center mb-12">
@@ -67,18 +67,23 @@ export default function TestimonialSection() {
                 exit={{ opacity: 0, x: -50 }}
                 transition={{ duration: 0.5, ease: "easeInOut" }}
               >
-                <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-8 md:p-12 border border-white/20">
+                <div className="bg-white/10 dark:bg-white/5 backdrop-blur-sm rounded-2xl p-8 md:p-12 border border-white/20 dark:border-white/10">
                   <Quote size={48} className="text-[#FFD700] mb-6" />
                   <blockquote className="text-xl md:text-2xl leading-relaxed mb-8 italic">
                     &ldquo;{displayTestimonials[currentIndex].quote}&rdquo;
                   </blockquote>
                   <div className="flex items-center gap-4">
                     <div className="w-16 h-16 rounded-full bg-[#FFD700] flex items-center justify-center text-white font-bold text-xl">
-                      {displayTestimonials[currentIndex].initials || displayTestimonials[currentIndex].author_name?.split(' ').map((n: string) => n[0]).join('')}
+                      {displayTestimonials[currentIndex].initials ||
+                        displayTestimonials[currentIndex].author_name
+                          ?.split(" ")
+                          .filter(Boolean)
+                          .map((n: string) => n[0])
+                          .join("")}
                     </div>
                     <div>
-                      <h4 className="font-bold text-lg">{displayTestimonials[currentIndex].author_name || displayTestimonials[currentIndex].name}</h4>
-                      <p className="text-gray-300">{displayTestimonials[currentIndex].author_title || displayTestimonials[currentIndex].title}</p>
+                      <h4 className="font-bold text-lg">{displayTestimonials[currentIndex].author_name}</h4>
+                      <p className="text-gray-300 dark:text-gray-400">{displayTestimonials[currentIndex].author_title}</p>
                     </div>
                   </div>
                 </div>
@@ -88,7 +93,7 @@ export default function TestimonialSection() {
 
           <div className="flex items-center justify-center gap-4 mt-8">
             <button 
-              className="w-12 h-12 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center transition-all"
+              className="w-12 h-12 rounded-full bg-white/10 dark:bg-white/5 hover:bg-white/20 dark:hover:bg-white/10 flex items-center justify-center transition-all"
               onClick={prevTestimonial}
               aria-label="Témoignage précédent"
             >
@@ -113,7 +118,7 @@ export default function TestimonialSection() {
             </div>
 
             <button 
-              className="w-12 h-12 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center transition-all"
+              className="w-12 h-12 rounded-full bg-white/10 dark:bg-white/5 hover:bg-white/20 dark:hover:bg-white/10 flex items-center justify-center transition-all"
               onClick={nextTestimonial}
               aria-label="Témoignage suivant"
             >

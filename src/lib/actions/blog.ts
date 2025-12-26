@@ -1,7 +1,11 @@
-import { supabase } from '../supabase'
+import { supabase, isSupabaseConfigured, getSupabaseConfigErrorMessage, logSupabaseError, toastSupabaseError } from '../supabase'
 
 export async function getBlogPosts() {
   try {
+    if (!isSupabaseConfigured()) {
+      throw new Error(getSupabaseConfigErrorMessage() || 'Supabase is not configured')
+    }
+
     const { data, error, count } = await supabase
       .from('blog_posts')
       .select(`
@@ -19,7 +23,8 @@ export async function getBlogPosts() {
       total: count || 0
     }
   } catch (error) {
-    console.error('Error fetching blog posts:', error)
+    logSupabaseError('Error fetching blog posts:', error)
+    toastSupabaseError('Error fetching blog posts:', error)
     return {
       data: [],
       total: 0
@@ -29,6 +34,10 @@ export async function getBlogPosts() {
 
 export async function getBlogPost(postId: string) {
   try {
+    if (!isSupabaseConfigured()) {
+      throw new Error(getSupabaseConfigErrorMessage() || 'Supabase is not configured')
+    }
+
     const { data, error } = await supabase
       .from('blog_posts')
       .select(`
@@ -44,13 +53,18 @@ export async function getBlogPost(postId: string) {
     if (error) throw error
     return data
   } catch (error) {
-    console.error('Error fetching blog post:', error)
+    logSupabaseError('Error fetching blog post:', error)
+    toastSupabaseError('Error fetching blog post:', error)
     return null
   }
 }
 
 export async function getBlogCategories() {
   try {
+    if (!isSupabaseConfigured()) {
+      throw new Error(getSupabaseConfigErrorMessage() || 'Supabase is not configured')
+    }
+
     const { data, error } = await supabase
       .from('blog_categories')
       .select('*')
@@ -59,13 +73,18 @@ export async function getBlogCategories() {
     if (error) throw error
     return data || []
   } catch (error) {
-    console.error('Error fetching blog categories:', error)
+    logSupabaseError('Error fetching blog categories:', error)
+    toastSupabaseError('Error fetching blog categories:', error)
     return []
   }
 }
 
 export async function likeBlogPost(postId: string, userIp: string = 'anonymous') {
   try {
+    if (!isSupabaseConfigured()) {
+      throw new Error(getSupabaseConfigErrorMessage() || 'Supabase is not configured')
+    }
+
     // Vérifier si l'utilisateur a déjà liké ce post
     const { data: existingLike, error: checkError } = await supabase
       .from('blog_likes')
@@ -121,7 +140,8 @@ export async function likeBlogPost(postId: string, userIp: string = 'anonymous')
 
     return { success: true, data: { liked: true, likes_count: 0 }, action: 'liked' }
   } catch (error) {
-    console.error('Error liking blog post:', error)
+    logSupabaseError('Error liking blog post:', error)
+    toastSupabaseError('Error liking blog post:', error)
     throw error
   }
 }
@@ -132,6 +152,10 @@ export async function addBlogComment(postId: string, commentData: {
   content: string
 }) {
   try {
+    if (!isSupabaseConfigured()) {
+      throw new Error(getSupabaseConfigErrorMessage() || 'Supabase is not configured')
+    }
+
     const { data, error } = await supabase
       .from('blog_comments')
       .insert({
@@ -154,13 +178,18 @@ export async function addBlogComment(postId: string, commentData: {
 
     return data
   } catch (error) {
-    console.error('Error adding blog comment:', error)
+    logSupabaseError('Error adding blog comment:', error)
+    toastSupabaseError('Error adding blog comment:', error)
     throw error
   }
 }
 
 export async function getBlogComments(postId: string) {
   try {
+    if (!isSupabaseConfigured()) {
+      throw new Error(getSupabaseConfigErrorMessage() || 'Supabase is not configured')
+    }
+
     const { data, error } = await supabase
       .from('blog_comments')
       .select('*')
@@ -171,7 +200,8 @@ export async function getBlogComments(postId: string) {
     if (error) throw error
     return data || []
   } catch (error) {
-    console.error('Error fetching blog comments:', error)
+    logSupabaseError('Error fetching blog comments:', error)
+    toastSupabaseError('Error fetching blog comments:', error)
     return []
   }
 }

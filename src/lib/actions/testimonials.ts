@@ -1,7 +1,11 @@
-import { supabase } from '../supabase'
+import { supabase, isSupabaseConfigured, getSupabaseConfigErrorMessage, logSupabaseError, toastSupabaseError } from '../supabase'
 
 export async function getTestimonials() {
   try {
+    if (!isSupabaseConfigured()) {
+      throw new Error(getSupabaseConfigErrorMessage() || 'Supabase is not configured')
+    }
+
     const { data, error } = await supabase
       .from('testimonials')
       .select('*')
@@ -11,7 +15,8 @@ export async function getTestimonials() {
     if (error) throw error
     return data || []
   } catch (error) {
-    console.error('Error fetching testimonials:', error)
+    logSupabaseError('Error fetching testimonials:', error)
+    toastSupabaseError('Error fetching testimonials:', error)
     return []
   }
 }

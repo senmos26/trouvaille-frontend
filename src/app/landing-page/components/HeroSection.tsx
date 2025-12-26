@@ -2,93 +2,208 @@
 
 import { useRef } from "react"
 import Link from "next/link"
-import { motion, useScroll, useTransform } from "framer-motion"
-import { Rocket, Heart } from "lucide-react"
+import Image from "next/image"
+import { motion, useScroll, useTransform, useSpring } from "framer-motion"
+import { ArrowRight, Heart, CheckCircle2 } from "lucide-react"
 import Counter from "@/components/counter"
-import { sectionVariants } from "@/lib/animations"
+import TextType from "@/components/TextType"
+import { useStats } from "@/lib/hooks/use-stats"
 
 export default function HeroSection() {
-  const ref = useRef<HTMLDivElement>(null)
+  const containerRef = useRef<HTMLDivElement>(null)
+  const { data: statsData } = useStats()
+  
+  // Valeurs par défaut si les données ne sont pas encore chargées
+  const stats = statsData?.data || {
+    young_leaders: 500,
+    webinars: 100,
+    partnerships: 12
+  }
+  
+  // On track le scroll par rapport à ce container spécifique
   const { scrollYProgress } = useScroll({
-    target: ref,
+    target: containerRef,
     offset: ["start start", "end start"],
   })
 
-  const backgroundY = useTransform(scrollYProgress, [0, 1], ["0%", "30%"])
-  const textY = useTransform(scrollYProgress, [0, 1], ["0%", "50%"])
-  const titleY = useTransform(scrollYProgress, [0, 1], ["0%", "80%"])
-  const subtitleY = useTransform(scrollYProgress, [0, 1], ["0%", "60%"])
-  const buttonsY = useTransform(scrollYProgress, [0, 1], ["0%", "40%"])
-  const statsY = useTransform(scrollYProgress, [0, 1], ["0%", "20%"])
-  const opacity = useTransform(scrollYProgress, [0, 0.5], [1, 0])
+  // --- CONFIGURATION PARALLAXE EXPERT ---
+  
+  // 1. L'Image de fond : Doit être plus grande que le container et bouger lentement
+  // On utilise spring pour lisser le mouvement (doux arrêt)
+  const bgY = useTransform(scrollYProgress, [0, 1], ["0%", "20%"])
+  const bgScale = useTransform(scrollYProgress, [0, 1], [1.1, 1.15]) // Zoom très léger continu
 
+  // 2. Le Texte (Gauche) : Monte plus vite que le fond pour créer le détachement
+  const textY = useTransform(scrollYProgress, [0, 1], ["0%", "60%"])
+  const textOpacity = useTransform(scrollYProgress, [0, 0.5], [1, 0]) // Fade out à mi-chemin
+
+  // 3. La Carte (Droite) : Effet de "flottement" distinct (inertie différente)
+  // Elle monte un peu moins vite que le texte, donnant l'impression d'être "posée"
+  const cardY = useTransform(scrollYProgress, [0, 1], ["0%", "40%"])
+  
   return (
-    <section ref={ref} className="relative min-h-screen flex items-center justify-center overflow-hidden">
-      <motion.div 
-        className="absolute inset-0"
-        style={{ 
-          y: backgroundY,
-          backgroundImage: 'linear-gradient(135deg, rgba(10, 17, 40, 0.95) 0%, rgba(23, 43, 77, 0.85) 50%, rgba(5, 10, 24, 0.95) 100%), url(/images/6007.jpg)',
-          backgroundSize: 'cover',
-          backgroundPosition: 'center',
-          backgroundAttachment: 'fixed'
-        }} 
-      />
+    <section 
+      ref={containerRef} 
+      className="relative h-[95vh] min-h-[700px] w-full flex items-center overflow-hidden"
+    >
       
-      <motion.div
-        className="container relative z-10 py-20"
-        style={{ y: textY }}
-        variants={sectionVariants}
-        initial="hidden"
-        animate="visible"
-      >
-        <motion.div style={{ y: titleY, opacity }} className="text-center">
-          <h1 className="text-5xl md:text-6xl lg:text-7xl font-bold mb-6 text-white">
-            Des idées pour bâtir
-            <br />
-            <span className="text-[#FFD700]">l&apos;Afrique de demain</span>
-          </h1>
+      {/* 1. LAYER ARRIÈRE-PLAN (Background) */}
+      <div className="absolute inset-0 z-0 w-full h-full">
+        <motion.div 
+          style={{ y: bgY, scale: bgScale }}
+          className="relative w-full h-[120%] -top-[10%] will-change-transform" // will-change pour performance GPU
+        >
+          <Image 
+            src="/images/6007.jpg" 
+            alt="Jeunesse Africaine en action"
+            fill
+            className="object-cover"
+            priority
+            quality={90}
+          />
+          
+          {/* Les dégradés sont DANS le div qui bouge pour rester collés à l'image */}
+          <div className="absolute inset-0 bg-gradient-to-r from-[#0A1128]/95 via-[#0A1128]/50 to-transparent" />
+          <div className="absolute bottom-0 left-0 right-0 h-40 bg-gradient-to-t from-[#0A1128] via-[#0A1128]/60 to-transparent" />
         </motion.div>
+      </div>
+
+      <div className="container relative z-10 grid grid-cols-1 lg:grid-cols-12 gap-8 items-center h-full pt-20">
         
-        <motion.div style={{ y: subtitleY, opacity }} className="text-center max-w-3xl mx-auto mb-12">
-          <p className="text-xl md:text-2xl text-white/90">
-            La Trouvaille est un organisme fondé par des jeunes et pour les jeunes. 
-            Une tribune où chaque voix compte pour construire une Afrique prospère, innovante et unie.
-          </p>
+        {/* 2. LAYER PREMIER PLAN (Texte) */}
+        <motion.div 
+          style={{ y: textY, opacity: textOpacity }}
+          className="lg:col-span-7 text-white space-y-8 will-change-transform"
+        >
+          
+         
+
+          <motion.h1 
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 0.1 }}
+            className="text-5xl md:text-6xl lg:text-7xl font-extrabold leading-[1.1] tracking-tight"
+          >
+            Des idées pour bâtir <br/>
+            <span className="text-[#FFD700] underline decoration-4 underline-offset-8 decoration-white/10">
+              <TextType
+                as="span"
+                text={[
+                  "l'Afrique de demain",
+                  "l'Afrique qui innove",
+                  "l'Afrique qui ose"
+                ]}
+                typingSpeed={80}
+                pauseDuration={2000}
+                showCursor={true}
+                cursorCharacter="|"
+              />
+            </span>.
+          </motion.h1>
+
+          <motion.p 
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 0.2 }}
+            className="text-lg md:text-xl text-gray-200 max-w-xl leading-relaxed font-medium"
+          >
+            La Trouvaille est la tribune où chaque voix compte. Ensemble, transformons le potentiel de la jeunesse en impact réel pour notre continent.
+          </motion.p>
+
+          <motion.div 
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 0.3 }}
+            className="flex flex-col sm:flex-row gap-4 pt-2"
+          >
+            <Link href="/contact">
+              <button className="group h-14 px-8 bg-[#FFD700] text-[#0A1128] font-bold text-lg hover:bg-white dark:hover:bg-gray-100 transition-all duration-300 rounded-sm flex items-center justify-center gap-2 min-w-[200px] shadow-[0_0_20px_rgba(255,215,0,0.2)] hover:shadow-[0_0_30px_rgba(255,215,0,0.4)]">
+                Nous rejoindre
+                <ArrowRight size={20} strokeWidth={3} className="transition-transform group-hover:translate-x-1" />
+              </button>
+            </Link>
+            <Link href="/about">
+              <button className="h-14 px-8 border-2 border-white/20 dark:border-white/30 text-white font-bold text-lg hover:bg-white hover:text-[#0A1128] hover:border-white transition-all duration-300 rounded-sm min-w-[200px] backdrop-blur-sm">
+                Notre Mission
+              </button>
+            </Link>
+          </motion.div>
+          
+         
         </motion.div>
-        
-        <motion.div style={{ y: buttonsY, opacity }} className="flex flex-wrap gap-4 justify-center mb-16">
-          <Link href="/about">
-            <button className="inline-flex items-center gap-2 px-8 py-4 bg-[#FFD700] text-[#0A1128] rounded-full font-semibold text-lg hover:bg-[#E6C200] transition-all hover:scale-105 hover:shadow-lg">
-              <Rocket size={20} /> Découvrir notre mission
-            </button>
-          </Link>
-          <Link href="/contact">
-            <button className="inline-flex items-center gap-2 px-8 py-4 border-2 border-white/30 text-white rounded-full font-semibold text-lg hover:bg-white/10 hover:border-white transition-all hover:scale-105">
-              <Heart size={20} /> Nous rejoindre
-            </button>
-          </Link>
-        </motion.div>
-        
-        <motion.div style={{ y: statsY, opacity }}>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-4xl mx-auto">
-            {[
-              { value: 500, suffix: "+", label: "Jeunes Engagés" },
-              { value: 100, suffix: "+", label: "Webinaires Réalisés" },
-              { value: 12, suffix: "", label: "Partenariats" },
-            ].map((stat) => (
-              <div key={stat.label} className="text-center">
-                <div className="text-4xl md:text-5xl font-bold text-[#FFD700] mb-2">
-                  <Counter end={stat.value} suffix={stat.suffix} duration={2500} />
+
+        {/* 3. LAYER FLOTTANT (Card) - Inertie différente */}
+        <motion.div 
+          style={{ y: cardY, opacity: textOpacity }} // Utilise cardY ici
+          className="hidden lg:block lg:col-start-9 lg:col-span-4 perspective-1000"
+        >
+          <motion.div 
+            initial={{ opacity: 0, x: 50, rotateY: -10 }}
+            animate={{ opacity: 1, x: 0, rotateY: 0 }}
+            transition={{ duration: 1, type: "spring", bounce: 0.2 }}
+            className="bg-white dark:bg-gray-800 text-[#0A1128] dark:text-white p-8 rounded-sm shadow-2xl relative will-change-transform"
+          >
+            {/* Petit accent décoratif */}
+            <div className="absolute top-0 left-0 w-full h-1.5 bg-gradient-to-r from-[#FFD700] to-[#FFE55C]" />
+            
+            <h3 className="text-xl font-bold mb-6 flex items-center gap-2">
+              <Heart className="fill-[#FFD700] text-[#FFD700]" />
+              Notre Impact en Chiffres
+            </h3>
+
+            <div className="space-y-6 divide-y divide-gray-100">
+              <div className="pt-4 group cursor-default">
+                <div className="flex items-baseline gap-1">
+                  <span className="text-4xl font-extrabold tabular-nums group-hover:text-blue-700 dark:group-hover:text-[#FFD700] transition-colors">
+                    <Counter end={stats.young_leaders} suffix="+" duration={2500} />
+                  </span>
                 </div>
-                <div className="text-sm md:text-base text-white/80 font-medium uppercase tracking-wide">
-                  {stat.label}
-                </div>
+                <p className="text-sm text-gray-600 dark:text-gray-400 font-medium uppercase tracking-wide mt-1">Jeunes Leaders Engagés</p>
               </div>
-            ))}
-          </div>
+
+              <div className="pt-4 group cursor-default">
+                <div className="flex items-baseline gap-1">
+                  <span className="text-4xl font-extrabold tabular-nums group-hover:text-blue-700 dark:group-hover:text-[#FFD700] transition-colors">
+                    <Counter end={stats.webinars} suffix="+" duration={2500} />
+                  </span>
+                </div>
+                <p className="text-sm text-gray-600 dark:text-gray-400 font-medium uppercase tracking-wide mt-1">Webinaires Éducatifs</p>
+              </div>
+
+              <div className="pt-4 group cursor-default">
+                <div className="flex items-baseline gap-1">
+                  <span className="text-4xl font-extrabold tabular-nums group-hover:text-blue-700 dark:group-hover:text-[#FFD700] transition-colors">
+                    <Counter end={stats.partnerships} duration={2500} />
+                  </span>
+                </div>
+                <p className="text-sm text-gray-600 dark:text-gray-400 font-medium uppercase tracking-wide mt-1">Partenariats Stratégiques</p>
+              </div>
+            </div>
+
+            <div className="mt-8 pt-6 border-t border-gray-100">
+               <p className="text-sm text-gray-500 italic">
+                 "Une tribune pour construire une Afrique prospère et unie."
+               </p>
+            </div>
+          </motion.div>
         </motion.div>
-      </motion.div>
+
+      </div>
+      
+      {/* Mobile Stats (Only visible on mobile) - Fixed at bottom */}
+      <div className="absolute bottom-0 z-20 w-full bg-[#0A1128] py-6 lg:hidden border-t border-white/10">
+        <div className="container flex justify-around text-center">
+            <div>
+               <p className="text-2xl font-bold text-white"><Counter end={500} suffix="+" /></p>
+               <p className="text-xs text-gray-400 uppercase">Membres</p>
+            </div>
+            <div>
+               <p className="text-2xl font-bold text-white"><Counter end={12} /></p>
+               <p className="text-xs text-gray-400 uppercase">Partenaires</p>
+            </div>
+        </div>
+      </div>
+
     </section>
   )
 }

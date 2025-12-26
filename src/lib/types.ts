@@ -166,7 +166,8 @@ export interface Objective {
   title: string
   description: string
   icon: string
-  order: number
+  color: string
+  sort_order: number
   status: 'active' | 'inactive'
   created_at: string
   updated_at: string
@@ -175,13 +176,16 @@ export interface Objective {
 // Types pour les témoignages
 export interface Testimonial {
   id: string
-  content: string
+  quote: string
   author_name: string
   author_title: string
   author_company?: string
-  image?: string
-  rating: number
-  status: 'active' | 'inactive'
+  author_photo?: string
+  initials?: string
+  rating?: number
+  status: 'draft' | 'published' | 'archived'
+  sort_order: number
+  archived_at?: string
   created_at: string
   updated_at: string
 }
@@ -189,13 +193,13 @@ export interface Testimonial {
 // Types pour les entrées de timeline
 export interface TimelineEntry {
   id: string
+  year: string
   title: string
-  description: string
-  date: string
-  type: 'milestone' | 'achievement' | 'event'
-  image?: string
-  order: number
-  status: 'active' | 'inactive'
+  content: string
+  images: string[]
+  sort_order: number
+  status: 'draft' | 'published' | 'archived'
+  archived_at?: string
   created_at: string
   updated_at: string
 }

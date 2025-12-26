@@ -28,7 +28,7 @@ export default function GalleryPage() {
   type GalleryEvent = {
     id: string
     title: string
-    photos?: Array<{ image_url: string }>
+    gallery?: Array<{ image_url: string; alt_text?: string | null }>
     category?: { name: string } | string
     rubrique?: { name: string } | string
     created_at?: string
@@ -73,11 +73,11 @@ export default function GalleryPage() {
   } else if (sortBy === "title") {
     filteredEvents = [...filteredEvents].sort((a: GalleryEvent, b: GalleryEvent) => a.title.localeCompare(b.title))
   } else if (sortBy === "photos") {
-    filteredEvents = [...filteredEvents].sort((a: GalleryEvent, b: GalleryEvent) => (b.photos?.length || 0) - (a.photos?.length || 0))
+    filteredEvents = [...filteredEvents].sort((a: GalleryEvent, b: GalleryEvent) => (b.gallery?.length || 0) - (a.gallery?.length || 0))
   }
 
   const totalEvents = filteredEvents.length
-  const totalPhotos = filteredEvents.reduce((sum: number, event: GalleryEvent) => sum + (event.photos?.length || 0), 0)
+  const totalPhotos = filteredEvents.reduce((sum: number, event: GalleryEvent) => sum + (event.gallery?.length || 0), 0)
 
   // Gestion des états de chargement et d'erreur
   if (eventsLoading) {
@@ -337,7 +337,7 @@ export default function GalleryPage() {
                 >
                 <div className="relative h-48 overflow-hidden">
                   <Image 
-                    src={event.photos?.[0]?.image_url || 'https://images.unsplash.com/photo-1507842217343-583bb7270b66?w=800'} 
+                    src={event.gallery?.[0]?.image_url || 'https://images.unsplash.com/photo-1507842217343-583bb7270b66?w=800'} 
                     alt={event.title}
                     width={400}
                     height={192}
@@ -354,7 +354,7 @@ export default function GalleryPage() {
                     )}
                   </div>
                   <div className="absolute bottom-4 right-4 bg-white/90 backdrop-blur-sm rounded-lg px-3 py-1.5 text-xs font-semibold text-[#0A1128]">
-                    {event.photos?.length || 0} photos
+                    {event.gallery?.length || 0} photos
                   </div>
                 </div>
                 
@@ -381,17 +381,17 @@ export default function GalleryPage() {
                   </div>
 
                   <div className="mt-4 grid grid-cols-4 gap-2">
-                    {(event.photos || []).slice(1, 5).map((photo: { image_url: string }, idx: number) => (
+                    {(event.gallery || []).slice(1, 5).map((photo: { image_url: string }, idx: number) => (
                       <div 
                         key={idx} 
                         className="aspect-square rounded-lg overflow-hidden relative group"
                       >
                         <Image src={photo.image_url} alt="" width={100} height={100} className="w-full h-full object-cover" />
                         {/* Indicateur "+X photos" sur la dernière miniature */}
-                        {idx === 3 && (event.photos?.length || 0) > 5 && (
+                        {idx === 3 && (event.gallery?.length || 0) > 5 && (
                           <div className="absolute inset-0 bg-[#0A1128]/80 flex items-center justify-center">
                             <span className="text-white font-bold text-sm">
-                              +{(event.photos?.length || 0) - 5}
+                              +{(event.gallery?.length || 0) - 5}
                             </span>
                           </div>
                         )}

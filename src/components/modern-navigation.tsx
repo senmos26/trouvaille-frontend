@@ -64,13 +64,13 @@ export function ModernNavigation() {
           <NavigationMenuItem key={link.href}>
             <Link
               href={link.href}
-              className="relative group px-4 py-2 text-sm font-medium transition-all duration-300"
+              className="relative group/link px-4 py-2 text-sm font-medium transition-all duration-300"
             >
               <span className={cn(
                 "relative z-10 transition-colors duration-300",
                 isActiveLink(link.href) 
-                  ? "text-[#0A1128]" 
-                  : "text-[#0A1128]/70 group-hover:text-[#0A1128]"
+                  ? "text-[#0A1128] dark:text-white" 
+                  : "text-[#0A1128] dark:text-gray-200 group-hover/link:text-[#0A1128] dark:group-hover/link:text-white"
               )}>
                 {link.label}
               </span>
@@ -78,7 +78,7 @@ export function ModernNavigation() {
               {/* Active indicator with gradient */}
               {isActiveLink(link.href) && (
                 <motion.div
-                  layoutId={`activeTab-${link.href}`}
+                  layoutId="mainNavActiveTab"
                   className="absolute inset-0 bg-gradient-to-r from-[#FFD700] via-[#FFD700] to-[#FFC107] rounded-lg"
                   initial={false}
                   transition={{ type: "spring", bounce: 0.2, duration: 0.6 }}
@@ -87,12 +87,12 @@ export function ModernNavigation() {
               
               {/* Hover effect - only when NOT active */}
               {!isActiveLink(link.href) && (
-                <span className="absolute inset-0 bg-[#FFD700]/10 rounded-lg scale-0 group-hover:scale-100 transition-transform duration-300" />
+                <span className="absolute inset-0 bg-[#FFD700]/10 rounded-lg scale-0 group-hover/link:scale-100 transition-transform duration-300" />
               )}
               
               {/* Bottom border animation - only when NOT active */}
               {!isActiveLink(link.href) && (
-                <span className="absolute bottom-0 left-1/2 -translate-x-1/2 h-0.5 bg-[#FFD700] w-0 group-hover:w-[calc(100%-2rem)] transition-all duration-300" />
+                <span className="absolute bottom-0 left-1/2 -translate-x-1/2 h-0.5 bg-[#FFD700] w-0 group-hover/link:w-[calc(100%-2rem)] transition-all duration-300" />
               )}
             </Link>
           </NavigationMenuItem>
@@ -106,8 +106,8 @@ export function ModernNavigation() {
             <NavigationMenuItem key={menuName}>
               <NavigationMenuTrigger
                 className={cn(
-                  "relative group bg-transparent hover:bg-[#FFD700]/10 data-[state=open]:bg-[#FFD700]/10 transition-all duration-300",
-                  isActive && "text-[#0A1128] font-semibold bg-gradient-to-r from-[#FFD700] via-[#FFD700] to-[#FFC107]"
+                  "relative group bg-transparent hover:bg-[#FFD700]/10 data-[state=open]:bg-[#FFD700]/10 transition-all duration-300 text-[#0A1128] dark:text-gray-200 hover:text-[#0A1128] dark:hover:text-white",
+                  isActive && "text-[#0A1128] dark:text-[#0A1128] font-semibold bg-gradient-to-r from-[#FFD700] via-[#FFD700] to-[#FFC107]"
                 )}
               >
                 {menuName}
@@ -147,22 +147,22 @@ export function ModernNavigation() {
                             <div className={cn(
                               "flex items-center gap-2 text-sm font-semibold mb-1 transition-colors duration-300",
                               isActiveLink(item.href) 
-                                ? "text-[#0A1128]" 
-                                : "text-[#0A1128]/80 group-hover:text-[#0A1128]"
+                                ? "text-[#0A1128] dark:text-white" 
+                                : "text-[#0A1128] dark:text-gray-200 group-hover:text-[#0A1128] dark:group-hover:text-white"
                             )}>
                               {item.label}
                               <ChevronRight className={cn(
                                 "w-4 h-4 transition-all duration-300",
                                 isActiveLink(item.href) 
                                   ? "text-[#FFD700] translate-x-1" 
-                                  : "text-[#0A1128]/30 translate-x-0 group-hover:translate-x-1 group-hover:text-[#FFD700]"
+                                  : "text-[#0A1128]/30 dark:text-gray-500 translate-x-0 group-hover:translate-x-1 group-hover:text-[#FFD700]"
                               )} />
                             </div>
                             <p className={cn(
                               "text-xs leading-relaxed transition-colors duration-300",
                               isActiveLink(item.href) 
-                                ? "text-[#0A1128]/70" 
-                                : "text-[#0A1128]/60 group-hover:text-[#0A1128]/80"
+                                ? "text-[#0A1128]/70 dark:text-gray-300" 
+                                : "text-[#0A1128]/60 dark:text-gray-400 group-hover:text-[#0A1128]/80 dark:group-hover:text-gray-300"
                             )}>
                               {item.description}
                             </p>
@@ -190,13 +190,13 @@ export function ModernNavigation() {
         <NavigationMenuItem>
           <Link
             href="/contact"
-            className="relative group px-4 py-2 text-sm font-medium transition-all duration-300"
+            className="relative group/link px-4 py-2 text-sm font-medium transition-all duration-300"
           >
             <span className={cn(
               "relative z-10 transition-colors duration-300",
               isActiveLink("/contact") 
-                ? "text-[#0A1128]" 
-                : "text-[#0A1128]/70 group-hover:text-[#0A1128]"
+                ? "text-[#0A1128] dark:text-white" 
+                : "text-[#0A1128] dark:text-gray-200 group-hover/link:text-[#0A1128] dark:group-hover/link:text-white"
             )}>
               Contact
             </span>
@@ -204,7 +204,7 @@ export function ModernNavigation() {
             {/* Active indicator */}
             {isActiveLink("/contact") && (
               <motion.div
-                layoutId="activeTab-/contact"
+                layoutId="mainNavActiveTab"
                 className="absolute inset-0 bg-gradient-to-r from-[#FFD700] via-[#FFD700] to-[#FFC107] rounded-lg"
                 initial={false}
                 transition={{ type: "spring", bounce: 0.2, duration: 0.6 }}
@@ -213,12 +213,12 @@ export function ModernNavigation() {
             
             {/* Hover effect - only when NOT active */}
             {!isActiveLink("/contact") && (
-              <span className="absolute inset-0 bg-[#FFD700]/10 rounded-lg scale-0 group-hover:scale-100 transition-transform duration-300" />
+              <span className="absolute inset-0 bg-[#FFD700]/10 rounded-lg scale-0 group-hover/link:scale-100 transition-transform duration-300" />
             )}
             
             {/* Bottom border animation - only when NOT active */}
             {!isActiveLink("/contact") && (
-              <span className="absolute bottom-0 left-1/2 -translate-x-1/2 h-0.5 bg-[#FFD700] w-0 group-hover:w-[calc(100%-2rem)] transition-all duration-300" />
+              <span className="absolute bottom-0 left-1/2 -translate-x-1/2 h-0.5 bg-[#FFD700] w-0 group-hover/link:w-[calc(100%-2rem)] transition-all duration-300" />
             )}
           </Link>
         </NavigationMenuItem>
