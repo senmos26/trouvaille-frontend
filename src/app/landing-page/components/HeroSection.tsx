@@ -182,7 +182,7 @@ export default function HeroSection() {
 
             <div className="mt-8 pt-6 border-t border-gray-100">
               <p className="text-sm text-gray-500 italic">
-                "Une tribune pour construire une Afrique prospère et unie."
+                &quot;Une tribune pour construire une Afrique prospère et unie.&quot;
               </p>
             </div>
           </motion.div>
