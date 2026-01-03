@@ -1,10 +1,10 @@
 "use client"
 
-import { useRef, ReactNode } from "react"
+import { useRef, ReactNode, Profiler } from "react"
 import Link from "next/link"
 import Image from "next/image"
 import { motion, useScroll, useTransform, MotionValue, useMotionTemplate } from "framer-motion"
-import { ArrowRight, Ticket, Globe, Zap, Users } from "lucide-react"
+import { ArrowRight, Ticket, Globe, Zap, Users, PersonStanding, PersonStandingIcon } from "lucide-react"
 import { Timeline } from "@/components/ui/timeline"
 import { useTimelineEntries } from "@/lib/hooks/use-timeline"
 
@@ -99,7 +99,7 @@ const ParallaxImage = ({ src, alt, className = "" }: { src: string, alt: string,
           src={src}
           alt={alt}
           fill
-          className="object-cover grayscale hover:grayscale-0 transition-all duration-1000"
+          className="object-cover grayscale-0 md:grayscale md:hover:grayscale-0 transition-all duration-1000"
         />
       </motion.div>
       <div className="absolute inset-0 bg-[#0A1128]/10 pointer-events-none" />
@@ -241,9 +241,8 @@ export default function AboutPage() {
               </div>
             </div>
 
-            {/* Overlapping Small Photo - Negative margin only on this column */}
-            <div className="lg:col-span-5 xl:col-span-4 order-1 lg:order-2 flex justify-end lg:-mt-[25rem]">
-              <div className="aspect-square relative w-full border-8 border-white dark:border-[#050A15] rounded-[2.5rem] overflow-hidden shadow-2xl transition-transform hover:scale-[1.02] duration-700">
+            <div className="lg:col-span-5 xl:col-span-4 order-1 lg:order-2 flex justify-end -mt-32 sm:-mt-48 lg:-mt-[25rem] relative z-30">
+              <div className="aspect-square relative w-[80%] sm:w-[70%] lg:w-full border-8 border-white dark:border-[#050A15] rounded-[2.5rem] overflow-hidden shadow-2xl transition-transform hover:scale-[1.02] duration-700">
                 <ParallaxImage src="https://images.unsplash.com/photo-1517486808906-6ca8b3f04846?w=800" alt="Team work" />
               </div>
             </div>
@@ -286,11 +285,11 @@ export default function AboutPage() {
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
                 transition={{ delay: i * 0.1, duration: 0.6 }}
-                className="group p-10 bg-white/5 border border-white/10 rounded-[2rem] hover:bg-[#FFD700] hover:text-[#0A1128] transition-all duration-500 cursor-pointer"
+                className="group p-10 bg-white/5 border border-white/10 rounded-[2rem] md:hover:bg-[#FFD700] md:hover:text-[#0A1128] transition-all duration-500 cursor-pointer"
               >
-                <item.icon className="w-10 h-10 mb-8 opacity-50 group-hover:opacity-100 transition-opacity" />
+               
                 <h3 className="text-2xl font-black uppercase mb-4 tracking-tight">{item.title}</h3>
-                <p className="text-sm font-medium opacity-60 group-hover:opacity-90">{item.desc}</p>
+                <p className="text-sm font-medium opacity-90 md:opacity-60 md:group-hover:opacity-90">{item.desc}</p>
               </motion.div>
             ))}
           </div>
@@ -305,17 +304,17 @@ export default function AboutPage() {
 
       <section className="py-24 px-4">
         <div className="container mx-auto">
-          <div className="relative rounded-[3rem] bg-[#FFD700] p-12 md:p-32 overflow-hidden text-[#0A1128] text-center">
+          <div className="relative rounded-[2.5rem] md:rounded-[3rem] bg-[#FFD700] px-6 py-16 md:p-32 overflow-hidden text-[#0A1128] text-center shadow-2xl">
             <div className="relative z-10 max-w-3xl mx-auto space-y-8">
-              <h2 className="text-5xl md:text-8xl font-black uppercase tracking-[-0.05em] leading-[0.85]">
+              <h2 className="text-4xl sm:text-6xl md:text-8xl font-black uppercase tracking-[-0.05em] leading-[0.85]">
                 Rejoignez le <br /> mouvement.
               </h2>
-              <div className="flex justify-center gap-4 pt-8">
-                <Link href="/contact" className="px-8 py-4 bg-[#0A1128] text-white font-bold rounded-full hover:scale-105 transition-transform flex items-center gap-2">
+              <div className="flex flex-col sm:flex-row items-center justify-center gap-4 pt-4 md:pt-8">
+                <Link href="/contact" className="w-full sm:w-auto px-8 py-4 bg-[#0A1128] text-white font-bold rounded-full hover:scale-105 transition-transform flex items-center justify-center gap-2 text-center">
                   Agir maintenant <ArrowRight size={18} />
                 </Link>
-                <Link href="/team" className="px-8 py-4 border-2 border-[#0A1128] text-[#0A1128] font-bold rounded-full hover:bg-[#0A1128] hover:text-white transition-colors flex items-center gap-2">
-                  L&apos;équipe <Ticket size={18} />
+                <Link href="/team" className="w-full sm:w-auto px-8 py-4 border-2 border-[#0A1128] text-[#0A1128] font-bold rounded-full hover:bg-[#0A1128] hover:text-white transition-colors flex items-center justify-center gap-2 text-center">
+                  L&apos;équipe 
                 </Link>
               </div>
             </div>

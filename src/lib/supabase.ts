@@ -3,11 +3,6 @@ import { createClient } from '@supabase/supabase-js'
 const rawSupabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || ''
 const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || ''
 
-// Diagnostic logs
-console.log('🔍 [SUPABASE CONFIG] URL:', rawSupabaseUrl)
-console.log('🔍 [SUPABASE CONFIG] Anon Key exists:', !!supabaseAnonKey)
-console.log('🔍 [SUPABASE CONFIG] Anon Key length:', supabaseAnonKey.length)
-console.log('🔍 [SUPABASE CONFIG] Anon Key first 20 chars:', supabaseAnonKey.substring(0, 20))
 
 const supabaseUrl = rawSupabaseUrl
   ? rawSupabaseUrl.startsWith('http://') || rawSupabaseUrl.startsWith('https://')
