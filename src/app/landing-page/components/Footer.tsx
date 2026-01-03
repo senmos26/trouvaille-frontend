@@ -4,9 +4,11 @@ import Link from "next/link"
 import Image from "next/image"
 import { Instagram, Linkedin, ArrowUpRight, Facebook } from "lucide-react"
 import { useEffect, useState } from "react"
+import { usePathname } from "next/navigation"
 
 export default function Footer() {
   const [mounted, setMounted] = useState(false)
+  const pathname = usePathname()
   useEffect(() => setMounted(true), [])
   const linkGroups = [
     {
@@ -97,7 +99,8 @@ export default function Footer() {
                     <li key={link.label}>
                       <Link
                         href={link.href}
-                        className="text-base font-bold uppercase tracking-tighter hover:text-[#FFD700] transition-colors"
+                        className={`text-base font-bold uppercase tracking-tighter transition-colors ${pathname === link.href ? 'text-[#FFD700]' : 'hover:text-[#FFD700]'
+                          }`}
                       >
                         {link.label}
                       </Link>

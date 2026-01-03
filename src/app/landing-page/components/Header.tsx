@@ -137,7 +137,10 @@ export default function Header() {
                           <Link
                             href={item.href}
                             onClick={() => setIsMobileMenuOpen(false)}
-                            className="block text-base font-medium text-[#0A1128] dark:text-gray-300 hover:text-[#FFD700] transition-colors"
+                            className={`block text-base font-medium transition-colors ${isActiveLink(item.href)
+                                ? 'text-[#FFD700]'
+                                : 'text-[#0A1128] dark:text-gray-300 hover:text-[#FFD700]'
+                              }`}
                           >
                             {item.label}
                           </Link>
