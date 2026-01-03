@@ -3,7 +3,7 @@
 import { useRef, ReactNode } from "react"
 import Link from "next/link"
 import Image from "next/image"
-import { motion, useScroll, useTransform, MotionValue } from "framer-motion"
+import { motion, useScroll, useTransform, MotionValue, useMotionTemplate } from "framer-motion"
 import { ArrowRight, Ticket, Globe, Zap, Users } from "lucide-react"
 import { Timeline } from "@/components/ui/timeline"
 import { useTimelineEntries } from "@/lib/hooks/use-timeline"
@@ -116,6 +116,54 @@ const fallbackTimelineData = [
   { title: "2024", content: "L'Échelle Continentale. Expansion stratégique dans 10 pays, consolidant notre position de leader dans l'accompagnement des leaders responsables de demain." },
 ]
 
+const HeroParallax = () => {
+  const heroRef = useRef(null)
+  const { scrollYProgress } = useScroll({
+    target: heroRef,
+    offset: ["start start", "end start"]
+  })
+
+  const translateXLeft = useTransform(scrollYProgress, [0, 1], [0, -400])
+  const translateXRight = useTransform(scrollYProgress, [0, 1], [0, 400])
+  const opacity = useTransform(scrollYProgress, [0, 0.5], [1, 0])
+  const scale = useTransform(scrollYProgress, [0, 1], [1, 0.8])
+
+  return (
+    <section ref={heroRef} className="relative h-screen min-h-[700px] flex items-center justify-center overflow-hidden">
+      <div className="absolute inset-0 w-full h-full bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-[#0A1128]/5 via-transparent to-transparent opacity-50" />
+
+      <div className="container mx-auto px-4 z-10 text-center">
+        <div className="flex flex-col items-center select-none">
+          <motion.div
+            style={{ x: translateXLeft, opacity, scale }}
+            className="text-[15vw] md:text-[12rem] font-black leading-[0.7] tracking-[-0.05em] uppercase text-[#0A1128] dark:text-white"
+          >
+            Audace<span className="text-[#FFD700] text-[2rem] md:text-[5rem] align-top relative top-4 md:top-8 font-serif italic lowercase tracking-normal ml-2">et</span>
+          </motion.div>
+
+          <motion.div
+            style={{ x: translateXRight, opacity, scale }}
+            className="text-[15vw] md:text-[12rem] font-black leading-[0.7] tracking-[-0.05em] uppercase text-[#0A1128] dark:text-white mt-4"
+          >
+            Impact
+          </motion.div>
+        </div>
+
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.8, duration: 1 }}
+          className="mt-16 flex flex-col items-center gap-6"
+        >
+          <p className="max-w-md mx-auto text-[10px] md:text-xs font-black uppercase tracking-[0.4em] text-[#0A1128]/40 dark:text-white/40">
+            L&apos;architecture du futur africain
+          </p>
+        </motion.div>
+      </div>
+    </section>
+  )
+}
+
 export default function AboutPage() {
   const { data: timelineData } = useTimelineEntries()
   const containerRef = useRef(null)
@@ -125,18 +173,18 @@ export default function AboutPage() {
     ? (timelineData || []).map((entry: { year?: string; title?: string; content?: string }) => ({
       title: entry.year || entry.title || "",
       content: (
-        <div className="space-y-6">
-          <h3 className="text-3xl md:text-5xl font-black text-[#0A1128] dark:text-white uppercase tracking-tighter leading-none">{entry.title}</h3>
-          <p className="text-xl md:text-2xl font-serif italic text-[#0A1128]/80 dark:text-white/80 leading-relaxed max-w-2xl">{entry.content}</p>
+        <div className="space-y-4 md:space-y-6">
+          <h3 className="text-xl md:text-5xl font-black text-[#0A1128] dark:text-white uppercase tracking-tighter leading-none">{entry.title}</h3>
+          <p className="text-lg md:text-2xl font-serif italic text-[#0A1128]/80 dark:text-white/80 leading-relaxed max-w-2xl">{entry.content}</p>
         </div>
       )
     }))
     : fallbackTimelineData.map(item => ({
       title: item.title,
       content: (
-        <div className="space-y-6">
-          <h3 className="text-3xl md:text-5xl font-black text-[#0A1128] dark:text-white uppercase tracking-tighter leading-none">{item.title === "2021" ? "Genèse" : "Expansion"}</h3>
-          <p className="text-xl md:text-2xl font-serif italic text-[#0A1128]/80 dark:text-white/80 leading-relaxed max-w-2xl">{item.content}</p>
+        <div className="space-y-4 md:space-y-6">
+          <h3 className="text-xl md:text-5xl font-black text-[#0A1128] dark:text-white uppercase tracking-tighter leading-none">{item.title === "2021" ? "Genèse" : "Expansion"}</h3>
+          <p className="text-lg md:text-2xl font-serif italic text-[#0A1128]/80 dark:text-white/80 leading-relaxed max-w-2xl">{item.content}</p>
         </div>
       )
     }))
@@ -144,35 +192,7 @@ export default function AboutPage() {
   return (
     <div ref={containerRef} className="bg-white dark:bg-[#050A15] text-[#0A1128] dark:text-white selection:bg-[#FFD700] selection:text-[#0A1128] overflow-x-hidden">
 
-      {/* 1. HERO SECTION - EFFET TEXTE MASSIF */}
-      <section className="relative h-screen min-h-[700px] flex items-center justify-center overflow-hidden">
-        <div className="absolute inset-0 w-full h-full bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-[#0A1128]/5 via-transparent to-transparent opacity-50" />
-
-        <div className="container mx-auto px-4 z-10 text-center">
-          <motion.div
-            initial={{ opacity: 0, y: 100 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 1, ease: [0.16, 1, 0.3, 1] }} // Courbe "Apple"
-          >
-            <h1 className="text-[14vw] md:text-[11rem] font-black leading-[0.8] tracking-[-0.05em] uppercase mix-blend-difference text-[#0A1128] dark:text-white">
-              Audace<span className="text-[#FFD700] text-[1.5rem] md:text-[3rem] align-top relative top-4 md:top-8 font-serif italic lowercase tracking-normal">et</span>
-              <br />
-              Impact
-            </h1>
-          </motion.div>
-
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 0.5, duration: 1 }}
-            className="mt-12 flex flex-col items-center gap-6"
-          >
-            <p className="max-w-md mx-auto text-sm md:text-base font-bold uppercase tracking-[0.2em] text-[#0A1128]/40 dark:text-white/40">
-              L&apos;architecture du futur africain
-            </p>
-          </motion.div>
-        </div>
-      </section>
+      <HeroParallax />
 
       {/* 2. STORY SECTION */}
       <section className="py-24 md:py-40">

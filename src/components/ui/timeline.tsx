@@ -36,10 +36,10 @@ export const Timeline = ({ data }: { data: TimelineEntry[] }) => {
       <div className="mx-auto max-w-7xl px-4 py-20 md:px-8 lg:px-10">
         <div className="text-left mb-12 max-w-4xl">
 
-          <h2 className="mb-6 text-4xl md:text-7xl font-black text-[#0A1128] dark:text-white uppercase tracking-tighter leading-[0.9]">
+          <h2 className="mb-6 text-3xl md:text-7xl font-black text-[#0A1128] dark:text-white uppercase tracking-tighter leading-[0.9]">
             Les étapes clés de <br /> <span className="text-[#FFD700] italic font-serif lowercase tracking-normal">La Trouvaille</span>
           </h2>
-          <p className="max-w-2xl text-base text-[#0A1128]/60 dark:text-white/60 md:text-xl font-serif italic leading-relaxed">
+          <p className="max-w-2xl text-sm text-[#0A1128]/60 dark:text-white/60 md:text-xl font-serif italic leading-relaxed">
             Chaque année marque une nouvelle progression. Voici les jalons qui ont façonné notre mouvement et renforcé notre impact sur le continent africain.
           </p>
         </div>
@@ -61,7 +61,7 @@ export const Timeline = ({ data }: { data: TimelineEntry[] }) => {
             </div>
 
             <div className="relative w-full pl-20 pr-4 md:pl-4">
-              <h3 className="mb-4 block text-left text-3xl font-black text-[#0A1128] dark:text-white md:hidden uppercase tracking-tighter">
+              <h3 className="mb-4 block text-left text-2xl font-black text-[#0A1128] dark:text-white md:hidden uppercase tracking-tighter">
                 {item.title}
               </h3>
               {item.content}

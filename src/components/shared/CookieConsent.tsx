@@ -36,21 +36,19 @@ export default function CookieConsent() {
                     animate={{ y: 0, opacity: 1, scale: 1 }}
                     exit={{ y: 100, opacity: 0, scale: 0.95 }}
                     transition={{ type: "spring", damping: 20, stiffness: 100 }}
-                    className="fixed bottom-6 left-6 right-6 md:left-auto md:right-8 md:max-w-[440px] z-[200]"
+                    className="fixed bottom-4 left-4 right-4 md:bottom-6 md:right-8 md:left-auto md:max-w-[440px] z-[200]"
                 >
-                    <div className="relative overflow-hidden bg-white/90 dark:bg-[#0A1128]/95 backdrop-blur-2xl border border-gray-100 dark:border-white/10 rounded-[2.5rem] shadow-[0_20px_50px_rgba(0,0,0,0.15)] dark:shadow-[0_20px_50px_rgba(0,0,0,0.4)] p-8 md:p-10">
+                    <div className="relative overflow-hidden bg-white/90 dark:bg-[#0A1128]/95 backdrop-blur-2xl border border-gray-100 dark:border-white/10 rounded-[2rem] md:rounded-[2.5rem] shadow-[0_20px_50px_rgba(0,0,0,0.15)] dark:shadow-[0_20px_50px_rgba(0,0,0,0.4)] p-6 md:p-10">
 
                         {/* Ambient Glow */}
                         <div className="absolute -top-20 -right-20 w-44 h-44 bg-[#FFD700] opacity-[0.08] blur-[60px] rounded-full pointer-events-none" />
 
                         <div className="relative z-10">
-                            <div className="flex items-center justify-between mb-8">
-                                <div className="flex items-center gap-4">
-                                    <div className="w-12 h-12 bg-[#FFD700] rounded-2xl flex items-center justify-center text-[#0A1128] shadow-lg shadow-[#FFD700]/20">
-                                        <ShieldCheck size={24} />
-                                    </div>
+                            <div className="flex items-center justify-between mb-6 md:mb-8">
+                                <div className="flex items-center gap-3 md:gap-4">
+                                  
                                     <div>
-                                        <h3 className="text-2xl font-black text-[#0A1128] dark:text-white uppercase tracking-tighter leading-none">
+                                        <h3 className="text-xl md:text-2xl font-black text-[#0A1128] dark:text-white uppercase tracking-tighter leading-none">
                                             Confiance
                                         </h3>
                                         <span className="text-[10px] font-black uppercase tracking-[0.3em] text-[#FFD700]">Digital Privacy</span>
@@ -64,38 +62,38 @@ export default function CookieConsent() {
                                 </button>
                             </div>
 
-                            <div className="space-y-4 mb-10">
-                                <p className="text-base text-[#0A1128] dark:text-white/90 font-bold leading-tight">
+                            <div className="space-y-3 mb-8 md:space-y-4 md:mb-10">
+                                <p className="text-sm md:text-base text-[#0A1128] dark:text-white/90 font-bold leading-tight">
                                     Sublimons ensemble votre navigation.
                                 </p>
-                                <p className="text-sm text-gray-500 dark:text-gray-400 leading-relaxed">
-                                    Nous utilisons des technologies de suivi pour personnaliser votre expérience sur <span className="text-[#0A1128] dark:text-white font-black underline decoration-[#FFD700] decoration-2 underline-offset-4">La Trouvaille</span>. Votre consentement nous aide à bâtir une plateforme plus performante.
+                                <p className="text-xs md:text-sm text-gray-500 dark:text-gray-400 leading-relaxed">
+                                    Nous utilisons des technologies de suivi pour personnaliser votre expérience sur <span className="text-[#0A1128] dark:text-white font-black underline decoration-[#FFD700] decoration-2 underline-offset-4">La Trouvaille</span>.
                                 </p>
                             </div>
 
                             {/* Legal Links - Styled as mini chips */}
-                            <div className="flex flex-wrap gap-3 mb-10 text-[10px] font-black uppercase tracking-widest">
-                                <Link href="/legal/politique-confidentialite" className="px-3 py-1.5 rounded-full bg-gray-100 dark:bg-white/5 text-gray-500 dark:text-gray-400 hover:bg-[#FFD700] hover:text-[#0A1128] dark:hover:bg-[#FFD700] dark:hover:text-[#0A1128] transition-all">
+                            <div className="flex flex-wrap gap-2 mb-8 md:gap-3 md:mb-10 text-[9px] md:text-[10px] font-black uppercase tracking-widest">
+                                <Link href="/legal/politique-confidentialite" className="px-3 py-1.5 rounded-full bg-gray-100 dark:bg-white/5 text-gray-500 dark:text-gray-400 hover:bg-[#FFD700] hover:text-[#0A1128] transition-all">
                                     Confidentialité
                                 </Link>
-                                <Link href="/legal/mentions-legales" className="px-3 py-1.5 rounded-full bg-gray-100 dark:bg-white/5 text-gray-500 dark:text-gray-400 hover:bg-[#FFD700] hover:text-[#0A1128] dark:hover:bg-[#FFD700] dark:hover:text-[#0A1128] transition-all">
+                                <Link href="/legal/mentions-legales" className="px-3 py-1.5 rounded-full bg-gray-100 dark:bg-white/5 text-gray-500 dark:text-gray-400 hover:bg-[#FFD700] hover:text-[#0A1128] transition-all">
                                     Mentions Légales
                                 </Link>
                             </div>
 
-                            <div className="flex flex-col sm:flex-row items-center gap-4">
+                            <div className="flex flex-col sm:flex-row items-center gap-3 md:gap-4">
                                 <button
                                     onClick={handleDecline}
-                                    className="w-full sm:w-auto px-8 py-4 text-xs font-black uppercase tracking-[0.2em] text-gray-400 hover:text-[#0A1128] dark:hover:text-white transition-colors order-2 sm:order-1"
+                                    className="w-full sm:w-auto px-6 py-3 md:px-8 md:py-4 text-[10px] md:text-xs font-black uppercase tracking-[0.2em] text-gray-400 hover:text-[#0A1128] dark:hover:text-white transition-colors order-2 sm:order-1"
                                 >
-                                    Continuer sans accepter
+                                    Refuser
                                 </button>
                                 <button
                                     onClick={handleAccept}
-                                    className="w-full sm:flex-1 bg-[#0A1128] dark:bg-[#FFD700] text-white dark:text-[#0A1128] px-8 py-5 rounded-2xl text-xs font-black uppercase tracking-[0.2em] shadow-xl shadow-[#0A1128]/10 dark:shadow-[#FFD700]/10 hover:scale-[1.02] active:scale-[0.98] transition-all flex items-center justify-center gap-3 group order-1 sm:order-2"
+                                    className="w-full sm:flex-1 bg-[#0A1128] dark:bg-[#FFD700] text-white dark:text-[#0A1128] px-6 py-4 md:px-8 md:py-5 rounded-xl md:rounded-2xl text-[10px] md:text-xs font-black uppercase tracking-[0.2em] shadow-xl shadow-[#0A1128]/10 dark:shadow-[#FFD700]/10 hover:scale-[1.02] active:scale-[0.98] transition-all flex items-center justify-center gap-2 group order-1 sm:order-2"
                                 >
                                     Accepter
-                                    <ArrowRight size={16} className="group-hover:translate-x-1 transition-transform" />
+                                    <ArrowRight size={14} className="group-hover:translate-x-1 transition-transform md:w-4 md:h-4" />
                                 </button>
                             </div>
 
