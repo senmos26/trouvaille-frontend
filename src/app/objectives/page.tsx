@@ -201,7 +201,7 @@ export default function ObjectivesPage() {
             Nos 6 Axes <span className="text-[#FFD700] italic font-serif lowercase">d&apos;impact</span>.
           </SectionTitle>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-16 text-left">
+          <div className="flex md:grid md:grid-cols-2 lg:grid-cols-3 gap-6 mt-16 text-left overflow-x-auto md:overflow-visible pb-12 md:pb-0 snap-x snap-mandatory -mx-4 px-4 md:mx-0 md:px-0 no-scrollbar">
             {displayObjectives.map((objective: { id: string; title: string; description: string; icon: string; color: string }, index: number) => {
               // Récupérer l'icône Lucide dynamiquement
               const IconComponent = objectivesData && objectivesData.length > 0
@@ -215,7 +215,7 @@ export default function ObjectivesPage() {
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true }}
                   transition={{ delay: index * 0.1, duration: 0.6 }}
-                  className="group p-10 bg-white/5 border border-white/10 rounded-[2rem] hover:bg-[#FFD700] hover:text-[#0A1128] transition-all duration-500 cursor-pointer flex flex-col h-full"
+                  className="group min-w-[85vw] md:min-w-0 snap-center p-10 bg-white/5 border border-white/10 rounded-[2rem] hover:bg-[#FFD700] hover:text-[#0A1128] transition-all duration-500 cursor-pointer flex flex-col h-full"
                 >
                   <div className="flex items-start justify-between mb-8">
                     <IconComponent className="w-12 h-12 opacity-50 group-hover:opacity-100 transition-opacity" />
@@ -227,7 +227,7 @@ export default function ObjectivesPage() {
                     {objective.description}
                   </p>
 
-                  <div className="mt-auto pt-6 flex justify-end opacity-0 group-hover:opacity-100 transition-opacity duration-300 transform translate-x-[-10px] group-hover:translate-x-0">
+                  <div className="mt-auto pt-6 flex justify-end opacity-0 md:group-hover:opacity-100 opacity-100 md:opacity-0 transition-opacity duration-300 transform translate-x-0 md:translate-x-[-10px] md:group-hover:translate-x-0">
                     <ArrowUpRight size={24} />
                   </div>
                 </motion.div>
