@@ -2,7 +2,7 @@
 
 import { motion, Variants } from "framer-motion"
 import Link from "next/link"
-import { ArrowLeft, FileText, Scale, User, MapPin, Globe } from "lucide-react"
+import { ArrowLeft, Scale, User, MapPin, Globe } from "lucide-react"
 
 export default function MentionsLegales() {
     const containerVariants: Variants = {

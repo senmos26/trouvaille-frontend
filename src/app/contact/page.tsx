@@ -3,7 +3,7 @@
 import { useState } from "react"
 import { motion } from "framer-motion"
 import Link from "next/link"
-import { Mail, Phone, MapPin, Users, MessageCircle, User, BookText, MessageSquare, Clock, ArrowUpRight, Sparkles, Shield, FileText } from "lucide-react"
+import { Mail, Phone, MapPin, MessageCircle, User, BookText, MessageSquare, ArrowUpRight } from "lucide-react"
 import { createContact } from "@/lib/actions/contacts"
 import { toast } from "sonner"
 import { cn } from "@/lib/utils"

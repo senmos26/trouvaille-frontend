@@ -4,7 +4,7 @@ import { useRef } from "react"
 import Link from "next/link"
 import Image from "next/image"
 import { motion, useScroll, useTransform } from "framer-motion"
-import { ArrowRight, Heart } from "lucide-react"
+import { ArrowRight } from "lucide-react"
 import Counter from "@/components/counter"
 import TextType from "@/components/TextType"
 import { useStats } from "@/lib/hooks/use-stats"
@@ -109,7 +109,7 @@ export default function HeroSection() {
             transition={{ duration: 0.8, delay: 0.2 }}
             className="text-lg md:text-xl text-white max-w-2xl leading-relaxed font-light italic font-serif"
           >
-            "La Trouvaille est la tribune où chaque voix compte. Ensemble, transformons le potentiel de la jeunesse en impact réel pour notre continent."
+            &quot;La Trouvaille est la tribune où chaque voix compte. Ensemble, transformons le potentiel de la jeunesse en impact réel pour notre continent.&quot;
           </motion.p>
 
           <motion.div

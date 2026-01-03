@@ -1,10 +1,10 @@
 "use client"
 
-import { useRef, ReactNode, Profiler } from "react"
+import { useRef, ReactNode } from "react"
 import Link from "next/link"
 import Image from "next/image"
-import { motion, useScroll, useTransform, MotionValue, useMotionTemplate } from "framer-motion"
-import { ArrowRight, Ticket, Globe, Zap, Users, PersonStanding, PersonStandingIcon } from "lucide-react"
+import { motion, useScroll, useTransform, MotionValue } from "framer-motion"
+import { ArrowRight, Globe, Zap, Users } from "lucide-react"
 import { Timeline } from "@/components/ui/timeline"
 import { useTimelineEntries } from "@/lib/hooks/use-timeline"
 
@@ -287,7 +287,7 @@ export default function AboutPage() {
                 transition={{ delay: i * 0.1, duration: 0.6 }}
                 className="group p-10 bg-white/5 border border-white/10 rounded-[2rem] md:hover:bg-[#FFD700] md:hover:text-[#0A1128] transition-all duration-500 cursor-pointer"
               >
-               
+
                 <h3 className="text-2xl font-black uppercase mb-4 tracking-tight">{item.title}</h3>
                 <p className="text-sm font-medium opacity-90 md:opacity-60 md:group-hover:opacity-90">{item.desc}</p>
               </motion.div>
@@ -314,7 +314,7 @@ export default function AboutPage() {
                   Agir maintenant <ArrowRight size={18} />
                 </Link>
                 <Link href="/team" className="w-full sm:w-auto px-8 py-4 border-2 border-[#0A1128] text-[#0A1128] font-bold rounded-full hover:bg-[#0A1128] hover:text-white transition-colors flex items-center justify-center gap-2 text-center">
-                  L&apos;équipe 
+                  L&apos;équipe
                 </Link>
               </div>
             </div>

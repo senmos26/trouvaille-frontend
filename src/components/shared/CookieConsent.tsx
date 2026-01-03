@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react"
 import { motion, AnimatePresence } from "framer-motion"
 import Link from "next/link"
-import { Cookie, X, ShieldCheck, Settings, ArrowRight } from "lucide-react"
+import { X, Settings, ArrowRight } from "lucide-react"
 
 export default function CookieConsent() {
     const [isVisible, setIsVisible] = useState(false)
@@ -46,7 +46,7 @@ export default function CookieConsent() {
                         <div className="relative z-10">
                             <div className="flex items-center justify-between mb-6 md:mb-8">
                                 <div className="flex items-center gap-3 md:gap-4">
-                                  
+
                                     <div>
                                         <h3 className="text-xl md:text-2xl font-black text-[#0A1128] dark:text-white uppercase tracking-tighter leading-none">
                                             Confiance
