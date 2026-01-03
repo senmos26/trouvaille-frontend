@@ -78,7 +78,7 @@ export default function TestimonialSection() {
   const total = testimonials.length
 
   return (
-    <section className="relative py-48 bg-white dark:bg-[#050A15] overflow-hidden font-sans transition-colors duration-500">
+    <section className="relative py-24 md:py-48 bg-white dark:bg-[#050A15] overflow-hidden font-sans transition-colors duration-500">
 
       {/* ATMOSPHERE BACKGROUND */}
       <div className="absolute inset-0 pointer-events-none">
@@ -98,18 +98,17 @@ export default function TestimonialSection() {
             <div className="relative border-[4px] border-[#111827] dark:border-white p-1 pb-1 shadow-[20px_20px_0px_0px_rgba(23,43,77,0.05)] dark:shadow-[20px_20px_0px_0px_rgba(255,255,255,0.05)]">
 
               {/* STICKER */}
-              <div className="absolute -top-[52px] left-0 bg-[#111827] dark:bg-white px-8 py-3 z-20 transition-all">
-                <span className="text-white dark:text-black font-black text-xl uppercase tracking-tighter flex items-center gap-3">
-                 
-                  Paroles de nos partenaires
+              <div className="absolute -top-10 md:-top-[52px] left-0 bg-[#111827] dark:bg-white px-4 md:px-8 py-2 md:py-3 z-20 transition-all">
+                <span className="text-white dark:text-black font-black text-sm md:text-xl uppercase tracking-tighter flex items-center gap-3">
+                  Partenaires
                 </span>
               </div>
 
-              <div className="bg-white dark:bg-[#050A15] border-[4px] border-[#111827] dark:border-white p-6 md:p-12 relative overflow-hidden transition-colors duration-500">
-                <div className="grid md:grid-cols-12 gap-10 md:gap-16 items-center">
+              <div className="bg-white dark:bg-[#050A15] border-[4px] border-[#111827] dark:border-white p-4 sm:p-6 md:p-12 relative overflow-hidden transition-colors duration-500">
+                <div className="grid md:grid-cols-12 gap-6 md:gap-10 lg:gap-16 items-center">
 
                   {/* LEFT: AVATAR */}
-                  <div className="md:col-span-3 p-0.5 max-w-[300px] md:max-w-none mx-auto md:mx-0">
+                  <div className="md:col-span-3 p-0.5 max-w-[200px] sm:max-w-[250px] md:max-w-none mx-auto md:mx-0">
                     <AnimatePresence mode="wait">
                       <motion.div
                         key={current.id}
@@ -124,7 +123,7 @@ export default function TestimonialSection() {
                   </div>
 
                   {/* RIGHT: CONTENT */}
-                  <div className="md:col-span-9 flex flex-col justify-center h-full space-y-8">
+                  <div className="md:col-span-9 flex flex-col justify-center h-full space-y-6 md:space-y-8">
                     <AnimatePresence mode="wait">
                       <motion.div
                         key={current.id}
@@ -135,37 +134,37 @@ export default function TestimonialSection() {
                         className="space-y-6"
                       >
                         <blockquote className="relative">
-                          <p className="text-2xl md:text-3xl lg:text-3xl xl:text-4xl font-black text-[#111827] dark:text-white leading-[1.1] uppercase tracking-tighter italic transition-colors">
+                          <p className="text-lg sm:text-xl md:text-2xl lg:text-3xl xl:text-4xl font-black text-[#111827] dark:text-white leading-[1.15] md:leading-[1.1] uppercase tracking-tighter italic transition-colors">
                             &quot;{current.quote}&quot;
                           </p>
                         </blockquote>
 
                         <div className="space-y-1">
-                          <h4 className="text-xl md:text-2xl font-black text-[#111827] dark:text-white uppercase tracking-tight transition-colors">
+                          <h4 className="text-base sm:text-lg md:text-xl lg:text-2xl font-black text-[#111827] dark:text-white uppercase tracking-tight transition-colors">
                             {current.author_name}
                           </h4>
-                          <p className="text-base font-bold text-[#FFB800] dark:text-[#FFD700] uppercase tracking-tight">
+                          <p className="text-xs sm:text-sm md:text-base font-bold text-[#FFB800] dark:text-[#FFD700] uppercase tracking-tight">
                             {current.author_title || "Partenaire Stratégique"}
                           </p>
                         </div>
                       </motion.div>
                     </AnimatePresence>
 
-                    <div className="space-y-6">
+                    <div className="space-y-4 md:space-y-6">
                       {/* NAVIGATION & SCALABLE COUNTER */}
-                      <div className="flex flex-col sm:flex-row items-center gap-8 pt-6">
-                        <div className="flex gap-4 w-full sm:w-auto">
+                      <div className="flex flex-col sm:flex-row items-center gap-4 md:gap-8 pt-4 md:pt-6">
+                        <div className="flex gap-3 md:gap-4 w-full sm:w-auto">
                           <button
                             onClick={() => paginate(-1)}
-                            className="flex-1 sm:flex-none bg-[#111827] dark:bg-white text-white dark:text-black py-4 px-8 font-black text-lg uppercase tracking-tighter hover:bg-[#FFD700] hover:dark:bg-[#FFD700] hover:text-black transition-all active:translate-y-1 active:translate-x-1 border-b-4 border-r-4 border-gray-700 dark:border-gray-300 hover:border-black"
+                            className="flex-1 sm:flex-none bg-[#111827] dark:bg-white text-white dark:text-black py-3 md:py-4 px-4 sm:px-6 md:px-8 font-black text-sm md:text-base lg:text-lg uppercase tracking-tighter hover:bg-[#FFD700] hover:dark:bg-[#FFD700] hover:text-black transition-all active:translate-y-1 active:translate-x-1 border-b-4 border-r-4 border-gray-700 dark:border-gray-300 hover:border-black"
                           >
-                            Précédent
+                            Préc.
                           </button>
                           <button
                             onClick={() => paginate(1)}
-                            className="flex-1 sm:flex-none bg-[#111827] dark:bg-white text-white dark:text-black py-4 px-8 font-black text-lg uppercase tracking-tighter hover:bg-[#FFD700] hover:dark:bg-[#FFD700] hover:text-black transition-all active:translate-y-1 active:translate-x-1 border-b-4 border-r-4 border-gray-700 dark:border-gray-300 hover:border-black"
+                            className="flex-1 sm:flex-none bg-[#111827] dark:bg-white text-white dark:text-black py-3 md:py-4 px-4 sm:px-6 md:px-8 font-black text-sm md:text-base lg:text-lg uppercase tracking-tighter hover:bg-[#FFD700] hover:dark:bg-[#FFD700] hover:text-black transition-all active:translate-y-1 active:translate-x-1 border-b-4 border-r-4 border-gray-700 dark:border-gray-300 hover:border-black"
                           >
-                            Suivant
+                            Suiv.
                           </button>
                         </div>
 

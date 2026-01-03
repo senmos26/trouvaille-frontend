@@ -131,7 +131,7 @@ export default function EventsSection() {
                     <div className="flex items-center gap-4 mb-5">
                       <div className="flex items-center gap-2 text-xs font-bold text-[#0A1128] dark:text-white/90 uppercase tracking-widest">
                         <MapPin size={15} className="text-[#FFD700]" />
-                        <span className="truncate max-w-[140px]">{event.location}</span>
+                        <span className="truncate max-w-[140px]">{event.location || "À définir"}</span>
                       </div>
 
                       <div className="h-4 w-px bg-gray-200 dark:bg-white/10" />
@@ -149,7 +149,7 @@ export default function EventsSection() {
 
                     {/* Description courte */}
                     <p className="text-[#0A1128]/70 dark:text-gray-400 line-clamp-2 text-sm font-medium leading-relaxed mb-6 flex-grow italic">
-                      {stripHtml(event.description)}
+                      {stripHtml(event.description) || "Description à venir..."}
                     </p>
 
                     {/* Bottom Action Area */}

@@ -96,7 +96,7 @@ const EventCard = ({ event, index }: { event: { id: string; date: string; image?
             <div className="flex items-center gap-4 mb-5">
               <div className="flex items-center gap-2 text-[10px] font-black text-[#0A1128]/60 dark:text-white/60 uppercase tracking-widest">
                 <MapPin size={15} className="text-[#FFD700]" />
-                <span className="truncate max-w-[120px]">{event.location}</span>
+                <span className="truncate max-w-[120px]">{event.location || "À définir"}</span>
               </div>
 
               <div className="h-4 w-px bg-gray-200 dark:bg-white/10" />
@@ -114,7 +114,7 @@ const EventCard = ({ event, index }: { event: { id: string; date: string; image?
 
             {/* Description */}
             <p className="text-[#0A1128]/70 dark:text-gray-400 line-clamp-2 text-sm font-medium leading-relaxed italic mb-8">
-              {stripHtml(event.description)}
+              {stripHtml(event.description) || "Description à venir..."}
             </p>
             {/* Call to Action */}
             <div className="mt-auto flex items-center justify-between pt-6 border-t border-gray-100 dark:border-white/10">

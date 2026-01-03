@@ -189,11 +189,15 @@ export default function HeroSection() {
       <div className="absolute bottom-0 z-20 w-full bg-[#0A1128] py-6 lg:hidden border-t border-white/10">
         <div className="container flex justify-around text-center">
           <div>
-            <p className="text-2xl font-bold text-white"><Counter end={500} suffix="+" /></p>
+            <p className="text-2xl font-bold text-white"><Counter end={stats.young_leaders} suffix="+" duration={2500} /></p>
             <p className="text-xs text-gray-400 uppercase">Membres</p>
           </div>
           <div>
-            <p className="text-2xl font-bold text-white"><Counter end={12} /></p>
+            <p className="text-2xl font-bold text-white"><Counter end={stats.webinars} suffix="+" duration={2500} /></p>
+            <p className="text-xs text-gray-400 uppercase">Webinaires</p>
+          </div>
+          <div>
+            <p className="text-2xl font-bold text-white"><Counter end={stats.partnerships} duration={2500} /></p>
             <p className="text-xs text-gray-400 uppercase">Partenaires</p>
           </div>
         </div>

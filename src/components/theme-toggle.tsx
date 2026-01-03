@@ -23,8 +23,10 @@ export default function ThemeToggle({ isScrolled = false }: { isScrolled?: boole
       className={cn(
         "inline-flex h-9 w-9 items-center justify-center rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50",
         !isScrolled
-          ? "text-white hover:bg-white/10"
-          : "text-[#0A1128] dark:text-white hover:bg-gray-100 dark:hover:bg-white/10"
+          ? theme === "dark"
+            ? "text-white hover:bg-white/10 "
+            : "text-[#0A1128] hover:bg-white/10 "
+          : "text-[#0A1128] dark:text-white hover:bg-gray-100 "
       )}
       aria-label="Toggle theme"
     >
