@@ -2,7 +2,8 @@
 
 import { useState, useEffect, useCallback } from "react"
 import { motion, AnimatePresence } from "framer-motion"
-import { Quote, Star } from "lucide-react"
+import Image from "next/image"
+import { Star } from "lucide-react"
 import { useTestimonials } from "@/lib/hooks/use-testimonials"
 
 // --- 1. SKELETON LOADING (Brutalist Style) ---
@@ -26,8 +27,8 @@ const TestimonialSkeleton = () => (
 const BrutalistAvatar = ({ name, avatarUrl }: { name: string, avatarUrl?: string }) => {
   if (avatarUrl) {
     return (
-      <div className="aspect-square w-full border-[2px] border-[#111827] dark:border-white overflow-hidden grayscale hover:grayscale-0 transition-all duration-500">
-        <img src={avatarUrl} alt={name} className="w-full h-full object-cover" />
+      <div className="aspect-square w-full relative border-[2px] border-[#111827] dark:border-white overflow-hidden grayscale hover:grayscale-0 transition-all duration-500">
+        <Image src={avatarUrl} alt={name} fill className="object-cover" />
       </div>
     )
   }

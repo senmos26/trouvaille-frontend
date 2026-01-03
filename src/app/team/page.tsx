@@ -4,7 +4,7 @@ import React, { useState } from "react"
 import Link from "next/link"
 import Image from "next/image"
 import { motion } from "framer-motion"
-import { Facebook, Twitter, Linkedin, ArrowUpRight, Plus } from "lucide-react"
+import { Twitter, Linkedin, ArrowUpRight, Plus } from "lucide-react"
 import { useTeamMembers } from "@/lib/hooks/use-team"
 import { cn } from "@/lib/utils"
 
@@ -48,10 +48,10 @@ export default function TeamPage() {
             className="lg:w-1/2"
           >
             <h1 className="text-7xl md:text-8xl lg:text-9xl font-serif italic text-[#FFD700] opacity-90 leading-none">
-              L'Humain
+              L&apos;Humain
             </h1>
             <h2 className="text-4xl md:text-5xl lg:text-6xl font-sans font-bold text-white uppercase tracking-tight mt-2 lg:ml-24">
-              Au cœur de l'innovation
+              Au cœur de l&apos;innovation
             </h2>
           </motion.div>
 
@@ -64,7 +64,7 @@ export default function TeamPage() {
             <p>
               Nous sommes une mosaïque de talents, de cultures et d'ambitions.
               Unis par la volonté de redéfinir les standards et de propulser
-              l'Afrique vers son plein potentiel.
+              l&apos;Afrique vers son plein potentiel.
             </p>
           </motion.div>
         </div>
@@ -173,7 +173,7 @@ export default function TeamPage() {
           </h2>
           <Link href="/contact" className="inline-block relative group">
             <span className="text-xl md:text-2xl uppercase font-bold tracking-widest text-[#FFD700]">
-              Rejoignez l'aventure
+              Rejoignez l&apos;aventure
             </span>
             <span className="absolute -bottom-2 left-0 w-full h-[2px] bg-[#FFD700] scale-x-0 group-hover:scale-x-100 transition-transform duration-300 origin-left" />
           </Link>

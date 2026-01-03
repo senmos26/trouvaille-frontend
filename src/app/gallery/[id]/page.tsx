@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect, useId, useRef, useCallback, use } from "react"
+import { useState, useEffect, useRef, useCallback, use } from "react"
 import Link from "next/link"
 import Image from "next/image"
 import { motion, AnimatePresence } from "framer-motion"
@@ -15,12 +15,11 @@ export default function EventGalleryPage({ params }: { params: Promise<{ id: str
   const [activePhotoIndex, setActivePhotoIndex] = useState<number | null>(null)
   const [gridSize, setGridSize] = useState<"2" | "3" | "4">("4")
   const ref = useRef<HTMLDivElement | null>(null)
-  const id = useId()
 
-  const getPhotos = useCallback((item: { gallery?: any[]; photos?: any[]; event_images?: any[] } | null | undefined): Array<{ id: string; image_url: string; alt_text?: string }> => {
+  const getPhotos = useCallback((item: { gallery?: Array<string | { id?: string; image_url: string; alt_text?: string }>; photos?: Array<string | { id?: string; image_url: string; alt_text?: string }>; event_images?: Array<string | { id?: string; image_url: string; alt_text?: string }> } | null | undefined): Array<{ id: string; image_url: string; alt_text?: string }> => {
     if (!item) return []
     const rawPhotos = item.gallery || item.photos || item.event_images || []
-    return rawPhotos.map((p: { id?: string; image_url: string; alt_text?: string } | string, idx: number) => ({
+    return (rawPhotos as Array<string | { id?: string; image_url: string; alt_text?: string }>).map((p, idx: number) => ({
       id: (typeof p !== 'string' && p.id) ? p.id : `photo-${idx}`,
       image_url: typeof p === 'string' ? p : p.image_url,
       alt_text: (typeof p !== 'string' && p.alt_text) ? p.alt_text : ''
@@ -28,7 +27,6 @@ export default function EventGalleryPage({ params }: { params: Promise<{ id: str
   }, [])
 
   const getCategoryName = (item: { category?: { name: string } | string } | null | undefined) => typeof item?.category === 'string' ? item.category : item?.category?.name || ''
-  const getRubriqueName = (item: { rubrique?: { name: string } | string } | null | undefined) => typeof item?.rubrique === 'string' ? item.rubrique : item?.rubrique?.name || ''
 
   useEffect(() => {
     function onKeyDown(e: KeyboardEvent) {

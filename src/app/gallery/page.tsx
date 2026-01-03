@@ -7,7 +7,6 @@ import { motion, AnimatePresence } from "framer-motion"
 import { Calendar, MapPin, Users, Filter, Camera, Search, X, ChevronDown, Sparkles, ArrowUpRight } from "lucide-react"
 import { useEvents } from "@/lib/hooks/use-events"
 import { useEventCategories, useEventRubriques } from "@/lib/hooks/use-categories"
-import { cn } from "@/lib/utils"
 import {
   Select,
   SelectContent,
@@ -40,7 +39,7 @@ const SkeletonCard = () => (
 )
 
 // --- GALLERY EVENT CARD ---
-const GalleryEventCard = ({ event, index }: { event: { id: string; gallery: { image_url: string }[]; category: any; ruby: any; title: string; created_at?: string; date: string; location: string; participants?: number; rubrique?: any }; index: number }) => {
+const GalleryEventCard = ({ event, index }: { event: { id: string; gallery: { image_url: string }[]; category?: { name: string } | string; title: string; created_at?: string; date: string; location: string; participants?: number; rubrique?: { name: string } | string }; index: number }) => {
   const photos = event.gallery || [];
 
   return (
@@ -160,7 +159,7 @@ export default function GalleryPage() {
   const rubriques = ["Toutes", ...(rubriquesData?.map((rub: { name: string }) => rub.name) || [])]
 
   // Filtering
-  const filteredEvents = pastEvents.filter((event: { title: string; location?: string; category: any; rubrique: any }) => {
+  const filteredEvents = pastEvents.filter((event: { title: string; location?: string; category?: { name: string } | string; rubrique?: { name: string } | string }) => {
     const matchSearch = !searchQuery ||
       event.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
       (event.location || '').toLowerCase().includes(searchQuery.toLowerCase());
@@ -219,7 +218,7 @@ export default function GalleryPage() {
               </p>
               <div className="hidden md:flex flex-col items-end gap-1">
                 <span className="text-[9px] uppercase tracking-[0.4em] font-black text-gray-400 dark:text-white/40">Instants Gravés</span>
-                <span className="text-2xl font-black text-[#FFD700]">{pastEvents.reduce((acc: number, e: { gallery?: any[] }) => acc + (e.gallery?.length || 0), 0)}</span>
+                <span className="text-2xl font-black text-[#FFD700]">{pastEvents.reduce((acc: number, e: { gallery?: { image_url: string }[] }) => acc + (e.gallery?.length || 0), 0)}</span>
               </div>
             </motion.div>
           </div>
@@ -338,7 +337,7 @@ export default function GalleryPage() {
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-x-12 gap-y-20">
             <AnimatePresence mode="popLayout">
-              {filteredEvents.map((event: { id: string; gallery: { image_url: string }[]; category: any; ruby: any; title: string; created_at?: string; date: string; location: string; participants?: number; rubrique?: any }, idx: number) => (
+              {filteredEvents.map((event: { id: string; gallery: { image_url: string }[]; category?: { name: string } | string; title: string; created_at?: string; date: string; location: string; participants?: number; rubrique?: { name: string } | string }, idx: number) => (
                 <GalleryEventCard key={event.id} event={event} index={idx} />
               ))}
             </AnimatePresence>

@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react"
 import { motion, AnimatePresence } from "framer-motion"
-import { Search, Sparkles, X, Filter, SortAsc, ChevronLeft, ChevronRight, BookOpen } from "lucide-react"
+import { Search, X, Filter, SortAsc, ChevronLeft, ChevronRight, BookOpen } from "lucide-react"
 import { useBlogPosts } from "@/lib/hooks/use-blog"
 import { BlogCard } from "@/app/landing-page/components/BlogCard"
 import {
@@ -218,7 +218,7 @@ export default function BlogPage() {
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-x-12 gap-y-20">
             <AnimatePresence mode="popLayout">
-              {currentPosts.map((post: any, idx: number) => (
+              {currentPosts.map((post: { id: string; title: string; excerpt?: string; category?: { name: string }; published_at?: string; created_at: string; image?: string; author_name?: string }, idx: number) => (
                 <BlogCard key={post.id} post={post} index={idx} />
               ))}
             </AnimatePresence>

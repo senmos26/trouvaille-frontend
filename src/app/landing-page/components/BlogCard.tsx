@@ -5,7 +5,7 @@ import Image from "next/image"
 import { motion } from "framer-motion"
 import { ArrowUpRight, Calendar, User } from "lucide-react"
 
-export const BlogCard = ({ post, index = 0 }: { post: any, index?: number }) => {
+export const BlogCard = ({ post, index = 0 }: { post: { id: string; title: string; excerpt?: string; category?: { name: string }; published_at?: string; created_at: string; image?: string; author_name?: string }, index?: number }) => {
   return (
     <motion.div
       layout

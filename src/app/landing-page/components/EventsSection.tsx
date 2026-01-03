@@ -3,7 +3,7 @@
 import { useState } from "react"
 import Link from "next/link"
 import Image from "next/image"
-import { motion, AnimatePresence } from "framer-motion"
+import { motion } from "framer-motion"
 import { MapPin, Calendar, ArrowUpRight, Users, Sparkles } from "lucide-react"
 import { useEvents } from "@/lib/hooks/use-events"
 import { cn } from "@/lib/utils"

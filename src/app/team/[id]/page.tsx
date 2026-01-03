@@ -3,14 +3,9 @@
 import { use, useState } from "react"
 import Link from "next/link"
 import Image from "next/image"
-import { motion, AnimatePresence } from "framer-motion"
-import {
-  ArrowLeft, Mail, Linkedin, Twitter, Facebook,
-  Award, Briefcase, GraduationCap, Loader2, MapPin,
-  Copy, Check, X, Send, Phone
-} from "lucide-react"
+import { motion } from "framer-motion"
+import { ArrowLeft, Mail, Linkedin, Twitter, Facebook, Award, Briefcase, GraduationCap, MapPin, Check } from "lucide-react"
 import { useTeamMember } from "@/lib/hooks/use-team"
-import { cn } from "@/lib/utils"
 
 // --- UI COMPONENTS FROM EVENT DETAIL ---
 
@@ -21,25 +16,11 @@ const SectionTitle = ({ children }: { children: React.ReactNode }) => (
   </h2>
 )
 
-const InfoItem = ({ icon: Icon, label, value }: any) => (
-  <div className="flex items-center gap-4 p-5 rounded-2xl bg-gray-50 dark:bg-white/5 border border-transparent hover:border-[#FFD700]/30 transition-all group">
-    <div className="p-3 bg-white dark:bg-white/10 rounded-xl text-[#0A1128] dark:text-white shadow-sm group-hover:scale-110 transition-transform">
-      <Icon size={22} className="text-[#FFD700]" />
-    </div>
-    <div>
-      <p className="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] mb-1">{label}</p>
-      <p className="font-black text-[#0A1128] dark:text-white text-base leading-none">{value}</p>
-    </div>
-  </div>
-)
+
 
 export default function TeamMemberPage({ params }: { params: Promise<{ id: string }> }) {
   const { id: memberId } = use(params)
   const { data: member, isLoading, error } = useTeamMember(memberId)
-  const [showContact, setShowContact] = useState(false)
-
-  // Safety helpers
-  const getSafeString = (val: any) => (typeof val === 'string' ? val : val?.name || "")
 
   if (isLoading) {
     return (
@@ -53,7 +34,7 @@ export default function TeamMemberPage({ params }: { params: Promise<{ id: strin
     return (
       <div className="min-h-screen bg-white dark:bg-[#0A1128] flex flex-col items-center justify-center gap-4 text-[#0A1128] dark:text-white">
         <h2 className="text-2xl font-bold">Membre introuvable</h2>
-        <Link href="/team" className="text-[#FFD700] hover:underline">Retour à l'équipe</Link>
+        <Link href="/team" className="text-[#FFD700] hover:underline">Retour à l&apos;équipe</Link>
       </div>
     )
   }
@@ -90,7 +71,7 @@ export default function TeamMemberPage({ params }: { params: Promise<{ id: strin
             >
               <div className="flex flex-wrap gap-3 mb-6">
                 <span className="px-4 py-1.5 bg-[#FFD700] text-[#0A1128] text-xs font-black uppercase tracking-widest rounded-full">
-                  L'équipe
+                  L&apos;équipe
                 </span>
                 <span className="px-4 py-1.5 bg-white/10 backdrop-blur-md text-white text-sm font-bold uppercase tracking-wide rounded-md border border-white/20">
                   Membre Fondateur
@@ -134,7 +115,7 @@ export default function TeamMemberPage({ params }: { params: Promise<{ id: strin
             {/* SKILLS / EXPERTISE HIGHLIGHTS */}
             {member.skills && member.skills.length > 0 && (
               <section>
-                <SectionTitle>Domaines d'expertise</SectionTitle>
+                <SectionTitle>Domaines d&apos;expertise</SectionTitle>
                 <div className="grid sm:grid-cols-2 gap-4">
                   {member.skills.map((skill: string, i: number) => (
                     <div key={i} className="flex items-start gap-3 p-4 rounded-xl bg-[#FFD700]/5 border border-[#FFD700]/10">
@@ -155,7 +136,7 @@ export default function TeamMemberPage({ params }: { params: Promise<{ id: strin
               <section>
                 <SectionTitle>Parcours Pro</SectionTitle>
                 <div className="space-y-6">
-                  {member.experience.map((exp: any, i: number) => (
+                  {member.experience.map((exp: { period: string; company: string; title: string; description?: string }, i: number) => (
                     <div key={i} className="group flex flex-col md:flex-row gap-6 p-6 rounded-3xl border border-gray-100 dark:border-white/5 bg-gray-50 dark:bg-white/5 shadow-sm hover:shadow-xl transition-all duration-500">
                       <div className="shrink-0 md:w-48">
                         <div className="inline-block px-3 py-1 bg-[#FFD700]/20 text-[#FFD700] font-black text-xs uppercase tracking-wider rounded-lg mb-2">
@@ -180,7 +161,7 @@ export default function TeamMemberPage({ params }: { params: Promise<{ id: strin
               <section>
                 <SectionTitle>Formation</SectionTitle>
                 <div className="grid sm:grid-cols-2 gap-4">
-                  {member.education.map((edu: any, i: number) => (
+                  {member.education.map((edu: { degree: string; school: string; year: string }, i: number) => (
                     <div key={i} className="group p-6 rounded-3xl border border-gray-100 dark:border-white/5 bg-gray-50 dark:bg-white/5 shadow-sm hover:border-[#FFD700]/30 transition-all">
                       <GraduationCap className="text-[#FFD700] mb-4" size={32} />
                       <h4 className="text-xl font-bold text-[#0A1128] dark:text-white mb-2 uppercase tracking-tight">{edu.degree}</h4>
@@ -197,7 +178,7 @@ export default function TeamMemberPage({ params }: { params: Promise<{ id: strin
               <section>
                 <SectionTitle>Accomplissements</SectionTitle>
                 <div className="space-y-4">
-                  {member.achievements.map((ach: any, i: number) => (
+                  {member.achievements.map((ach: { achievement: string }, i: number) => (
                     <div key={i} className="flex items-center gap-4 p-5 rounded-2xl bg-gray-50 dark:bg-white/5 border border-gray-100 dark:border-white/5">
                       <Award className="text-[#FFD700] shrink-0" size={24} />
                       <p className="text-[#0A1128]/80 dark:text-white/80 font-medium">{ach.achievement}</p>
@@ -265,7 +246,7 @@ export default function TeamMemberPage({ params }: { params: Promise<{ id: strin
               {/* Additional Sidebar Info (Maybe Stats or Quote) */}
               <div className="p-8 rounded-[2rem] bg-[#FFD700]/5 dark:bg-gradient-to-br dark:from-[#FFD700]/20 dark:to-transparent border border-[#FFD700]/20 dark:border-[#FFD700]/10">
                 <p className="font-serif italic text-gray-500 dark:text-white/60 text-center">
-                  "Ensemble pour transformer l'avenir de l'Afrique."
+                  &quot;Ensemble pour transformer l&apos;avenir de l&apos;Afrique.&quot;
                 </p>
               </div>
 

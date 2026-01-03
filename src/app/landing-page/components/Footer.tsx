@@ -2,7 +2,7 @@
 
 import Link from "next/link"
 import Image from "next/image"
-import { Mail, Phone, MapPin, Instagram, Linkedin, Twitter, ArrowUpRight, Facebook } from "lucide-react"
+import { Instagram, Linkedin, ArrowUpRight, Facebook } from "lucide-react"
 
 export default function Footer() {
   const linkGroups = [

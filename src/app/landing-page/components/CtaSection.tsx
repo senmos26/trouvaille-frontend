@@ -2,7 +2,7 @@
 
 import Link from "next/link"
 import { motion } from "framer-motion"
-import { ArrowUpRight, Users, Sparkles } from "lucide-react"
+import { ArrowUpRight, Users } from "lucide-react"
 
 export default function CtaSection() {
   return (
@@ -26,7 +26,7 @@ export default function CtaSection() {
               className="text-4xl md:text-7xl lg:text-8xl font-black leading-[0.9] tracking-[-0.04em] max-w-4xl mb-10"
             >
               Prêt à transformer <br />
-              <span className="text-[#FFD700] italic font-serif lowercase tracking-normal">l'avenir</span> avec nous ?
+              <span className="text-[#FFD700] italic font-serif lowercase tracking-normal">l&apos;avenir</span> avec nous ?
             </motion.h2>
 
 

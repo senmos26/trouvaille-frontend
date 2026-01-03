@@ -80,38 +80,14 @@ const SectionTitle = ({ children, subtitle, dark = false }: { children: ReactNod
   </div>
 )
 
-const ParallaxImage = ({ src, alt, className = "" }: { src: string, alt: string, className?: string }) => {
-  const ref = useRef(null)
-  const { scrollYProgress } = useScroll({
-    target: ref,
-    offset: ["start end", "end start"]
-  })
 
-  // Animation douce parallax
-  const y = useTransform(scrollYProgress, [0, 1], ["-15%", "15%"])
-  const scale = useTransform(scrollYProgress, [0, 1], [1.1, 1.2])
-
-  return (
-    <div ref={ref} className={`relative w-full h-full overflow-hidden will-change-transform ${className}`}>
-      <motion.div style={{ y, scale, height: "130%", width: "100%", top: "-15%", position: "absolute" }}>
-        <Image
-          src={src}
-          alt={alt}
-          fill
-          className="object-cover grayscale hover:grayscale-0 transition-all duration-1000"
-        />
-      </motion.div>
-      <div className="absolute inset-0 bg-[#0A1128]/10 pointer-events-none" />
-    </div>
-  )
-}
 
 // ============================================================================
 // 2. PAGE OBJECTIFS
 // ============================================================================
 
 export default function ObjectivesPage() {
-  const { data: objectivesData, isLoading, error } = useObjectives()
+  const { data: objectivesData, isLoading } = useObjectives()
 
   // Utiliser uniquement les données Supabase
   const objectives = objectivesData || []

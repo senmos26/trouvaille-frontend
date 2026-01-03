@@ -28,7 +28,7 @@ export default function ArticlesSection() {
               className="text-5xl md:text-6xl lg:text-7xl font-black text-[#0A1128] dark:text-white leading-[0.9] tracking-[-0.04em] uppercase"
             >
               Le <span className="text-[#FFD700] lowercase italic font-serif">Journal</span> <br className="hidden md:block" />
-              d'Afrique.
+              d&apos;Afrique.
             </motion.h2>
           </div>
 

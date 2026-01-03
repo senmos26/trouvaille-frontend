@@ -29,7 +29,7 @@ export default function ContactPage() {
       }
       toast.success("Message envoyé !", { description: "Nous vous répondrons sous 24h." })
       setFormData({ name: "", email: "", subject: "", message: "" })
-    } catch (error) {
+    } catch {
       toast.error("Une erreur est survenue. Veuillez réessayer.")
     } finally {
       setIsSubmitting(false)
