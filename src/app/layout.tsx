@@ -7,6 +7,7 @@ import { PointerProvider } from "@/components/pointer-provider";
 import Footer from "./landing-page/components/Footer";
 import { Toaster } from "sonner";
 import ParallaxLayout from "@/components/parallax-layout";
+import CookieConsent from "@/components/shared/CookieConsent";
 
 const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://trouvaille-frontend-zeta.vercel.app'
 const ogImageUrl = `${siteUrl}/images/la_trouvaille.png`
@@ -114,6 +115,7 @@ export default function RootLayout({
                     {children}
                   </main>
                 </ParallaxLayout>
+                <CookieConsent />
               </div>
             </PointerProvider>
           </ThemeProvider>
