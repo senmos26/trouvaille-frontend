@@ -216,10 +216,12 @@ export default function BlogPage() {
             <p className="text-gray-400 dark:text-gray-400 max-w-xs text-lg font-medium leading-relaxed">Aucun article ne correspond pour le moment. Essayez d&apos;élargir votre horizon.</p>
           </motion.div>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-x-12 gap-y-20">
+          <div className="flex md:grid md:grid-cols-2 lg:grid-cols-3 gap-x-12 gap-y-20 overflow-x-auto md:overflow-visible pb-12 md:pb-0 snap-x snap-mandatory -mx-4 px-4 md:mx-0 md:px-0 no-scrollbar">
             <AnimatePresence mode="popLayout">
               {currentPosts.map((post: { id: string; title: string; excerpt?: string; category?: { name: string }; published_at?: string; created_at: string; image?: string; author_name?: string }, idx: number) => (
-                <BlogCard key={post.id} post={post} index={idx} />
+                <div key={post.id} className="min-w-[85vw] md:min-w-0 snap-center">
+                  <BlogCard post={post} index={idx} />
+                </div>
               ))}
             </AnimatePresence>
           </div>

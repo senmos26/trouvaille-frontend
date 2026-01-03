@@ -78,14 +78,16 @@ export default function HeroSection() {
 
 
 
+
           <motion.h1
-            initial={{ opacity: 0, y: 20 }}
+            initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.1 }}
-            className="text-5xl md:text-6xl lg:text-7xl font-extrabold leading-[1.1] tracking-tight"
+            transition={{ duration: 0.8, delay: 0.1 }}
+            className="text-[2.8rem] md:text-[4.5rem] lg:text-[5.5rem] font-black leading-[0.85] tracking-[-0.04em] uppercase"
           >
-            Des idées pour bâtir <br />
-            <span className="text-[#FFD700] underline decoration-4 underline-offset-8 decoration-white/10">
+            Des idées pour <br />
+            <span className="text-[#FFD700] lowercase italic font-serif tracking-normal">bâtir</span> <br className="md:hidden" />
+            <span className="relative inline-block ml-0 md:ml-4 mt-2 md:mt-0">
               <TextType
                 as="span"
                 text={[
@@ -98,32 +100,32 @@ export default function HeroSection() {
                 showCursor={true}
                 cursorCharacter="|"
               />
-            </span>.
+            </span>
           </motion.h1>
 
           <motion.p
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.2 }}
-            className="text-lg md:text-xl text-gray-200 max-w-xl leading-relaxed font-medium"
+            transition={{ duration: 0.8, delay: 0.2 }}
+            className="text-lg md:text-xl text-white max-w-2xl leading-relaxed font-light italic font-serif"
           >
-            La Trouvaille est la tribune où chaque voix compte. Ensemble, transformons le potentiel de la jeunesse en impact réel pour notre continent.
+            "La Trouvaille est la tribune où chaque voix compte. Ensemble, transformons le potentiel de la jeunesse en impact réel pour notre continent."
           </motion.p>
 
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.3 }}
-            className="flex flex-col sm:flex-row gap-4 pt-2"
+            transition={{ duration: 0.8, delay: 0.3 }}
+            className="flex flex-col sm:flex-row gap-6 pt-6"
           >
             <Link href="/contact">
-              <button className="group h-14 px-8 bg-[#FFD700] text-[#0A1128] font-bold text-lg hover:bg-white dark:hover:bg-gray-100 transition-all duration-300 rounded-sm flex items-center justify-center gap-2 min-w-[200px] shadow-[0_0_20px_rgba(255,215,0,0.2)] hover:shadow-[0_0_30px_rgba(255,215,0,0.4)]">
+              <button className="group relative h-16 px-10 bg-[#FFD700] text-[#0A1128] font-black text-sm uppercase tracking-widest hover:scale-[1.05] active:scale-[0.98] transition-all duration-500 rounded-full flex items-center justify-center gap-3 shadow-lg">
                 Nous rejoindre
-                <ArrowRight size={20} strokeWidth={3} className="transition-transform group-hover:translate-x-1" />
+                <ArrowRight size={18} strokeWidth={3} className="transition-transform group-hover:translate-x-1" />
               </button>
             </Link>
             <Link href="/about">
-              <button className="h-14 px-8 border-2 border-white/20 dark:border-white/30 text-white font-bold text-lg hover:bg-white hover:text-[#0A1128] hover:border-white transition-all duration-300 rounded-sm min-w-[200px] backdrop-blur-sm">
+              <button className="h-16 px-10 border border-white/20 text-white font-black text-sm uppercase tracking-widest hover:bg-white hover:text-[#0A1128] transition-all duration-500 rounded-full backdrop-blur-md">
                 Notre Mission
               </button>
             </Link>
@@ -146,10 +148,7 @@ export default function HeroSection() {
             {/* Petit accent décoratif */}
             <div className="absolute top-0 left-0 w-full h-1.5 bg-gradient-to-r from-[#FFD700] to-[#FFE55C]" />
 
-            <h3 className="text-xl font-bold mb-6 flex items-center gap-2">
-              <Heart className="fill-[#FFD700] text-[#FFD700]" />
-              Notre Impact en Chiffres
-            </h3>
+
 
             <div className="space-y-6 divide-y divide-gray-100">
               <div className="pt-4 group cursor-default">
@@ -180,11 +179,7 @@ export default function HeroSection() {
               </div>
             </div>
 
-            <div className="mt-8 pt-6 border-t border-gray-100">
-              <p className="text-sm text-gray-500 italic">
-                &quot;Une tribune pour construire une Afrique prospère et unie.&quot;
-              </p>
-            </div>
+
           </motion.div>
         </motion.div>
 

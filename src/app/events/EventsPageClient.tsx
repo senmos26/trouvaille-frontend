@@ -55,7 +55,7 @@ const EventCard = ({ event, index }: { event: { id: string; date: string; image?
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true }}
       transition={{ duration: 0.5, delay: index * 0.1 }}
-      className="group w-full h-[600px]"
+      className="group w-full h-[600px] min-w-[85vw] md:min-w-0 snap-center"
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
     >
@@ -68,11 +68,11 @@ const EventCard = ({ event, index }: { event: { id: string; date: string; image?
               src={event.image || '/images/placeholder.jpg'}
               alt={event.title}
               fill
-              className="object-cover transition-all duration-1000 ease-out grayscale group-hover:grayscale-0 group-hover:scale-110"
+              className="object-cover transition-all duration-1000 ease-out md:grayscale group-hover:grayscale-0 md:grayscale-0 grayscale-0 group-hover:scale-110"
               unoptimized={event.image?.includes('supabase')}
             />
             {/* Overlay Gradient */}
-            <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-60 group-hover:opacity-20 transition-opacity duration-700" />
+            <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-60 md:group-hover:opacity-20 transition-opacity duration-700" />
 
             {/* Category Badge */}
             <div className="absolute top-6 left-6">
@@ -108,7 +108,7 @@ const EventCard = ({ event, index }: { event: { id: string; date: string; image?
             </div>
 
             {/* Title */}
-            <h3 className="text-2xl font-black text-[#0A1128] dark:text-white mb-4 line-clamp-2 leading-[1.1] uppercase tracking-tighter group-hover:text-[#FFD700] transition-colors">
+            <h3 className="text-2xl font-black text-[#FFD700] md:text-[#0A1128] dark:md:text-white mb-4 line-clamp-2 leading-[1.1] uppercase tracking-tighter md:group-hover:text-[#FFD700] transition-colors">
               {event.title}
             </h3>
 
@@ -136,13 +136,15 @@ const EventCard = ({ event, index }: { event: { id: string; date: string; image?
               {/* Animated CTA Button */}
               <div className="relative overflow-hidden rounded-full p-2">
                 <div className={cn(
-                  "flex items-center justify-center h-10 w-10 rounded-full bg-[#0A1128] dark:bg-white text-white dark:text-[#0A1128] transition-all duration-300",
-                  isHovered ? "w-28" : "w-10"
+                  "flex items-center justify-center h-10 rounded-full bg-[#0A1128] dark:bg-white text-white dark:text-[#0A1128] transition-all duration-300",
+                  "w-28 md:w-10",
+                  isHovered ? "md:w-28" : ""
                 )}>
-                  <ArrowUpRight size={20} className={cn("transition-transform", isHovered && "translate-x-8 opacity-0 absolute")} />
+                  <ArrowUpRight size={20} className={cn("transition-transform md:block hidden", isHovered && "md:translate-x-8 md:opacity-0 md:absolute")} />
                   <span className={cn(
-                    "absolute text-xs font-bold whitespace-nowrap opacity-0 transition-all duration-300",
-                    isHovered && "opacity-100"
+                    "text-xs font-bold whitespace-nowrap transition-all duration-300",
+                    "opacity-100 md:opacity-0",
+                    isHovered && "md:opacity-100"
                   )}>
                     S&apos;inscrire
                   </span>
@@ -341,7 +343,7 @@ function EventsPageContent() {
             <p className="text-gray-400 dark:text-gray-400 max-w-xs text-lg font-medium leading-relaxed">Aucun événement ne correspond pour le moment. Essayez d&apos;élargir votre horizon.</p>
           </motion.div>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-x-12 gap-y-20">
+          <div className="flex md:grid md:grid-cols-2 lg:grid-cols-3 gap-x-12 gap-y-20 overflow-x-auto md:overflow-visible pb-12 md:pb-0 snap-x snap-mandatory -mx-4 px-4 md:mx-0 md:px-0 no-scrollbar">
             <AnimatePresence mode="popLayout">
               {filteredEvents.map((event: { id: string; date: string; image?: string; title: string; category?: { name: string }; location: string; participants?: number; description: string; speakers?: { name: string }[] }, idx: number) => (
                 <EventCard key={event.id} event={event} index={idx} />

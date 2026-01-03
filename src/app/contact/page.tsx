@@ -2,7 +2,8 @@
 
 import { useState } from "react"
 import { motion } from "framer-motion"
-import { Mail, Phone, MapPin, Users, MessageCircle, User, BookText, MessageSquare, Clock, ArrowUpRight, Sparkles } from "lucide-react"
+import Link from "next/link"
+import { Mail, Phone, MapPin, Users, MessageCircle, User, BookText, MessageSquare, Clock, ArrowUpRight, Sparkles, Shield, FileText } from "lucide-react"
 import { createContact } from "@/lib/actions/contacts"
 import { toast } from "sonner"
 import { cn } from "@/lib/utils"
@@ -226,28 +227,29 @@ export default function ContactPage() {
                 </motion.a>
               ))}
 
-              <div className="p-8 rounded-[2rem] bg-[#0A1128] border border-white/5 shadow-2xl relative overflow-hidden group">
-                <div className="absolute inset-0 bg-gradient-to-tr from-[#FFD700]/10 to-transparent" />
-                <div className="relative z-10 flex items-center gap-6">
-                  <div className="w-14 h-14 rounded-2xl bg-[#FFD700] flex items-center justify-center text-[#0A1128] shadow-lg">
-                    <Users size={24} />
+              {/* LEGAL LINKS */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <Link
+                  href="/legal/mentions-legales"
+                  className="group block p-8 rounded-2xl bg-[#0A1128] border border-white/5 hover:border-[#FFD700]/30 transition-all duration-500 relative overflow-hidden"
+                >
+                  <div className="absolute top-0 right-0 w-24 h-24 bg-[#FFD700]/5 blur-2xl rounded-full translate-x-12 -translate-y-12" />
+                  <div className="relative z-10">
+                    <span className="text-[#FFD700] text-[9px] font-black uppercase tracking-[0.3em] mb-2 block">Juridique</span>
+                    <h4 className="text-white font-black uppercase tracking-tighter text-lg leading-none group-hover:text-[#FFD700] transition-colors">Mentions Légales</h4>
                   </div>
-                  <div>
-                    <h4 className="text-white font-black uppercase tracking-tighter text-xl mb-1">Communauté</h4>
-                    <p className="text-white/50 text-xs font-medium uppercase tracking-widest flex items-center gap-2">
-                      <Sparkles size={12} className="text-[#FFD700]" />
-                      5000+ Ambassadeurs
-                    </p>
-                  </div>
-                </div>
-              </div>
-            </div>
+                </Link>
 
-            {/* Timings */}
-            <div className="p-8 border-t border-gray-100 dark:border-white/10 flex items-center gap-6 opacity-60">
-              <Clock size={20} className="text-[#FFD700]" />
-              <div className="text-xs font-black uppercase tracking-[0.2em] text-gray-400">
-                Temps de réponse moyen : <span className="text-[#0A1128] dark:text-white">Moins de 24h</span>
+                <Link
+                  href="/legal/politique-confidentialite"
+                  className="group block p-8 rounded-2xl bg-[#0A1128] border border-white/5 hover:border-[#FFD700]/30 transition-all duration-500 relative overflow-hidden"
+                >
+                  <div className="absolute top-0 right-0 w-24 h-24 bg-[#FFD700]/5 blur-2xl rounded-full translate-x-12 -translate-y-12" />
+                  <div className="relative z-10">
+                    <span className="text-[#FFD700] text-[9px] font-black uppercase tracking-[0.3em] mb-2 block">Données</span>
+                    <h4 className="text-white font-black uppercase tracking-tighter text-lg leading-none group-hover:text-[#FFD700] transition-colors">Confidentialité</h4>
+                  </div>
+                </Link>
               </div>
             </div>
           </motion.div>

@@ -8,6 +8,9 @@ import Footer from "./landing-page/components/Footer";
 import { Toaster } from "sonner";
 import ParallaxLayout from "@/components/parallax-layout";
 import CookieConsent from "@/components/shared/CookieConsent";
+import { cookies } from "next/headers";
+import ThemeSync from "@/components/theme-sync";
+import SmoothScroll from "@/components/shared/SmoothScroll";
 
 const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://trouvaille-frontend-zeta.vercel.app'
 const ogImageUrl = `${siteUrl}/images/la_trouvaille.png`
@@ -87,11 +90,14 @@ export const metadata: Metadata = {
   },
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const cookieStore = await cookies();
+  const theme = cookieStore.get("theme")?.value || "system";
+
   return (
     <html lang="fr" suppressHydrationWarning>
       <body
@@ -100,10 +106,12 @@ export default function RootLayout({
         <QueryProvider>
           <ThemeProvider
             attribute="class"
-            defaultTheme="system"
+            defaultTheme={theme}
             enableSystem
             disableTransitionOnChange
           >
+            <ThemeSync />
+            <SmoothScroll />
             <div className="dark-gradient" />
             <PointerProvider>
               <div className="content-wrapper">

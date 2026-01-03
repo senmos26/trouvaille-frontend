@@ -73,12 +73,12 @@ export default function EventsSection() {
 
         {/* CONTENT STATE */}
         {!isLoading && displayEvents.length > 0 && (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+          <div className="flex md:grid md:grid-cols-2 lg:grid-cols-3 gap-8 overflow-x-auto md:overflow-visible pb-12 md:pb-0 snap-x snap-mandatory -mx-4 px-4 md:mx-0 md:px-0 no-scrollbar">
             {displayEvents.map((event) => (
               <Link
                 key={event.id}
                 href={`/event/${event.id}`}
-                className="block h-full"
+                className="block h-full min-w-[85vw] md:min-w-0 snap-center"
                 onMouseEnter={() => setHoveredId(event.id)}
                 onMouseLeave={() => setHoveredId(null)}
               >
@@ -96,7 +96,7 @@ export default function EventsSection() {
                         src={event.image}
                         alt={event.title}
                         fill
-                        className="object-cover transition-transform duration-700 ease-out group-hover:scale-110"
+                        className="object-cover transition-transform duration-700 ease-out md:grayscale group-hover:grayscale-0 group-hover:scale-110 grayscale-0"
                         sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
                       />
                     ) : (
@@ -143,7 +143,7 @@ export default function EventsSection() {
                     </div>
 
                     {/* Title */}
-                    <h3 className="text-2xl font-black text-[#0A1128] dark:text-white mb-4 line-clamp-2 leading-tight uppercase tracking-tighter group-hover:text-[#FFD700] transition-colors">
+                    <h3 className="text-2xl font-black text-[#FFD700] md:text-[#0A1128] dark:md:text-white mb-4 line-clamp-2 leading-tight uppercase tracking-tighter md:group-hover:text-[#FFD700] transition-colors">
                       {event.title}
                     </h3>
 
@@ -178,15 +178,17 @@ export default function EventsSection() {
                       </div>
 
                       {/* Animated CTA Button */}
-                      <div className="relative overflow-hidden rounded-full p-2">
+                      <div className="relative overflow-hidden rounded-full p-1 md:p-2">
                         <div className={cn(
-                          "flex items-center justify-center h-10 w-10 rounded-full bg-[#0A1128] dark:bg-white text-white dark:text-[#0A1128] transition-all duration-300",
-                          hoveredId === event.id ? "w-28" : "w-10"
+                          "flex items-center justify-center h-10 rounded-full bg-[#0A1128] dark:bg-white text-white dark:text-[#0A1128] transition-all duration-300",
+                          "w-28 md:w-10",
+                          hoveredId === event.id ? "md:w-28" : ""
                         )}>
-                          <ArrowUpRight size={20} className={cn("transition-transform", hoveredId === event.id && "translate-x-8 opacity-0 absolute")} />
+                          <ArrowUpRight size={20} className={cn("transition-transform md:block hidden", hoveredId === event.id && "md:translate-x-8 md:opacity-0 md:absolute")} />
                           <span className={cn(
-                            "absolute text-xs font-bold whitespace-nowrap opacity-0 transition-all duration-300",
-                            hoveredId === event.id && "opacity-100"
+                            "text-xs font-bold whitespace-nowrap transition-all duration-300",
+                            "opacity-100 md:opacity-0",
+                            hoveredId === event.id && "md:opacity-100"
                           )}>
                             S&apos;inscrire
                           </span>

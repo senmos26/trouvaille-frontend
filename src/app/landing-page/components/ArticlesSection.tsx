@@ -42,9 +42,9 @@ export default function ArticlesSection() {
 
         {/* Grid des Cartes */}
         {isLoading ? (
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+          <div className="flex md:grid md:grid-cols-3 gap-8 overflow-x-auto md:overflow-visible pb-10">
             {[1, 2, 3].map(i => (
-              <div key={i} className="h-[520px] w-full bg-white dark:bg-white/5 rounded-[2rem] border border-gray-100 dark:border-white/5 animate-pulse overflow-hidden">
+              <div key={i} className="min-w-[85vw] md:min-w-0 h-[520px] w-full bg-white dark:bg-white/5 rounded-[2rem] border border-gray-100 dark:border-white/5 animate-pulse overflow-hidden">
                 <div className="h-[240px] bg-gray-200 dark:bg-white/10" />
                 <div className="p-8 space-y-4">
                   <div className="h-4 w-20 bg-gray-200 dark:bg-white/10 rounded-full" />
@@ -55,9 +55,11 @@ export default function ArticlesSection() {
             ))}
           </div>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+          <div className="flex md:grid md:grid-cols-2 lg:grid-cols-3 gap-8 overflow-x-auto md:overflow-visible pb-12 md:pb-0 snap-x snap-mandatory -mx-4 px-4 md:mx-0 md:px-0 no-scrollbar">
             {articles.map((post, idx) => (
-              <BlogCard key={post.id} post={post} index={idx} />
+              <div key={post.id} className="min-w-[85vw] md:min-w-0 snap-center">
+                <BlogCard post={post} index={idx} />
+              </div>
             ))}
           </div>
         )}

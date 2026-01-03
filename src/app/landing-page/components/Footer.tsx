@@ -3,8 +3,11 @@
 import Link from "next/link"
 import Image from "next/image"
 import { Instagram, Linkedin, ArrowUpRight, Facebook } from "lucide-react"
+import { useEffect, useState } from "react"
 
 export default function Footer() {
+  const [mounted, setMounted] = useState(false)
+  useEffect(() => setMounted(true), [])
   const linkGroups = [
     {
       title: "Navigation",
@@ -50,15 +53,15 @@ export default function Footer() {
           {/* Left: Huge Editorial Statement */}
           <div className="lg:col-span-7 space-y-8">
             {/* Logo - Format GIGANTESQUE pour impact maximal */}
-            <Link href="/" className="inline-flex items-center space-x-6 group">
+            <Link href="/" className="inline-flex items-center space-x-4 md:space-x-6 group">
               <Image
                 src="/images/la_trouvaille.png"
                 alt="La Trouvaille"
                 width={400}
                 height={160}
-                className="h-20 md:h-32 lg:h-40 w-auto transition-transform group-hover:scale-105"
+                className="h-16 md:h-32 lg:h-40 w-auto transition-transform group-hover:scale-105"
               />
-              <span className="font-black text-6xl md:text-[8rem] lg:text-[5rem] tracking-tighter text-white uppercase leading-[0.8] mb-[-0.1em]">
+              <span className="font-black text-4xl md:text-[6.5rem] lg:text-[5rem] tracking-tighter text-white uppercase leading-[0.8] mb-[-0.1em]">
                 LA <br className="md:hidden" /> TROUVAILLE
               </span>
             </Link>
@@ -147,17 +150,26 @@ export default function Footer() {
       {/* Global Footer Bottom */}
       <div className="container mx-auto px-6 pt-8 flex flex-col md:flex-row items-center justify-between gap-4 border-t border-white/5 relative z-10">
         <p className="text-[9px] uppercase tracking-[0.4em] text-white/20">
-          © 2025 La Trouvaille — Des idées pour bâtir une meilleure Afrique.
+          © 2026 La Trouvaille — Des idées pour bâtir une meilleure Afrique.
         </p>
         <div className="flex gap-8 text-[9px] uppercase tracking-[0.4em] text-white/20">
-          <Link href="#" className="hover:text-white transition-colors">Politique de confidentialité</Link>
-          <Link href="#" className="hover:text-white transition-colors">Mentions légales</Link>
+          {mounted ? (
+            <>
+              <Link href="/legal/politique-confidentialite" className="hover:text-white transition-colors">Politique de confidentialité</Link>
+              <Link href="/legal/mentions-legales" className="hover:text-white transition-colors">Mentions légales</Link>
+            </>
+          ) : (
+            <>
+              <Link href="#" className="hover:text-white transition-colors">Politique de confidentialité</Link>
+              <Link href="#" className="hover:text-white transition-colors">Mentions légales</Link>
+            </>
+          )}
         </div>
       </div>
 
       {/* Decorative Watermark */}
-      <div className="absolute bottom-[5%] left-1/2 -translate-x-1/2 pointer-events-none select-none opacity-[0.015]">
-        <span className="text-[12vw] font-black uppercase leading-none tracking-[-0.05em] whitespace-nowrap text-white">
+      <div className="absolute bottom-[5%] left-0 w-full flex justify-center pointer-events-none select-none opacity-[0.015] overflow-hidden">
+        <span className="text-[15vw] md:text-[12vw] font-black uppercase leading-none tracking-[-0.05em] whitespace-nowrap text-white">
           La Trouvaille
         </span>
       </div>

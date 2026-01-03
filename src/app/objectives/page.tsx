@@ -2,7 +2,7 @@
 
 import React, { useRef, ReactNode } from "react"
 import Link from "next/link"
-import { motion, useScroll, useTransform, MotionValue } from "framer-motion"
+import { motion, useScroll, useTransform, MotionValue, useMotionTemplate } from "framer-motion"
 import { Target, ArrowRight, ArrowUpRight } from "lucide-react"
 import { useObjectives } from "@/lib/hooks/use-objectives"
 import * as LucideIcons from "lucide-react"
@@ -26,7 +26,7 @@ const ScrollRevealParagraph = ({ children, className }: ScrollRevealProps) => {
   const words = children.split(" ")
 
   return (
-    <p ref={container} className={`flex flex-wrap leading-[1.1] ${className}`}>
+    <p ref={container} className={`flex flex-wrap leading-[1.05] justify-center ${className}`}>
       {words.map((word, i) => {
         const start = i / words.length
         const end = start + (1 / words.length)
@@ -41,12 +41,21 @@ const ScrollRevealParagraph = ({ children, className }: ScrollRevealProps) => {
 }
 
 const Word = ({ children, progress, range }: { children: string, progress: MotionValue<number>, range: [number, number] }) => {
-  const opacity = useTransform(progress, range, [0.15, 1])
-  const y = useTransform(progress, range, [10, 0])
+  const opacity = useTransform(progress, range, [0.08, 1])
+  const blurValue = useTransform(progress, range, [8, 0])
+  const filter = useMotionTemplate`blur(${blurValue}px)`
+  const scale = useTransform(progress, range, [0.95, 1])
 
   return (
-    <span className="relative mr-[1.5%] lg:mr-[1.2%] mt-[0.5%] inline-block">
-      <motion.span style={{ opacity, y }} className="transition-colors duration-200">
+    <span className="relative mx-[0.3rem] md:mx-[0.6rem] lg:mx-[0.8rem] inline-block">
+      <motion.span
+        style={{
+          opacity,
+          filter,
+          scale
+        }}
+        className="transition-all duration-300"
+      >
         {children}
       </motion.span>
     </span>
@@ -82,7 +91,59 @@ const SectionTitle = ({ children, subtitle, dark = false }: { children: ReactNod
 
 
 // ============================================================================
-// 2. PAGE OBJECTIFS
+// 2. SOUS-COMPOSANTS SPÉCIFIQUES
+// ============================================================================
+
+const HeroParallax = () => {
+  const heroRef = useRef(null)
+  const { scrollYProgress } = useScroll({
+    target: heroRef,
+    offset: ["start start", "end start"]
+  })
+
+  const translateXLeft = useTransform(scrollYProgress, [0, 1], [0, -400])
+  const translateXRight = useTransform(scrollYProgress, [0, 1], [0, 400])
+  const opacity = useTransform(scrollYProgress, [0, 0.5], [1, 0])
+  const scale = useTransform(scrollYProgress, [0, 1], [1, 0.8])
+
+  return (
+    <section ref={heroRef} className="relative h-screen min-h-[700px] flex items-center justify-center overflow-hidden">
+      <div className="absolute inset-0 w-full h-full bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-[#0A1128]/5 via-transparent to-transparent opacity-50" />
+
+      <div className="container mx-auto px-4 z-10 text-center">
+        <div className="flex flex-col items-center select-none">
+          <motion.div
+            style={{ x: translateXLeft, opacity, scale }}
+            className="text-[15vw] md:text-[12rem] font-black leading-[0.7] tracking-[-0.05em] uppercase text-[#0A1128] dark:text-white"
+          >
+            Vision<span className="text-[#FFD700] text-[2rem] md:text-[5rem] align-top relative top-4 md:top-8 font-serif italic lowercase tracking-normal ml-2">&</span>
+          </motion.div>
+
+          <motion.div
+            style={{ x: translateXRight, opacity, scale }}
+            className="text-[15vw] md:text-[12rem] font-black leading-[0.7] tracking-[-0.05em] uppercase text-[#0A1128] dark:text-white mt-4"
+          >
+            Piliers
+          </motion.div>
+        </div>
+
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.8, duration: 1 }}
+          className="mt-16 flex flex-col items-center gap-6"
+        >
+          <p className="max-w-md mx-auto text-[10px] md:text-xs font-black uppercase tracking-[0.4em] text-[#0A1128]/40 dark:text-white/40">
+            L&apos;architecture de notre impact
+          </p>
+        </motion.div>
+      </div>
+    </section>
+  )
+}
+
+// ============================================================================
+// 3. PAGE OBJECTIFS
 // ============================================================================
 
 export default function ObjectivesPage() {
@@ -90,8 +151,6 @@ export default function ObjectivesPage() {
 
   // Utiliser uniquement les données Supabase
   const objectives = objectivesData || []
-
-  // Fallback si pas de données (pour le design)
   const displayObjectives = objectivesData && objectivesData.length > 0 ? objectivesData : objectives
 
   if (isLoading) {
@@ -105,46 +164,29 @@ export default function ObjectivesPage() {
   return (
     <div className="bg-white dark:bg-[#050A15] text-[#0A1128] dark:text-white selection:bg-[#FFD700] selection:text-[#0A1128] overflow-x-hidden">
 
-      {/* 1. HERO SECTION - MASSIVE TEXT STYLE */}
-      <section className="relative h-screen min-h-[700px] flex items-center justify-center overflow-hidden">
-        <div className="absolute inset-0 w-full h-full bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-[#0A1128]/5 via-transparent to-transparent opacity-50" />
+      <HeroParallax />
 
-        <div className="container mx-auto px-4 z-10 text-center">
-          <motion.div
-            initial={{ opacity: 0, y: 100 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 1, ease: [0.16, 1, 0.3, 1] }}
-          >
-            <h1 className="text-[12vw] md:text-[10rem] font-black leading-[0.8] tracking-[-0.05em] uppercase mix-blend-difference text-[#0A1128] dark:text-white">
-              Vision<span className="text-[#FFD700] text-[1.5rem] md:text-[3rem] align-top relative top-4 md:top-8 font-serif italic lowercase tracking-normal">&</span>
-              <br />
-              Piliers
-            </h1>
-          </motion.div>
+      {/* 2. MANIFESTE - ACERNETITY STYLE REVEAL */}
+      <section className="py-32 md:py-60 relative overflow-hidden">
+        {/* Background Glows */}
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[500px] bg-[#FFD700]/5 blur-[120px] rounded-full pointer-events-none" />
 
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 0.5, duration: 1 }}
-            className="mt-12 flex flex-col items-center gap-6"
-          >
-            <p className="max-w-md mx-auto text-sm md:text-base font-bold uppercase tracking-[0.2em] text-[#0A1128]/40 dark:text-white/40">
-              L&apos;architecture de notre impact
-            </p>
-          </motion.div>
-        </div>
-      </section>
+        <div className="container mx-auto px-4 relative z-10">
+          <div className="flex flex-col items-center text-center">
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95 }}
+              whileInView={{ opacity: 1, scale: 1 }}
+              viewport={{ once: true }}
+              transition={{ duration: 1 }}
+              className="mb-12"
+            >
+              <h2 className="text-4xl md:text-7xl font-black leading-[0.9] tracking-[-0.04em] uppercase text-[#0A1128] dark:text-white">
+                Un engagement <span className="text-[#FFD700] italic font-serif lowercase">total</span> <br className="hidden md:block" /> pour l&apos;avenir.
+              </h2>
+            </motion.div>
 
-      {/* 2. MANIFESTE - SCROLL REVEAL */}
-      <section className="py-24 md:py-40">
-        <div className="container mx-auto px-4">
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-16 md:gap-24 items-start">
-            <div className="lg:col-span-12">
-              <SectionTitle subtitle="Notre Promesse">
-                Un engagement <span className="text-[#FFD700] italic font-serif lowercase">total</span> pour l&apos;avenir.
-              </SectionTitle>
-
-              <ScrollRevealParagraph className="text-3xl md:text-5xl lg:text-6xl font-black text-[#0A1128] dark:text-white uppercase tracking-tighter leading-[0.9] max-w-5xl">
+            <div className="max-w-5xl mx-auto mt-8">
+              <ScrollRevealParagraph className="text-3xl md:text-5xl lg:text-7xl font-black text-[#0A1128] dark:text-white uppercase tracking-tighter leading-[0.9] justify-center text-center">
                 Bâtir une jeunesse africaine épanouie, innovante et souveraine. Nos actions ne sont pas des gouttes d&apos;eau, mais les fondations structurelles d&apos;un continent en pleine renaissance.
               </ScrollRevealParagraph>
             </div>
