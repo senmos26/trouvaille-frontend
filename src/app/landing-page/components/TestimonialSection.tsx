@@ -3,7 +3,7 @@
 import { useState, useEffect, useCallback } from "react"
 import { motion, AnimatePresence } from "framer-motion"
 import Image from "next/image"
-import { Star } from "lucide-react"
+
 import { useTestimonials } from "@/lib/hooks/use-testimonials"
 
 // --- 1. SKELETON LOADING (Brutalist Style) ---
@@ -100,7 +100,7 @@ export default function TestimonialSection() {
               {/* STICKER */}
               <div className="absolute -top-[52px] left-0 bg-[#111827] dark:bg-white px-8 py-3 z-20 transition-all">
                 <span className="text-white dark:text-black font-black text-xl uppercase tracking-tighter flex items-center gap-3">
-                  <Star className="fill-current" size={16} />
+                 
                   Paroles de nos partenaires
                 </span>
               </div>
