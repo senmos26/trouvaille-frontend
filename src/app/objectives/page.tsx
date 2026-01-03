@@ -2,7 +2,6 @@
 
 import React, { useRef, ReactNode } from "react"
 import Link from "next/link"
-import Image from "next/image"
 import { motion, useScroll, useTransform, MotionValue } from "framer-motion"
 import { Target, ArrowRight, ArrowUpRight } from "lucide-react"
 import { useObjectives } from "@/lib/hooks/use-objectives"

@@ -62,7 +62,7 @@ export default function TeamPage() {
             className="lg:w-1/3 text-lg text-white/60 font-light leading-relaxed"
           >
             <p>
-              Nous sommes une mosaïque de talents, de cultures et d'ambitions.
+              Nous sommes une mosaïque de talents, de cultures et d&apos;ambitions.
               Unis par la volonté de redéfinir les standards et de propulser
               l&apos;Afrique vers son plein potentiel.
             </p>
