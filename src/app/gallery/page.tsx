@@ -4,7 +4,7 @@ import { useState } from "react"
 import Link from "next/link"
 import Image from "next/image"
 import { motion, AnimatePresence } from "framer-motion"
-import { Calendar, MapPin, Users, Filter, Camera, Search, X, ChevronDown, Check, Sparkles, ArrowUpRight } from "lucide-react"
+import { Calendar, MapPin, Users, Filter, Camera, Search, X, ChevronDown, Sparkles, ArrowUpRight } from "lucide-react"
 import { useEvents } from "@/lib/hooks/use-events"
 import { useEventCategories, useEventRubriques } from "@/lib/hooks/use-categories"
 import { cn } from "@/lib/utils"
@@ -40,7 +40,7 @@ const SkeletonCard = () => (
 )
 
 // --- GALLERY EVENT CARD ---
-const GalleryEventCard = ({ event, index }: { event: any; index: number }) => {
+const GalleryEventCard = ({ event, index }: { event: { id: string; gallery: { image_url: string }[]; category: any; ruby: any; title: string; created_at?: string; date: string; location: string; participants?: number; rubrique?: any }; index: number }) => {
   const photos = event.gallery || [];
 
   return (
@@ -106,7 +106,7 @@ const GalleryEventCard = ({ event, index }: { event: any; index: number }) => {
 
             {/* Thumbnails Preview */}
             <div className="grid grid-cols-4 gap-2 mb-6">
-              {photos.slice(1, 5).map((photo: any, idx: number) => (
+              {photos.slice(1, 5).map((photo: { image_url: string }, idx: number) => (
                 <div key={idx} className="aspect-square rounded-xl overflow-hidden relative">
                   <Image src={photo.image_url} alt="" fill className="object-cover" />
                   {idx === 3 && photos.length > 5 && (
@@ -127,7 +127,7 @@ const GalleryEventCard = ({ event, index }: { event: any; index: number }) => {
                 <span>{event.participants || 0}</span>
               </div>
               <div className="flex items-center gap-2 text-[10px] font-black uppercase tracking-[0.2em] text-[#0A1128] dark:text-white group-hover:text-[#FFD700] transition-colors">
-                Voir l'album
+                Voir l&apos;album
                 <div className="w-8 h-8 rounded-full border border-[#0A1128]/10 dark:border-white/10 flex items-center justify-center group-hover:bg-[#FFD700] group-hover:border-[#FFD700] transition-all">
                   <ArrowUpRight size={14} className="group-hover:text-[#0A1128]" />
                 </div>
@@ -154,13 +154,13 @@ export default function GalleryPage() {
   const today = new Date().setHours(0, 0, 0, 0)
 
   // Only past events for the gallery
-  const pastEvents = allEventsRaw.filter((e: any) => new Date(e.created_at || e.date).getTime() < today)
+  const pastEvents = allEventsRaw.filter((e: { created_at?: string; date: string }) => new Date(e.created_at || e.date).getTime() < today)
 
-  const categories = ["Tous", ...(categoriesData?.map((cat: any) => cat.name) || [])]
-  const rubriques = ["Toutes", ...(rubriquesData?.map((rub: any) => rub.name) || [])]
+  const categories = ["Tous", ...(categoriesData?.map((cat: { name: string }) => cat.name) || [])]
+  const rubriques = ["Toutes", ...(rubriquesData?.map((rub: { name: string }) => rub.name) || [])]
 
   // Filtering
-  let filteredEvents = pastEvents.filter((event: any) => {
+  const filteredEvents = pastEvents.filter((event: { title: string; location?: string; category: any; rubrique: any }) => {
     const matchSearch = !searchQuery ||
       event.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
       (event.location || '').toLowerCase().includes(searchQuery.toLowerCase());
@@ -172,7 +172,7 @@ export default function GalleryPage() {
   });
 
   // Sorting
-  filteredEvents.sort((a: any, b: any) => {
+  filteredEvents.sort((a: { created_at?: string; date: string; title: string; gallery?: { length: number } }, b: { created_at?: string; date: string; title: string; gallery?: { length: number } }) => {
     if (sortBy === "date") return new Date(b.created_at || b.date).getTime() - new Date(a.created_at || a.date).getTime();
     if (sortBy === "title") return a.title.localeCompare(b.title);
     if (sortBy === "photos") return (b.gallery?.length || 0) - (a.gallery?.length || 0);
@@ -199,7 +199,7 @@ export default function GalleryPage() {
             >
               <div className="flex items-center gap-3 mb-2">
                 <div className="w-12 h-px bg-[#FFD700]" />
-                <span className="text-[#FFD700] font-black uppercase tracking-[0.3em] text-[10px]">L'Héritage Visuel</span>
+                <span className="text-[#FFD700] font-black uppercase tracking-[0.3em] text-[10px]">L&apos;Héritage Visuel</span>
               </div>
 
               <h1 className="text-5xl md:text-6xl lg:text-7xl font-black text-[#0A1128] dark:text-white leading-[0.9] tracking-[-0.04em] uppercase mb-2">
@@ -215,11 +215,11 @@ export default function GalleryPage() {
               className="flex justify-between items-end border-t border-gray-100 dark:border-white/10 pt-4"
             >
               <p className="max-w-md text-sm md:text-base font-light leading-relaxed text-gray-500 dark:text-gray-300 italic font-serif">
-                "Capturer l'énergie de l'innovation et la force de notre communauté à travers le continent."
+                &quot;Capturer l&apos;énergie de l&apos;innovation et la force de notre communauté à travers le continent.&quot;
               </p>
               <div className="hidden md:flex flex-col items-end gap-1">
                 <span className="text-[9px] uppercase tracking-[0.4em] font-black text-gray-400 dark:text-white/40">Instants Gravés</span>
-                <span className="text-2xl font-black text-[#FFD700]">{pastEvents.reduce((acc: number, e: any) => acc + (e.gallery?.length || 0), 0)}</span>
+                <span className="text-2xl font-black text-[#FFD700]">{pastEvents.reduce((acc: number, e: { gallery?: any[] }) => acc + (e.gallery?.length || 0), 0)}</span>
               </div>
             </motion.div>
           </div>
@@ -332,13 +332,13 @@ export default function GalleryPage() {
         ) : filteredEvents.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-48 text-center">
             <Camera size={64} className="text-[#FFD700]/20 mb-8" />
-            <h3 className="text-4xl font-black uppercase tracking-tighter mb-4">Fin de l'exposition.</h3>
+            <h3 className="text-4xl font-black uppercase tracking-tighter mb-4">Fin de l&apos;exposition.</h3>
             <p className="text-gray-400 dark:text-gray-400 max-w-xs text-lg font-medium">Aucun album trouvé pour ces critères. Raffinez votre recherche.</p>
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-x-12 gap-y-20">
             <AnimatePresence mode="popLayout">
-              {filteredEvents.map((event: any, idx: number) => (
+              {filteredEvents.map((event: { id: string; gallery: { image_url: string }[]; category: any; ruby: any; title: string; created_at?: string; date: string; location: string; participants?: number; rubrique?: any }, idx: number) => (
                 <GalleryEventCard key={event.id} event={event} index={idx} />
               ))}
             </AnimatePresence>

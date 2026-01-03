@@ -2,7 +2,7 @@
 
 import { useState } from "react"
 import { motion } from "framer-motion"
-import { Mail, Phone, MapPin, Users, Send, MessageCircle, User, BookText, MessageSquare, Clock, Globe, ArrowUpRight, Sparkles } from "lucide-react"
+import { Mail, Phone, MapPin, Users, MessageCircle, User, BookText, MessageSquare, Clock, ArrowUpRight, Sparkles } from "lucide-react"
 import { createContact } from "@/lib/actions/contacts"
 import { toast } from "sonner"
 import { cn } from "@/lib/utils"
@@ -56,7 +56,7 @@ export default function ContactPage() {
             >
               <div className="flex items-center gap-3 mb-4">
                 <div className="w-12 h-px bg-[#FFD700]" />
-                <span className="text-[#FFD700] font-black uppercase tracking-[0.3em] text-[10px]">Service d'Excellence</span>
+                <span className="text-[#FFD700] font-black uppercase tracking-[0.3em] text-[10px]">Service d&apos;Excellence</span>
               </div>
 
               <h1 className="text-5xl md:text-7xl lg:text-[5.5rem] font-black tracking-tighter leading-[0.9] uppercase mb-6">
@@ -72,7 +72,7 @@ export default function ContactPage() {
               className="flex justify-between items-end border-t border-gray-100 dark:border-white/10 pt-8"
             >
               <p className="max-w-md text-sm md:text-base font-light leading-relaxed text-gray-500 dark:text-gray-300 italic font-serif">
-                "Une question, un partenariat ou simplement l'envie de rejoindre l'aventure ? Nos équipes vous écoutent."
+                &quot;Une question, un partenariat ou simplement l&apos;envie de rejoindre l&apos;aventure ? Nos équipes vous écoutent.&quot;
               </p>
               <div className="hidden md:flex flex-col items-end gap-1">
                 <span className="text-[9px] uppercase tracking-[0.4em] font-black text-gray-400 dark:text-white/40">Disponibilité</span>

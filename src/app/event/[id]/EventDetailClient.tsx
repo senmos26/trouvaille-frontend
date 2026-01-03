@@ -5,9 +5,9 @@ import Link from "next/link"
 import Image from "next/image"
 import { motion, AnimatePresence } from "framer-motion"
 import {
-  Calendar, MapPin, Users, ArrowLeft, Clock, Share2,
-  Check, X, Copy, Facebook, Linkedin, Send, Ticket,
-  ChevronRight, ChevronLeft, Twitter, Sparkles, ArrowUpRight
+  Calendar, MapPin, Users, ArrowLeft, Clock,
+  Check, X, Copy, Linkedin, Send, Ticket,
+  ChevronRight, ChevronLeft, Twitter, ArrowUpRight
 } from "lucide-react"
 import { useEvent } from "@/lib/hooks/use-events"
 import { useCreateRegistration } from "@/lib/hooks/use-registrations"
@@ -23,7 +23,7 @@ const SectionTitle = ({ children }: { children: React.ReactNode }) => (
   </h2>
 )
 
-const SpeakerCard = ({ name, role, colorIndex = 0 }: any) => {
+const SpeakerCard = ({ name, role }: { name: string; role: string }) => {
   return (
     <div className="group flex items-center gap-4 p-5 rounded-3xl border border-gray-100 dark:border-white/5 bg-white dark:bg-white/5 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-500">
       <div className="relative shrink-0">
@@ -39,7 +39,7 @@ const SpeakerCard = ({ name, role, colorIndex = 0 }: any) => {
   )
 }
 
-const InfoItem = ({ icon: Icon, label, value }: any) => (
+const InfoItem = ({ icon: Icon, label, value }: { icon: React.ElementType; label: string; value: string | number }) => (
   <div className="flex items-center gap-4 p-5 rounded-2xl bg-gray-50 dark:bg-white/5 border border-transparent hover:border-[#FFD700]/30 transition-all group">
     <div className="p-3 bg-white dark:bg-white/10 rounded-xl text-[#0A1128] dark:text-white shadow-sm group-hover:scale-110 transition-transform">
       <Icon size={22} className="text-[#FFD700]" />
@@ -100,7 +100,10 @@ export default function EventDetailClient({ params }: EventDetailClientProps) {
   if (error || !event) return <div className="min-h-screen flex flex-col items-center justify-center gap-4"><h2 className="text-2xl font-bold">Événement introuvable</h2><Link href="/events" className="text-blue-600 hover:underline">Retour au catalogue</Link></div>
 
   // Safety helpers
-  const getSafeString = (val: any) => (typeof val === 'string' ? val : val?.name || "")
+  const getSafeString = (val: { name?: string } | string | null | undefined) => {
+    if (!val) return "";
+    return typeof val === 'string' ? val : val.name || "";
+  }
 
   return (
     <div className="min-h-screen bg-white dark:bg-[#0A1128] text-[#0A1128] dark:text-white font-sans selection:bg-[#FFD700] selection:text-[#0A1128]">
@@ -202,7 +205,7 @@ export default function EventDetailClient({ params }: EventDetailClientProps) {
               <section>
                 <SectionTitle>Pourquoi participer ?</SectionTitle>
                 <div className="grid sm:grid-cols-2 gap-4">
-                  {event.highlights.map((h: any, i: number) => (
+                  {event.highlights.map((h: string | { highlight: string }, i: number) => (
                     <div key={i} className="flex items-start gap-3 p-4 rounded-xl bg-[#FFD700]/5 border border-[#FFD700]/10">
                       <div className="mt-1 p-1 bg-[#FFD700] rounded-full text-[#0A1128]">
                         <Check size={12} strokeWidth={4} />
@@ -221,11 +224,11 @@ export default function EventDetailClient({ params }: EventDetailClientProps) {
               <section>
                 <SectionTitle>Les Experts</SectionTitle>
                 <div className="grid sm:grid-cols-2 gap-4">
-                  {event.speakers?.map((s: any, i: number) => (
-                    <SpeakerCard key={i} name={getSafeString(s)} role={s.title || "Intervenant"} colorIndex={i} />
+                  {event.speakers?.map((s: { title?: string; name?: string }, i: number) => (
+                    <SpeakerCard key={i} name={getSafeString(s)} role={s.title || "Intervenant"} />
                   ))}
-                  {event.moderators?.map((m: any, i: number) => (
-                    <SpeakerCard key={`mod-${i}`} name={getSafeString(m)} role="Modérateur" colorIndex={i + 2} />
+                  {event.moderators?.map((m: { title?: string; name?: string }, i: number) => (
+                    <SpeakerCard key={`mod-${i}`} name={getSafeString(m)} role="Modérateur" />
                   ))}
                 </div>
               </section>
@@ -236,7 +239,7 @@ export default function EventDetailClient({ params }: EventDetailClientProps) {
               <section>
                 <SectionTitle>Album <span className="text-[#FFD700] lowercase italic font-serif px-2">des</span> Souvenirs</SectionTitle>
                 <div className="grid grid-cols-2 md:grid-cols-3 gap-6">
-                  {event.gallery.map((img: any, i: number) => (
+                  {event.gallery.map((img: { image_url: string }, i: number) => (
                     <motion.div
                       key={i}
                       whileHover={{ scale: 1.02 }}
@@ -253,7 +256,7 @@ export default function EventDetailClient({ params }: EventDetailClientProps) {
                       />
                       <div className="absolute inset-0 bg-gradient-to-t from-[#0A1128]/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
                       <div className="absolute bottom-4 left-4 text-white font-black uppercase text-[10px] tracking-widest opacity-0 group-hover:opacity-100 translate-y-4 group-hover:translate-y-0 transition-all duration-500">
-                        Agrandir l'image
+                        Agrandir l&apos;image
                       </div>
                     </motion.div>
                   ))}
@@ -284,7 +287,7 @@ export default function EventDetailClient({ params }: EventDetailClientProps) {
                     onClick={() => setShowRegister(true)}
                     className="w-full py-5 bg-[#0A1128] dark:bg-white text-white dark:text-[#0A1128] font-black text-lg uppercase tracking-tighter rounded-2xl shadow-xl hover:scale-[1.03] active:scale-[0.97] transition-all flex items-center justify-center gap-3 group/btn"
                   >
-                    <span>S'inscrire Maintenant</span>
+                    <span>S&apos;inscrire Maintenant</span>
                     <Ticket className="group-hover/btn:rotate-12 transition-transform" size={22} />
                   </button>
 
@@ -292,7 +295,7 @@ export default function EventDetailClient({ params }: EventDetailClientProps) {
                     onClick={() => setShowShare(true)}
                     className="w-full py-5 bg-transparent border-2 border-gray-200 dark:border-white/10 font-black text-sm uppercase tracking-widest rounded-2xl hover:bg-gray-50 dark:hover:bg-white/5 transition-all text-gray-400"
                   >
-                    Partager l'événement
+                    Partager l&apos;événement
                   </button>
                 </div>
 
@@ -355,20 +358,20 @@ export default function EventDetailClient({ params }: EventDetailClientProps) {
                       Inscription Confirmée !
                     </h3>
                     <p className="text-white/40 text-sm font-medium leading-relaxed max-w-xs mx-auto">
-                      Votre place est sécurisée. Un email de confirmation vient d'être envoyé à votre adresse.
+                      Votre place est sécurisée. Un email de confirmation vient d&apos;être envoyé à votre adresse.
                     </p>
 
                     <button
                       onClick={() => setShowRegister(false)}
                       className="mt-12 px-8 py-4 bg-white/5 hover:bg-white/10 text-white text-xs font-black uppercase tracking-widest rounded-xl transition-all"
                     >
-                      Retour à l'événement
+                      Retour à l&apos;événement
                     </button>
                   </motion.div>
                 ) : (
                   <>
                     <div className="mb-10 text-center">
-                      <h2 className="text-3xl font-black text-white uppercase tracking-tighter mb-2">Finaliser l'inscription</h2>
+                      <h2 className="text-3xl font-black text-white uppercase tracking-tighter mb-2">Finaliser l&apos;inscription</h2>
                       <p className="text-white/40 text-sm font-medium">Remplissez vos informations pour recevoir votre invitation.</p>
                     </div>
 
@@ -512,7 +515,7 @@ export default function EventDetailClient({ params }: EventDetailClientProps) {
 
             {/* Pagination / Thumbnails Indicator */}
             <div className="mt-10 flex gap-4 overflow-x-auto p-4 max-w-4xl no-scrollbar">
-              {event.gallery.map((img: any, i: number) => (
+              {event.gallery.map((img: { image_url: string }, i: number) => (
                 <button
                   key={i}
                   onClick={() => setLightbox(prev => ({ ...prev, index: i }))}

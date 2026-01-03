@@ -154,7 +154,7 @@ export default function ObjectivesPage() {
             className="mt-12 flex flex-col items-center gap-6"
           >
             <p className="max-w-md mx-auto text-sm md:text-base font-bold uppercase tracking-[0.2em] text-[#0A1128]/40 dark:text-white/40">
-              L'architecture de notre impact
+              L&apos;architecture de notre impact
             </p>
           </motion.div>
         </div>
@@ -166,11 +166,11 @@ export default function ObjectivesPage() {
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-16 md:gap-24 items-start">
             <div className="lg:col-span-12">
               <SectionTitle subtitle="Notre Promesse">
-                Un engagement <span className="text-[#FFD700] italic font-serif lowercase">total</span> pour l'avenir.
+                Un engagement <span className="text-[#FFD700] italic font-serif lowercase">total</span> pour l&apos;avenir.
               </SectionTitle>
 
               <ScrollRevealParagraph className="text-3xl md:text-5xl lg:text-6xl font-black text-[#0A1128] dark:text-white uppercase tracking-tighter leading-[0.9] max-w-5xl">
-                Bâtir une jeunesse africaine épanouie, innovante et souveraine. Nos actions ne sont pas des gouttes d'eau, mais les fondations structurelles d'un continent en pleine renaissance.
+                Bâtir une jeunesse africaine épanouie, innovante et souveraine. Nos actions ne sont pas des gouttes d&apos;eau, mais les fondations structurelles d&apos;un continent en pleine renaissance.
               </ScrollRevealParagraph>
             </div>
           </div>
@@ -181,7 +181,7 @@ export default function ObjectivesPage() {
       <section className="pt-24 md:pt-40 pb-32 md:pb-48 bg-[#0A1128] text-white rounded-t-[3rem] md:rounded-t-[8rem] relative z-10">
         <div className="container mx-auto px-4">
           <SectionTitle subtitle="Stratégie" dark>
-            Nos 6 Axes <span className="text-[#FFD700] italic font-serif lowercase">d'impact</span>.
+            Nos 6 Axes <span className="text-[#FFD700] italic font-serif lowercase">d&apos;impact</span>.
           </SectionTitle>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-16 text-left">

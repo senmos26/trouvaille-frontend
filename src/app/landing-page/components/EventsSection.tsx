@@ -58,7 +58,7 @@ export default function EventsSection() {
 
           <div className="mb-2">
             <Link href="/events" className="group flex items-center gap-4 text-[#0A1128] dark:text-white font-black text-sm uppercase tracking-[0.2em] border-b-2 border-[#FFD700] pb-2 transition-all hover:gap-6">
-              Explorer l'agenda
+              Explorer l&apos;agenda
               <ArrowUpRight className="w-5 h-5 transition-transform group-hover:-translate-y-1 group-hover:translate-x-1" />
             </Link>
           </div>
@@ -158,7 +158,7 @@ export default function EventsSection() {
                       {/* Speaker Avatars Stack */}
                       <div className="flex items-center -space-x-3">
                         {event.speakers && event.speakers.length > 0 ? (
-                          event.speakers.slice(0, 3).map((speaker: any, idx: number) => (
+                          event.speakers.slice(0, 3).map((speaker: { name: string }, idx: number) => (
                             <div key={idx} className="h-8 w-8 rounded-full border-2 border-white dark:border-[#0A1128] bg-gray-200 flex items-center justify-center text-[10px] font-bold text-gray-600 overflow-hidden relative" title={speaker.name}>
                               {/* Si tu as une image speaker, mets la ici, sinon Initiales */}
                               <span className="z-10">{speaker.name.charAt(0)}</span>
@@ -188,7 +188,7 @@ export default function EventsSection() {
                             "absolute text-xs font-bold whitespace-nowrap opacity-0 transition-all duration-300",
                             hoveredId === event.id && "opacity-100"
                           )}>
-                            S'inscrire
+                            S&apos;inscrire
                           </span>
                         </div>
                       </div>
@@ -212,7 +212,7 @@ export default function EventsSection() {
               <Calendar size={40} />
             </div>
             <h3 className="text-3xl font-black text-[#0A1128] dark:text-white mb-4 uppercase tracking-tighter">
-              Le silence avant <span className="text-[#FFD700]">l'impact</span>.
+              Le silence avant <span className="text-[#FFD700]">l&apos;impact</span>.
             </h3>
             <p className="text-gray-500 dark:text-gray-400 max-w-md mb-8 italic font-medium leading-relaxed">
               Nous préparons actuellement de nouvelles expériences immersives pour la jeunesse. <br /> Soyez prêts pour le prochain chapitre.

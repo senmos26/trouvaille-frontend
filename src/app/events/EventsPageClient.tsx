@@ -6,8 +6,8 @@ import Image from "next/image"
 import { motion, AnimatePresence } from "framer-motion"
 import {
   Search, Calendar, MapPin, ArrowUpRight,
-  ChevronDown, SlidersHorizontal, Users, Filter, X,
-  Clock, Bookmark, Sparkles
+  SlidersHorizontal, Users, Filter, X,
+  Sparkles
 } from "lucide-react"
 import { useEvents } from "@/lib/hooks/use-events"
 import { useEventCategories } from "@/lib/hooks/use-categories"
@@ -44,7 +44,7 @@ const SkeletonCard = () => (
 )
 
 // --- EVENT CARD COMPONENT ---
-const EventCard = ({ event, index }: { event: any; index: number }) => {
+const EventCard = ({ event, index }: { event: { id: string; date: string; image?: string; title: string; category?: { name: string }; location: string; participants?: number; description: string; speakers?: { name: string }[] }; index: number }) => {
   const [isHovered, setIsHovered] = useState(false);
   const eventDate = new Date(event.date);
 
@@ -116,12 +116,11 @@ const EventCard = ({ event, index }: { event: any; index: number }) => {
             <p className="text-[#0A1128]/70 dark:text-gray-400 line-clamp-2 text-sm font-medium leading-relaxed italic mb-8">
               {stripHtml(event.description)}
             </p>
-
             {/* Call to Action */}
             <div className="mt-auto flex items-center justify-between pt-6 border-t border-gray-100 dark:border-white/10">
               <div className="flex -space-x-3">
                 {event.speakers && event.speakers.length > 0 ? (
-                  event.speakers.slice(0, 3).map((speaker: any, idx: number) => (
+                  event.speakers.slice(0, 3).map((speaker: { name: string }, idx: number) => (
                     <div key={idx} className="h-8 w-8 rounded-full border-2 border-white dark:border-[#0A1128] bg-gray-200 flex items-center justify-center text-[10px] font-bold text-gray-600 overflow-hidden relative" title={speaker.name}>
                       <span className="z-10">{speaker.name.charAt(0)}</span>
                     </div>
@@ -145,7 +144,7 @@ const EventCard = ({ event, index }: { event: any; index: number }) => {
                     "absolute text-xs font-bold whitespace-nowrap opacity-0 transition-all duration-300",
                     isHovered && "opacity-100"
                   )}>
-                    S'inscrire
+                    S&apos;inscrire
                   </span>
                 </div>
               </div>
@@ -172,18 +171,18 @@ function EventsPageContent() {
   const today = new Date().setHours(0, 0, 0, 0)
 
   // Only future events for this page
-  const upcomingEvents = allEventsRaw.filter((e: any) => new Date(e.date).getTime() >= today)
-  const categories = ["Tout", ...(categoriesData?.map((c: any) => c.name) || [])]
+  const upcomingEvents = allEventsRaw.filter((e: { date: string }) => new Date(e.date).getTime() >= today)
+  const categories = ["Tout", ...(categoriesData?.map((c: { name: string }) => c.name) || [])]
 
   const filteredEvents = upcomingEvents
-    .filter((event: any) => {
+    .filter((event: { category?: { name: string }; title?: string; location?: string }) => {
       const matchCat = selectedCategory === "Tout" || event.category?.name === selectedCategory
       const matchSearch = !searchQuery ||
         event.title?.toLowerCase().includes(searchQuery.toLowerCase()) ||
         event.location?.toLowerCase().includes(searchQuery.toLowerCase())
       return matchCat && matchSearch
     })
-    .sort((a: any, b: any) => {
+    .sort((a: { date: string; participants?: number }, b: { date: string; participants?: number }) => {
       if (selectedSort === 'date-asc') return new Date(a.date).getTime() - new Date(b.date).getTime()
       if (selectedSort === 'date-desc') return new Date(b.date).getTime() - new Date(a.date).getTime()
       if (selectedSort === 'participants') return (b.participants || 0) - (a.participants || 0)
@@ -211,7 +210,7 @@ function EventsPageContent() {
             >
               <div className="flex items-center gap-3 mb-2">
                 <div className="w-12 h-px bg-[#FFD700]" />
-                <span className="text-[#FFD700] font-black uppercase tracking-[0.3em] text-[10px]">Agenda d'Excellence</span>
+                <span className="text-[#FFD700] font-black uppercase tracking-[0.3em] text-[10px]">Agenda d&apos;Excellence</span>
               </div>
 
               <h1 className="text-5xl md:text-6xl lg:text-7xl font-black text-[#0A1128] dark:text-white leading-[0.9] tracking-[-0.04em] uppercase mb-2">
@@ -227,7 +226,7 @@ function EventsPageContent() {
               className="flex justify-between items-end border-t border-gray-100 dark:border-white/10 pt-4"
             >
               <p className="max-w-md text-sm md:text-base font-light leading-relaxed text-gray-500 dark:text-gray-300 italic font-serif">
-                "Des moments d'exception pour forger des alliances et célébrer l'innovation africaine."
+                &quot;Des moments d&apos;exception pour forger des alliances et célébrer l&apos;innovation africaine.&quot;
               </p>
               <div className="hidden md:flex flex-col items-end gap-1">
                 <span className="text-[9px] uppercase tracking-[0.4em] font-black text-gray-400 dark:text-white/40">Rencontres Prévues</span>
@@ -338,13 +337,13 @@ function EventsPageContent() {
                 <Calendar size={48} className="text-[#FFD700]" strokeWidth={1.5} />
               </div>
             </div>
-            <h3 className="text-4xl font-black uppercase tracking-tighter mb-4 text-[#0A1128] dark:text-white">Le silence est d'or.</h3>
-            <p className="text-gray-400 dark:text-gray-400 max-w-xs text-lg font-medium leading-relaxed">Aucun événement ne correspond pour le moment. Essayez d'élargir votre horizon.</p>
+            <h3 className="text-4xl font-black uppercase tracking-tighter mb-4 text-[#0A1128] dark:text-white">Le silence est d&apos;or.</h3>
+            <p className="text-gray-400 dark:text-gray-400 max-w-xs text-lg font-medium leading-relaxed">Aucun événement ne correspond pour le moment. Essayez d&apos;élargir votre horizon.</p>
           </motion.div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-x-12 gap-y-20">
             <AnimatePresence mode="popLayout">
-              {filteredEvents.map((event: any, idx: number) => (
+              {filteredEvents.map((event: { id: string; date: string; image?: string; title: string; category?: { name: string }; location: string; participants?: number; description: string; speakers?: { name: string }[] }, idx: number) => (
                 <EventCard key={event.id} event={event} index={idx} />
               ))}
             </AnimatePresence>

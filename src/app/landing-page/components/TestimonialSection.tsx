@@ -52,7 +52,7 @@ const BrutalistAvatar = ({ name, avatarUrl }: { name: string, avatarUrl?: string
 
 export default function TestimonialSection() {
   const { data: testimonialsData, isLoading, error } = useTestimonials()
-  const testimonials = testimonialsData || []
+  const testimonials = (testimonialsData || []) as { id: string; author_name: string; avatar_url?: string; quote: string; author_title?: string }[]
 
   const [index, setIndex] = useState(0)
   const paginate = useCallback((dir: number) => {
@@ -135,7 +135,7 @@ export default function TestimonialSection() {
                       >
                         <blockquote className="relative">
                           <p className="text-2xl md:text-3xl lg:text-3xl xl:text-4xl font-black text-[#111827] dark:text-white leading-[1.1] uppercase tracking-tighter italic transition-colors">
-                            "{current.quote}"
+                            &quot;{current.quote}&quot;
                           </p>
                         </blockquote>
 

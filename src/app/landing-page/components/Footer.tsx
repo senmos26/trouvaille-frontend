@@ -64,7 +64,7 @@ export default function Footer() {
             </Link>
 
             <div className="space-y-6 pt-4">
-              <span className="text-[10px] font-black uppercase tracking-[0.5em] text-[#FFD700]">L'impact par l'action</span>
+              <span className="text-[10px] font-black uppercase tracking-[0.5em] text-[#FFD700]">L&apos;impact par l&apos;action</span>
               <h2 className="text-[11vw] md:text-[7rem] lg:text-[6.5rem] font-black uppercase leading-[0.75] tracking-[-0.05em] mt-6">
                 Bâtissons<br />
                 <span className="text-[#FFD700] italic font-serif lowercase tracking-normal">le</span> futur.
@@ -126,7 +126,7 @@ export default function Footer() {
                 </div>
               </div>
               <div className="space-y-4">
-                <h4 className="text-[10px] font-black uppercase tracking-[0.4em] text-white/30">Suivre l'audace</h4>
+                <h4 className="text-[10px] font-black uppercase tracking-[0.4em] text-white/30">Suivre l&apos;audace</h4>
                 <div className="flex gap-4">
                   {socialLinks.map((social) => (
                     <Link

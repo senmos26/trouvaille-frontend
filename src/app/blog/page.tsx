@@ -33,18 +33,18 @@ export default function BlogPage() {
   const allPosts = blogData?.data || []
 
   // Extraction des Catégories uniques
-  const categories = ["Tout", ...Array.from(new Set(allPosts.map((p: any) => p.category?.name).filter(Boolean)))]
+  const categories = ["Tout", ...Array.from(new Set(allPosts.map((p: { category?: { name: string } }) => p.category?.name).filter(Boolean).map(String)))]
 
   // --- LOGIQUE DE FILTRE & TRI ---
   const filteredPosts = allPosts
-    .filter((post: any) => {
+    .filter((post: { category?: { name: string }; title: string; excerpt?: string }) => {
       const matchCat = selectedCategory === "Tout" || post.category?.name === selectedCategory
       const matchSearch = !searchQuery ||
         post.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
         post.excerpt?.toLowerCase().includes(searchQuery.toLowerCase())
       return matchCat && matchSearch
     })
-    .sort((a: any, b: any) => {
+    .sort((a: { published_at?: string; created_at: string; title: string }, b: { published_at?: string; created_at: string; title: string }) => {
       const dateA = new Date(a.published_at || a.created_at).getTime()
       const dateB = new Date(b.published_at || b.created_at).getTime()
       if (sortOrder === "newest") return dateB - dateA
@@ -79,7 +79,7 @@ export default function BlogPage() {
             >
               <div className="flex items-center gap-3 mb-2">
                 <div className="w-12 h-px bg-[#FFD700]" />
-                <span className="text-[#FFD700] font-black uppercase tracking-[0.3em] text-[10px]">Le Journal d'Excellence</span>
+                <span className="text-[#FFD700] font-black uppercase tracking-[0.3em] text-[10px]">Le Journal d&apos;Excellence</span>
               </div>
 
               <h1 className="text-4xl md:text-5xl lg:text-[4.5rem] font-black tracking-tighter leading-[0.85] uppercase mb-2">
@@ -97,7 +97,7 @@ export default function BlogPage() {
               className="flex justify-between items-end border-t border-gray-100 dark:border-white/10 pt-4"
             >
               <p className="max-w-md text-sm md:text-base font-light leading-relaxed text-gray-500 dark:text-gray-300 italic font-serif">
-                "Partager la connaissance pour bâtir l'avenir. Découvrez nos dernières réflexions sur l'innovation et le leadership."
+                &quot;Partager la connaissance pour bâtir l&apos;avenir. Découvrez nos dernières réflexions sur l&apos;innovation et le leadership.&quot;
               </p>
               <div className="hidden md:flex flex-col items-end gap-1">
                 <span className="text-[9px] uppercase tracking-[0.4em] font-black text-gray-400 dark:text-white/40">Total des pensées</span>
@@ -212,13 +212,13 @@ export default function BlogPage() {
                 <BookOpen size={48} className="text-[#FFD700]" strokeWidth={1.5} />
               </div>
             </div>
-            <h3 className="text-4xl font-black uppercase tracking-tighter mb-4">Le silence est d'or.</h3>
-            <p className="text-gray-400 dark:text-gray-400 max-w-xs text-lg font-medium leading-relaxed">Aucun article ne correspond pour le moment. Essayez d'élargir votre horizon.</p>
+            <h3 className="text-4xl font-black uppercase tracking-tighter mb-4">Le silence est d&apos;or.</h3>
+            <p className="text-gray-400 dark:text-gray-400 max-w-xs text-lg font-medium leading-relaxed">Aucun article ne correspond pour le moment. Essayez d&apos;élargir votre horizon.</p>
           </motion.div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-x-12 gap-y-20">
             <AnimatePresence mode="popLayout">
-              {currentPosts.map((post, idx) => (
+              {currentPosts.map((post: any, idx: number) => (
                 <BlogCard key={post.id} post={post} index={idx} />
               ))}
             </AnimatePresence>

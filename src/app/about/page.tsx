@@ -3,7 +3,7 @@
 import { useRef, ReactNode } from "react"
 import Link from "next/link"
 import Image from "next/image"
-import { motion, useScroll, useTransform, useSpring, MotionValue } from "framer-motion"
+import { motion, useScroll, useTransform, MotionValue } from "framer-motion"
 import { ArrowRight, Ticket, Globe, Zap, Users } from "lucide-react"
 import { Timeline } from "@/components/ui/timeline"
 import { useTimelineEntries } from "@/lib/hooks/use-timeline"
@@ -122,7 +122,7 @@ export default function AboutPage() {
 
   // Timeline Data Adapté - Typographie Éditoriale
   const displayTimelineData = (timelineData || []).length > 0
-    ? (timelineData || []).map((entry: any) => ({
+    ? (timelineData || []).map((entry: { year?: string; title?: string; content?: string }) => ({
       title: entry.year || entry.title || "",
       content: (
         <div className="space-y-6">
@@ -168,7 +168,7 @@ export default function AboutPage() {
             className="mt-12 flex flex-col items-center gap-6"
           >
             <p className="max-w-md mx-auto text-sm md:text-base font-bold uppercase tracking-[0.2em] text-[#0A1128]/40 dark:text-white/40">
-              L'architecture du futur africain
+              L&apos;architecture du futur africain
             </p>
           </motion.div>
         </div>
@@ -186,7 +186,7 @@ export default function AboutPage() {
               </SectionTitle>
 
               <ScrollRevealParagraph className="text-3xl md:text-5xl lg:text-6xl font-black text-[#0A1128] dark:text-white uppercase tracking-tighter leading-[0.9]">
-                Nous ne sommes pas de simples spectateurs des mutations de l'Afrique. Nous sommes les architectes de sa renaissance. Chaque projet est une brique, chaque idée est un moteur.
+                Nous ne sommes pas de simples spectateurs des mutations de l&apos;Afrique. Nous sommes les architectes de sa renaissance. Chaque projet est une brique, chaque idée est un moteur.
               </ScrollRevealParagraph>
             </div>
 
@@ -207,13 +207,13 @@ export default function AboutPage() {
             <div className="lg:col-span-7 xl:col-span-8 order-2 lg:order-1 self-end">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-12 border-t border-[#0A1128]/10 dark:border-white/10 pt-12">
                 <div>
-                  <h4 className="text-[10px] font-black uppercase tracking-[0.4em] mb-4 text-[#FFD700]">L'Engagement / Mission</h4>
+                  <h4 className="text-[10px] font-black uppercase tracking-[0.4em] mb-4 text-[#FFD700]">L&apos;Engagement / Mission</h4>
                   <p className="text-xl md:text-2xl font-serif italic text-[#0A1128] dark:text-white leading-[1.2] tracking-tight">
-                    Propulser l'excellence africaine en bâtissant l'infrastructure qui transforme chaque talent brut en un leader d'impact mondial.
+                    Propulser l&apos;excellence africaine en bâtissant l&apos;infrastructure qui transforme chaque talent brut en un leader d&apos;impact mondial.
                   </p>
                 </div>
                 <div>
-                  <h4 className="text-[10px] font-black uppercase tracking-[0.4em] mb-4 text-[#FFD700]">L'Horizon / Vision</h4>
+                  <h4 className="text-[10px] font-black uppercase tracking-[0.4em] mb-4 text-[#FFD700]">L&apos;Horizon / Vision</h4>
                   <p className="text-xl md:text-2xl font-serif italic text-[#0A1128] dark:text-white leading-[1.2] tracking-tight">
                     Voir une jeunesse africaine unie, souveraine et maîtresse de sa destinée, au cœur des innovations qui façonneront le siècle.
                   </p>
@@ -243,7 +243,7 @@ export default function AboutPage() {
 
           <div className="relative z-20 h-full flex items-center justify-center p-6 md:p-24 text-center">
             <ScrollRevealParagraph className="text-3xl md:text-7xl lg:text-[7.5rem] font-black text-white uppercase tracking-[-0.04em] justify-center text-center leading-[0.8] max-w-[90vw]">
-              "L'avenir appartient à ceux qui voient des solutions là où les autres voient des problèmes."
+              &quot;L&apos;avenir appartient à ceux qui voient des solutions là où les autres voient des problèmes.&quot;
             </ScrollRevealParagraph>
           </div>
         </div>
@@ -295,7 +295,7 @@ export default function AboutPage() {
                   Agir maintenant <ArrowRight size={18} />
                 </Link>
                 <Link href="/team" className="px-8 py-4 border-2 border-[#0A1128] text-[#0A1128] font-bold rounded-full hover:bg-[#0A1128] hover:text-white transition-colors flex items-center gap-2">
-                  L'équipe <Ticket size={18} />
+                  L&apos;équipe <Ticket size={18} />
                 </Link>
               </div>
             </div>

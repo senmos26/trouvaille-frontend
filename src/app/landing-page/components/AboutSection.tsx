@@ -3,7 +3,7 @@
 import Link from "next/link"
 import Image from "next/image"
 import { motion } from "framer-motion"
-import { ArrowRight, Sparkles } from "lucide-react"
+import { ArrowRight } from "lucide-react"
 
 // --- COMPOSANT VALEUR (EDITORIAL CARD) ---
 const ValueCard = ({ number, title, description, index }: { number: string, title: string, description: string, index: number }) => (
@@ -31,7 +31,7 @@ const ValueCard = ({ number, title, description, index }: { number: string, titl
         {description}
       </p>
 
-    
+
     </div>
   </motion.div>
 )
@@ -81,7 +81,7 @@ export default function AboutSection() {
               transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
               className="text-4xl md:text-5xl lg:text-6xl font-black text-[#0A1128] dark:text-white leading-[0.95] tracking-[-0.04em] mb-6 uppercase"
             >
-              Plus qu’une <br />
+              Plus qu&apos;une <br />
               organisation, <br />
               <span className="text-[#FFD700] lowercase italic font-serif">un</span> Mouvement.
             </motion.h2>
@@ -95,10 +95,10 @@ export default function AboutSection() {
             >
               <p>
                 <strong className="text-[#0A1128] dark:text-white font-black uppercase tracking-tight text-lg block mb-1">La Trouvaille</strong>
-                est née d’une conviction inébranlable : la jeunesse africaine détient les clés de sa propre destinée.
+                est née d&apos;une conviction inébranlable : la jeunesse africaine détient les clés de sa propre destinée.
               </p>
               <p className="italic">
-                Nous ne sommes pas des spectateurs. Nous bâtissons l’infrastructure qui permet à chaque talent de s’exprimer pleinement.
+                Nous ne sommes pas des spectateurs. Nous bâtissons l&apos;infrastructure qui permet à chaque talent de s&apos;exprimer pleinement.
               </p>
 
               <div className="pt-4">

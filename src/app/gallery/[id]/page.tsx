@@ -17,18 +17,18 @@ export default function EventGalleryPage({ params }: { params: Promise<{ id: str
   const ref = useRef<HTMLDivElement | null>(null)
   const id = useId()
 
-  const getPhotos = useCallback((item: any): Array<{ id: string; image_url: string; alt_text?: string }> => {
+  const getPhotos = useCallback((item: { gallery?: any[]; photos?: any[]; event_images?: any[] } | null | undefined): Array<{ id: string; image_url: string; alt_text?: string }> => {
     if (!item) return []
     const rawPhotos = item.gallery || item.photos || item.event_images || []
-    return rawPhotos.map((p: any, idx: number) => ({
-      id: p.id || `photo-${idx}`,
+    return rawPhotos.map((p: { id?: string; image_url: string; alt_text?: string } | string, idx: number) => ({
+      id: (typeof p !== 'string' && p.id) ? p.id : `photo-${idx}`,
       image_url: typeof p === 'string' ? p : p.image_url,
-      alt_text: p.alt_text || ''
+      alt_text: (typeof p !== 'string' && p.alt_text) ? p.alt_text : ''
     }))
   }, [])
 
-  const getCategoryName = (item: any) => typeof item?.category === 'string' ? item.category : item?.category?.name || ''
-  const getRubriqueName = (item: any) => typeof item?.rubrique === 'string' ? item.rubrique : item?.rubrique?.name || ''
+  const getCategoryName = (item: { category?: { name: string } | string } | null | undefined) => typeof item?.category === 'string' ? item.category : item?.category?.name || ''
+  const getRubriqueName = (item: { rubrique?: { name: string } | string } | null | undefined) => typeof item?.rubrique === 'string' ? item.rubrique : item?.rubrique?.name || ''
 
   useEffect(() => {
     function onKeyDown(e: KeyboardEvent) {
@@ -58,7 +58,7 @@ export default function EventGalleryPage({ params }: { params: Promise<{ id: str
         <h2 className="text-4xl font-black uppercase tracking-tighter mb-4 text-[#0A1128] dark:text-white">Relique égarée.</h2>
         <p className="text-gray-500 mb-8 font-medium">Cette galerie semble avoir disparu des archives du temps.</p>
         <Link href="/gallery" className="inline-flex items-center gap-2 px-8 py-4 bg-[#FFD700] text-[#0A1128] font-black uppercase tracking-widest text-xs rounded-full hover:scale-105 transition-transform">
-          <ArrowLeft size={16} /> Retour à l'exposition
+          <ArrowLeft size={16} /> Retour à l&apos;exposition
         </Link>
       </div>
     </div>
@@ -86,7 +86,7 @@ export default function EventGalleryPage({ params }: { params: Promise<{ id: str
             <div className="w-10 h-10 rounded-full border border-gray-100 dark:border-white/10 flex items-center justify-center group-hover:border-[#FFD700] transition-all">
               <ArrowLeft size={16} className="group-hover:-translate-x-1 transition-transform" />
             </div>
-            Retour à l'agenda
+            Retour à l&apos;agenda
           </Link>
 
           <motion.div
