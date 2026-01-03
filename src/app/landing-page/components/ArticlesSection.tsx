@@ -1,209 +1,74 @@
 "use client"
 
-import { useState } from "react"
 import Link from "next/link"
 import { motion } from "framer-motion"
-import { Calendar, ThumbsUp, MessageCircle, Share2, PenSquare } from "lucide-react"
-import { sectionVariants, itemVariants } from "@/lib/animations"
+import { ArrowRight } from "lucide-react"
 import { useBlogPosts } from "@/lib/hooks/use-blog"
+import { BlogCard } from "./BlogCard" // Assure-toi que le chemin est bon
 
 export default function ArticlesSection() {
   const { data: blogData, isLoading } = useBlogPosts()
-  const [hoveredCard, setHoveredCard] = useState<number | null>(null)
-  const [likedPosts, setLikedPosts] = useState<number[]>([])
-  
-  // Utiliser uniquement les données Supabase, limiter à 3 articles
-  const displayArticles = (blogData?.data || []).slice(0, 3)
-  
-  const [postLikes, setPostLikes] = useState<Record<number, number>>(
-    displayArticles.reduce((acc: Record<number, number>, post: { id: number; likes?: number }) => ({ ...acc, [post.id]: post.likes || 0 }), {})
-  )
+  const articles = (blogData?.data || []).slice(0, 3)
 
-  const handleLike = (postId: number) => {
-    if (likedPosts.includes(postId)) {
-      setLikedPosts(likedPosts.filter(id => id !== postId))
-      setPostLikes({ ...postLikes, [postId]: postLikes[postId] - 1 })
-    } else {
-      setLikedPosts([...likedPosts, postId])
-      setPostLikes({ ...postLikes, [postId]: postLikes[postId] + 1 })
-    }
-  }
-  
-  if (isLoading) {
-    return (
-      <section className="py-20 bg-gray-50">
-        <div className="container text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#FFD700] mx-auto"></div>
-        </div>
-      </section>
-    )
-  }
   return (
-    <motion.section 
-      variants={sectionVariants} 
-      initial="hidden" 
-      whileInView="visible" 
-      viewport={{ once: true, amount: 0.2 }} 
-      className="py-20 bg-gray-50 dark:bg-gray-900"
-    >
-      <div className="container">
-        <motion.div variants={itemVariants} className="text-center mb-12">
-          <h2 className="text-4xl md:text-5xl font-bold mb-4">Derniers Articles</h2>
-          <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-            Découvrez nos réflexions sur les enjeux qui façonnent l&apos;avenir de l&apos;Afrique.
-          </p>
-        </motion.div>
+    <section className="relative py-24 bg-white dark:bg-[#0A1128] overflow-hidden">
 
-        {displayArticles.length === 0 ? (
-          <motion.div
-            variants={itemVariants}
-            className="mx-auto max-w-2xl rounded-2xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 p-10 text-center shadow-sm"
-          >
-            <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-[#0A1128]/5 dark:bg-[#FFD700]/10">
-              <PenSquare size={24} className="text-[#0A1128]" />
-            </div>
-            <h3 className="text-2xl font-bold text-[#0A1128] dark:text-white mb-2">
-              Aucun article pour le moment
-            </h3>
-            <p className="text-muted-foreground dark:text-gray-400 mb-6">
-              Revenez bientôt ou consultez tous nos articles.
-            </p>
-            <Link
-              href="/blog"
-              className="inline-flex items-center gap-2 px-8 py-4 bg-[#FFD700] text-[#0A1128] font-bold rounded-xl shadow-lg hover:bg-[#E6C200] hover:shadow-xl hover:-translate-y-1 transition-all dark:shadow-[#FFD700]/20"
+      {/* Background Decoratif Subtil */}
+      <div className="absolute top-0 left-0 w-full h-px bg-gradient-to-r from-transparent via-gray-200 dark:via-white/10 to-transparent" />
+
+      <div className="container relative z-10 px-4">
+
+        {/* Header de section: Editorial Style */}
+        <div className="flex flex-col md:flex-row md:items-end justify-between mb-20 gap-8">
+          <div className="space-y-4 max-w-2xl">
+            <motion.h2
+              initial={{ opacity: 0, y: 30 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              className="text-5xl md:text-6xl lg:text-7xl font-black text-[#0A1128] dark:text-white leading-[0.9] tracking-[-0.04em] uppercase"
             >
-              Voir tous les articles
+              Le <span className="text-[#FFD700] lowercase italic font-serif">Journal</span> <br className="hidden md:block" />
+              d'Afrique.
+            </motion.h2>
+          </div>
+
+          <div className="mb-2">
+            <Link href="/blog" className="group flex items-center gap-4 text-[#0A1128] dark:text-white font-black text-sm uppercase tracking-[0.2em] border-b-2 border-[#FFD700] pb-2 transition-all hover:gap-6">
+              Explorer le Journal
+              <ArrowRight className="w-5 h-5 transition-transform group-hover:translate-x-1" />
             </Link>
-          </motion.div>
+          </div>
+        </div>
+
+        {/* Grid des Cartes */}
+        {isLoading ? (
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            {[1, 2, 3].map(i => (
+              <div key={i} className="h-[520px] w-full bg-white dark:bg-white/5 rounded-[2rem] border border-gray-100 dark:border-white/5 animate-pulse overflow-hidden">
+                <div className="h-[240px] bg-gray-200 dark:bg-white/10" />
+                <div className="p-8 space-y-4">
+                  <div className="h-4 w-20 bg-gray-200 dark:bg-white/10 rounded-full" />
+                  <div className="h-8 w-full bg-gray-200 dark:bg-white/10 rounded-lg" />
+                  <div className="h-4 w-2/3 bg-gray-200 dark:bg-white/10 rounded-lg" />
+                </div>
+              </div>
+            ))}
+          </div>
         ) : (
-          <>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-12">
-              {displayArticles.map((article: { id: number; title: string; excerpt: string; image: string; category?: { name: string }; author_name: string; published_at: string; likes: number; comments_count: number }) => (
-                <motion.article
-                  key={article.id}
-                  variants={itemVariants}
-                  className="flex flex-col bg-white dark:bg-gray-800 rounded-xl overflow-hidden border border-gray-200 dark:border-gray-700 transition-all duration-300 cursor-pointer"
-                  style={{
-                    boxShadow: hoveredCard === article.id ? '0 18px 45px rgba(10, 17, 40, 0.18)' : '0 10px 30px rgba(10, 17, 40, 0.08)',
-                    transform: hoveredCard === article.id ? 'translateY(-6px)' : 'translateY(0)',
-                    borderColor: hoveredCard === article.id ? 'rgba(212, 175, 55, 0.3)' : 'rgba(17, 24, 39, 0.05)',
-                  }}
-                  onMouseEnter={() => setHoveredCard(article.id)}
-                  onMouseLeave={() => setHoveredCard(null)}
-                >
-              {/* Image */}
-              <div className="relative h-52 overflow-hidden">
-                <div
-                  className="absolute inset-0 bg-cover bg-center"
-                  style={{
-                    backgroundImage: `linear-gradient(135deg, rgba(10, 17, 40, 0.25), rgba(23, 43, 77, 0.25)), url('${article.image}')`,
-                  }}
-                />
-                <div
-                  className="absolute inset-0 transition-all duration-300"
-                  style={{
-                    background: hoveredCard === article.id
-                      ? 'linear-gradient(135deg, rgba(10, 17, 40, 0.75), rgba(212, 175, 55, 0.25))'
-                      : 'linear-gradient(135deg, rgba(10, 17, 40, 0.45), rgba(212, 175, 55, 0.05))',
-                  }}
-                />
-                <div className="absolute top-4 left-4 inline-flex items-center px-3 py-1.5 rounded-full bg-white/90 text-[#0A1128] font-semibold text-sm shadow-lg">
-                  {article.category?.name}
-                </div>
-              </div>
-
-              {/* Content */}
-              <div className="flex flex-col gap-4 p-6 flex-1 min-h-[320px]">
-                {/* Meta */}
-                <div className="flex items-center justify-between text-sm text-muted-foreground gap-4 flex-wrap">
-                  <span className="inline-flex items-center gap-1.5">
-                    <Calendar size={16} />
-                    {new Date(article.published_at).toLocaleDateString('fr-FR')}
-                  </span>
-                  <span className="inline-flex items-center gap-1.5">
-                    <PenSquare size={16} />
-                    {article.author_name}
-                  </span>
-                </div>
-
-                {/* Title */}
-                <h3 className="text-[#0A1128] text-xl font-bold leading-tight min-h-[3.5rem]">
-                  {article.title}
-                </h3>
-
-                {/* Excerpt */}
-                <p className="text-muted-foreground leading-relaxed flex-1 line-clamp-4 min-h-[5.6rem]">
-                  {article.excerpt}
-                </p>
-
-                {/* Actions */}
-                <div className="flex items-center justify-between pt-4 border-t gap-4">
-                  <Link href={`/blog/${article.id}`}>
-                    <button className="px-5 py-2.5 bg-[#FFD700] text-[#0A1128] font-semibold text-sm rounded-lg shadow-md hover:bg-[#E6C200] transition-all">
-                      Lire la suite
-                    </button>
-                  </Link>
-
-                  <div className="inline-flex gap-2.5">
-                    <button
-                      type="button"
-                      onClick={() => handleLike(article.id)}
-                      aria-label="Aimer l'article"
-                      className={`relative w-9 h-9 rounded-full inline-flex items-center justify-center transition-all ${
-                        likedPosts.includes(article.id)
-                          ? 'bg-[#FFD700]/20 text-[#FFD700]'
-                          : 'bg-gray-100 text-gray-600 hover:bg-[#FFD700]/20 hover:text-[#0A1128]'
-                      }`}
-                      title={`${postLikes[article.id]} j'aime`}
-                    >
-                      <ThumbsUp size={18} className={likedPosts.includes(article.id) ? 'fill-current' : ''} />
-                      {postLikes[article.id] > 0 && (
-                        <span className="absolute -top-1 -right-1 bg-[#FFD700] text-[#0A1128] text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center">
-                          {postLikes[article.id]}
-                        </span>
-                      )}
-                    </button>
-                    <Link href={`/blog/${article.id}#commentaires`}>
-                      <button
-                        type="button"
-                        aria-label="Commenter l'article"
-                        className="relative w-9 h-9 rounded-full bg-gray-100 text-gray-600 inline-flex items-center justify-center hover:bg-[#FFD700]/20 hover:text-[#0A1128] transition-all"
-                        title={`${article.comments_count || 0} commentaires`}
-                      >
-                        <MessageCircle size={18} />
-                        {(article.comments_count || 0) > 0 && (
-                          <span className="absolute -top-1 -right-1 bg-[#0A1128] text-white text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center">
-                            {article.comments_count || 0}
-                          </span>
-                        )}
-                      </button>
-                    </Link>
-                    <Link href={`/blog/${article.id}`}>
-                      <button
-                        type="button"
-                        aria-label="Partager l'article"
-                        className="w-9 h-9 rounded-full bg-gray-100 text-gray-600 inline-flex items-center justify-center hover:bg-[#FFD700]/20 hover:text-[#0A1128] transition-all"
-                      >
-                        <Share2 size={18} />
-                      </button>
-                    </Link>
-                  </div>
-                </div>
-              </div>
-            </motion.article>
-          ))}
-            </div>
-
-            <motion.div variants={itemVariants} className="text-center">
-              <Link href="/blog">
-                <button className="inline-flex items-center gap-2 px-8 py-4 bg-[#FFD700] text-[#0A1128] font-bold rounded-xl shadow-lg hover:bg-[#E6C200] hover:shadow-xl hover:-translate-y-1 transition-all dark:shadow-[#FFD700]/20">
-                  Voir tous les articles
-                </button>
-              </Link>
-            </motion.div>
-          </>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            {articles.map((post, idx) => (
+              <BlogCard key={post.id} post={post} index={idx} />
+            ))}
+          </div>
         )}
+
+        <div className="mt-16 md:hidden flex justify-center">
+          <Link href="/blog" className="flex items-center gap-4 px-10 py-5 bg-[#0A1128] dark:bg-white text-white dark:text-[#0A1128] rounded-full font-black text-xs uppercase tracking-[0.2em] shadow-xl w-full justify-center group active:scale-95 transition-all">
+            Tous les articles <ArrowRight size={18} className="transition-transform group-hover:translate-x-1" />
+          </Link>
+        </div>
+
       </div>
-    </motion.section>
+    </section>
   )
 }

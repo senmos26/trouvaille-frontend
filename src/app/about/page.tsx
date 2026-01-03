@@ -1,499 +1,308 @@
 "use client"
 
+import { useRef, ReactNode } from "react"
 import Link from "next/link"
 import Image from "next/image"
-import { motion } from "framer-motion"
-import {
-  MessageSquare,
-  Calendar,
-  MessageCircle,
-  Users,
-  Target,
-  Sparkles,
-  Globe,
-  Heart,
-  Award,
-  BarChart,
-  GitBranch,
-  Rocket,
-  TrendingUp,
-  MapPin
-} from "lucide-react"
+import { motion, useScroll, useTransform, useSpring, MotionValue } from "framer-motion"
+import { ArrowRight, Ticket, Globe, Zap, Users } from "lucide-react"
 import { Timeline } from "@/components/ui/timeline"
-import { useTimelineEntries } from "../../../lib/hooks/use-timeline"
+import { useTimelineEntries } from "@/lib/hooks/use-timeline"
 
-const stats = [
-  { icon: <GitBranch size={24} />, value: "2021", label: "Année de création", description: "Une initiative née de la volonté des jeunes Africains." },
-  { icon: <Award size={24} />, value: "50+", label: "Projets menés", description: "Actions concrètes sur le terrain dans plusieurs pays." },
-  { icon: <BarChart size={24} />, value: "5000+", label: "Jeunes mobilisés", description: "Une communauté engagée qui grandit chaque année." }
-]
+// --- 1. COMPOSANT TEXTE REVEAL (LE CŒUR DE L'EFFET) ---
 
-const specialities = [
-  { icon: <MessageSquare size={28} />, title: "Tribune d'expression", description: "Nous amplifions la voix de la jeunesse pour faire entendre ses idées." },
-  { icon: <Calendar size={28} />, title: "Organisation d'événements", description: "Des rencontres impactantes qui créent des passerelles durables." },
-  { icon: <MessageCircle size={28} />, title: "Débats & plaidoyers", description: "Des espaces de dialogue pour influencer les décisions publiques." }
-]
-
-const pillars = [
-  { icon: <Target size={24} />, title: "Mission", text: "Offrir une plateforme où chaque jeune peut transformer ses idées en actions." },
-  { icon: <Sparkles size={24} />, title: "Vision", text: "Une Afrique solidaire, prospère et propulsée par la créativité de sa jeunesse." },
-  { icon: <Heart size={24} />, title: "Valeurs", text: "Engagement, inclusion, excellence et collaboration permanente." }
-]
-
-// Données de fallback pour la timeline (en cas d'erreur ou de données vides)
-const fallbackTimelineData = [
-  {
-    title: "2021",
-    content: (
-      <div>
-        <h3 className="text-xl md:text-2xl font-bold text-[#0A1128] mb-4">
-          Naissance du mouvement
-        </h3>
-        <p className="text-neutral-700 text-sm md:text-base mb-8 leading-relaxed">
-          Création de La Trouvaille et lancement des premiers labs d&apos;idées. Un groupe de jeunes visionnaires se réunit avec une mission claire : donner une voix à la jeunesse africaine.
-        </p>
-        <div className="grid grid-cols-2 gap-4">
-          <Image
-            src="https://images.unsplash.com/photo-1522071820081-009f0129c71c?w=800&h=600&fit=crop"
-            alt="Lancement La Trouvaille"
-            width={800}
-            height={600}
-            className="h-20 md:h-44 lg:h-60 w-full rounded-lg object-cover shadow-[0_0_24px_rgba(10,17,40,0.06)]"
-          />
-          <Image
-            src="https://images.unsplash.com/photo-1517245386807-bb43f82c33c4?w=800&h=600&fit=crop"
-            alt="Premiers labs"
-            width={800}
-            height={600}
-            className="h-20 md:h-44 lg:h-60 w-full rounded-lg object-cover shadow-[0_0_24px_rgba(10,17,40,0.06)]"
-          />
-        </div>
-        <div className="mt-6 flex flex-wrap gap-2">
-          <span className="px-3 py-1 bg-[#FFD700]/10 text-[#0A1128] rounded-full text-xs font-semibold flex items-center gap-1">
-            <Rocket size={14} /> Lancement officiel
-          </span>
-          <span className="px-3 py-1 bg-[#0A1128]/10 text-[#0A1128] rounded-full text-xs font-semibold">
-            1er Labs d&apos;idées
-          </span>
-        </div>
-      </div>
-    ),
-  },
-  {
-    title: "2022",
-    content: (
-      <div>
-        <h3 className="text-xl md:text-2xl font-bold text-[#0A1128] mb-4">
-          Structuration continentale
-        </h3>
-        <p className="text-neutral-700 text-sm md:text-base mb-6 leading-relaxed">
-          Organisation de tournées régionales et signature de partenariats clés. Expansion de notre réseau dans plusieurs pays africains.
-        </p>
-        <div className="mb-6 space-y-3">
-          <div className="flex items-start gap-3">
-            <div className="w-2 h-2 rounded-full bg-[#FFD700] mt-2 flex-shrink-0" />
-            <p className="text-neutral-700 text-sm md:text-base">
-              Tournées régionales dans 8 pays africains
-            </p>
-          </div>
-          <div className="flex items-start gap-3">
-            <div className="w-2 h-2 rounded-full bg-[#FFD700] mt-2 flex-shrink-0" />
-            <p className="text-neutral-700 text-sm md:text-base">
-              Signature de 15+ partenariats stratégiques
-            </p>
-          </div>
-          <div className="flex items-start gap-3">
-            <div className="w-2 h-2 rounded-full bg-[#FFD700] mt-2 flex-shrink-0" />
-            <p className="text-neutral-700 text-sm md:text-base">
-              Création de bureaux régionaux
-            </p>
-          </div>
-        </div>
-        <div className="grid grid-cols-2 gap-4">
-          <Image
-            src="https://images.unsplash.com/photo-1531482615713-2afd69097998?w=800&h=600&fit=crop"
-            alt="Tournées régionales"
-            width={800}
-            height={600}
-            className="h-20 md:h-44 lg:h-60 w-full rounded-lg object-cover shadow-[0_0_24px_rgba(10,17,40,0.06)]"
-          />
-          <Image
-            src="https://images.unsplash.com/photo-1552664730-d307ca884978?w=800&h=600&fit=crop"
-            alt="Partenariats"
-            width={800}
-            height={600}
-            className="h-20 md:h-44 lg:h-60 w-full rounded-lg object-cover shadow-[0_0_24px_rgba(10,17,40,0.06)]"
-          />
-        </div>
-        <div className="mt-6 flex items-center gap-2 text-[#0A1128]">
-          <MapPin size={16} />
-          <span className="text-sm font-semibold">8 pays • 15 partenariats • 3 bureaux</span>
-        </div>
-      </div>
-    ),
-  },
-  {
-    title: "2023",
-    content: (
-      <div>
-        <h3 className="text-xl md:text-2xl font-bold text-[#0A1128] mb-4">
-          Impact démultiplié
-        </h3>
-        <p className="text-neutral-700 text-sm md:text-base mb-6 leading-relaxed">
-          Plus de 30 projets accompagnés et un réseau de mentors confirmés. L&apos;année de la consolidation et de l&apos;expansion de notre impact.
-        </p>
-        <div className="mb-8">
-          <h4 className="font-semibold text-[#0A1128] mb-4">Réalisations majeures</h4>
-          <div className="space-y-2">
-            <div className="flex items-center gap-2 text-xs md:text-sm text-neutral-700">
-              ✅ 30+ projets jeunesse accompagnés
-            </div>
-            <div className="flex items-center gap-2 text-xs md:text-sm text-neutral-700">
-              ✅ Réseau de 50+ mentors experts
-            </div>
-            <div className="flex items-center gap-2 text-xs md:text-sm text-neutral-700">
-              ✅ 3 grands événements continentaux
-            </div>
-            <div className="flex items-center gap-2 text-xs md:text-sm text-neutral-700">
-              ✅ 2000+ jeunes formés et accompagnés
-            </div>
-            <div className="flex items-center gap-2 text-xs md:text-sm text-neutral-700">
-              ✅ Plateforme digitale lancée
-            </div>
-          </div>
-        </div>
-        <div className="grid grid-cols-2 gap-4">
-          <Image
-            src="https://images.unsplash.com/photo-1556761175-5973dc0f32e7?w=800&h=600&fit=crop"
-            alt="Projets accompagnés"
-            width={800}
-            height={600}
-            className="h-20 md:h-44 lg:h-60 w-full rounded-lg object-cover shadow-[0_0_24px_rgba(10,17,40,0.06)]"
-          />
-          <Image
-            src="https://images.unsplash.com/photo-1524178232363-1fb2b075b655?w=800&h=600&fit=crop"
-            alt="Formations"
-            width={800}
-            height={600}
-            className="h-20 md:h-44 lg:h-60 w-full rounded-lg object-cover shadow-[0_0_24px_rgba(10,17,40,0.06)]"
-          />
-          <Image
-            src="https://images.unsplash.com/photo-1511578314322-379afb476865?w=800&h=600&fit=crop"
-            alt="Événements"
-            width={800}
-            height={600}
-            className="h-20 md:h-44 lg:h-60 w-full rounded-lg object-cover shadow-[0_0_24px_rgba(10,17,40,0.06)]"
-          />
-          <Image
-            src="https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=800&h=600&fit=crop"
-            alt="Réseau mentors"
-            width={800}
-            height={600}
-            className="h-20 md:h-44 lg:h-60 w-full rounded-lg object-cover shadow-[0_0_24px_rgba(10,17,40,0.06)]"
-          />
-        </div>
-      </div>
-    ),
-  },
-  {
-    title: "2024",
-    content: (
-      <div>
-        <h3 className="text-xl md:text-2xl font-bold text-[#0A1128] mb-4">
-          Accélération & Innovation
-        </h3>
-        <p className="text-neutral-700 text-sm md:text-base mb-8 leading-relaxed">
-          Lancement du programme Youth Voices et expansion dans 5 nouveaux pays africains. Une année marquée par l&apos;innovation et la scalabilité de nos programmes.
-        </p>
-        <div className="grid grid-cols-2 gap-4 mb-8">
-          <Image
-            src="https://images.unsplash.com/photo-1559136555-9303baea8ebd?w=800&h=600&fit=crop"
-            alt="Youth Voices"
-            width={800}
-            height={600}
-            className="h-20 md:h-44 lg:h-60 w-full rounded-lg object-cover shadow-[0_0_24px_rgba(10,17,40,0.06)]"
-          />
-          <Image
-            src="https://images.unsplash.com/photo-1515187029135-18ee286d815b?w=800&h=600&fit=crop"
-            alt="Expansion"
-            width={800}
-            height={600}
-            className="h-20 md:h-44 lg:h-60 w-full rounded-lg object-cover shadow-[0_0_24px_rgba(10,17,40,0.06)]"
-          />
-        </div>
-        <div className="flex flex-wrap gap-2">
-          <span className="px-3 py-1 bg-[#FFD700] text-[#0A1128] rounded-full text-xs font-bold flex items-center gap-1">
-            <TrendingUp size={14} /> 5 nouveaux pays
-          </span>
-          <span className="px-3 py-1 bg-[#0A1128] text-white rounded-full text-xs font-bold">
-            Youth Voices lancé
-          </span>
-          <span className="px-3 py-1 bg-[#14B8A6]/20 text-[#14B8A6] rounded-full text-xs font-bold">
-            50+ projets actifs
-          </span>
-        </div>
-      </div>
-    ),
-  },
-]
-
-// Variants simplifiés pour éviter les erreurs de type
-const sectionVariants = {
-  hidden: { opacity: 0, y: 50 },
-  visible: {
-    opacity: 1,
-    y: 0,
-    transition: { duration: 0.6, staggerChildren: 0.2 }
-  }
+interface ScrollRevealProps {
+  children: string
+  className?: string
 }
 
-const itemVariants = {
-  hidden: { opacity: 0, y: 20 },
-  visible: { opacity: 1, y: 0, transition: { duration: 0.5 } }
-}
+const ScrollRevealParagraph = ({ children, className }: ScrollRevealProps) => {
+  const container = useRef(null)
+  const { scrollYProgress } = useScroll({
+    target: container,
+    offset: ["start 0.9", "end 0.25"] // Commence quand le haut du texte entre, finit quand le bas est haut
+  })
 
-export default function AboutPage() {
-  const { data: timelineData, isLoading: timelineLoading, error: timelineError } = useTimelineEntries()
-
-  // Gestion des états de chargement et d'erreur pour la timeline
-  if (timelineLoading) {
-    return (
-      <div className="bg-white min-h-screen flex items-center justify-center">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#FFD700] mx-auto mb-4"></div>
-          <p className="text-[#0A1128]">Chargement de la page...</p>
-        </div>
-      </div>
-    )
-  }
-
-  if (timelineError) {
-    return (
-      <div className="bg-white min-h-screen flex items-center justify-center">
-        <div className="text-center">
-          <p className="text-red-500 mb-4">Erreur lors du chargement des données</p>
-          <p className="text-gray-600">Veuillez réessayer plus tard</p>
-        </div>
-      </div>
-    )
-  }
-
-  // Utiliser les données Supabase ou les données de fallback
-  const supabaseTimelineData = (timelineData || []).map((entry: { year?: string; title?: string; content?: string; images?: string[] }) => ({
-    title: entry.year || "",
-    content: (
-      <div>
-        <h3 className="text-xl md:text-2xl font-bold text-[#0A1128] mb-4">{entry.title}</h3>
-        <p className="text-neutral-700 text-sm md:text-base mb-8 leading-relaxed">{entry.content}</p>
-        {Array.isArray(entry.images) && entry.images.length > 0 && (
-          <div className="grid grid-cols-2 gap-4">
-            {entry.images.slice(0, 4).map((src, idx) => (
-              <Image
-                key={idx}
-                src={src}
-                alt=""
-                width={800}
-                height={600}
-                className="h-20 md:h-44 lg:h-60 w-full rounded-lg object-cover shadow-[0_0_24px_rgba(10,17,40,0.06)]"
-              />
-            ))}
-          </div>
-        )}
-      </div>
-    ),
-  }))
-
-  const displayTimelineData = supabaseTimelineData.length > 0 ? supabaseTimelineData : fallbackTimelineData
+  const words = children.split(" ")
 
   return (
-    <div className="bg-white">
-      {/* Hero Section */}
-      <motion.section
-        className="relative min-h-[70vh] flex items-center justify-center text-center bg-[#0A1128] text-white overflow-hidden py-24"
-        initial="hidden"
-        animate="visible"
-        variants={sectionVariants}
+    <p ref={container} className={`flex flex-wrap leading-[1.1] ${className}`}>
+      {words.map((word, i) => {
+        const start = i / words.length
+        const end = start + (1 / words.length)
+        return (
+          <Word key={i} progress={scrollYProgress} range={[start, end]}>
+            {word}
+          </Word>
+        )
+      })}
+    </p>
+  )
+}
+
+const Word = ({ children, progress, range }: { children: string, progress: MotionValue<number>, range: [number, number] }) => {
+  const opacity = useTransform(progress, range, [0.15, 1]) // 0.15 pour le texte "inactif", 1 pour "actif"
+
+  // On ajoute une petite transition sur le Y pour un effet de montée subtil
+  const y = useTransform(progress, range, [10, 0])
+
+  return (
+    <span className="relative mr-[1.5%] lg:mr-[1.2%] mt-[0.5%] inline-block">
+      <motion.span style={{ opacity, y }} className="transition-colors duration-200">
+        {children}
+      </motion.span>
+    </span>
+  )
+}
+
+// --- 2. COMPOSANTS UI PREMIUM ---
+
+const SectionTitle = ({ children, subtitle, dark = false }: { children: ReactNode, subtitle?: string, dark?: boolean }) => (
+  <div className="mb-16 md:mb-24">
+    {subtitle && (
+      <motion.span
+        initial={{ opacity: 0, x: -20 }}
+        whileInView={{ opacity: 1, x: 0 }}
+        viewport={{ once: true }}
+        className="text-[10px] font-black uppercase tracking-[0.3em] text-[#FFD700] mb-4 block"
       >
-        <div className="absolute inset-0 opacity-5">
-          <div className="absolute inset-0" style={{ backgroundImage: 'radial-gradient(#FFD700 1px, transparent 1px)', backgroundSize: '20px 20px' }} />
+        {subtitle}
+      </motion.span>
+    )}
+    <h2 className={`text-4xl md:text-6xl lg:text-7xl font-black leading-[0.9] tracking-[-0.04em] uppercase overflow-hidden ${dark ? "text-white" : "text-[#0A1128] dark:text-white"}`}>
+      <motion.span
+        initial={{ y: "100%" }}
+        whileInView={{ y: 0 }}
+        transition={{ duration: 0.8, ease: [0.33, 1, 0.68, 1] }}
+        viewport={{ once: true }}
+        className="block"
+      >
+        {children}
+      </motion.span>
+    </h2>
+  </div>
+)
+
+const ParallaxImage = ({ src, alt, className = "" }: { src: string, alt: string, className?: string }) => {
+  const ref = useRef(null)
+  const { scrollYProgress } = useScroll({
+    target: ref,
+    offset: ["start end", "end start"]
+  })
+
+  const y = useTransform(scrollYProgress, [0, 1], ["-15%", "15%"])
+  const scale = useTransform(scrollYProgress, [0, 1], [1.1, 1.2])
+
+  return (
+    <div ref={ref} className={`relative w-full h-full overflow-hidden will-change-transform ${className}`}>
+      <motion.div style={{ y, scale, height: "130%", width: "100%", top: "-15%", position: "absolute" }}>
+        <Image
+          src={src}
+          alt={alt}
+          fill
+          className="object-cover grayscale hover:grayscale-0 transition-all duration-1000"
+        />
+      </motion.div>
+      <div className="absolute inset-0 bg-[#0A1128]/10 pointer-events-none" />
+    </div>
+  )
+}
+
+// Données institutionnelles de la chronologie
+const fallbackTimelineData = [
+  { title: "2020", content: "L'Étincelle initiale. Une réunion visionnaire à Dakar pose les jalons d'un mouvement dédié à l'empowerment de la jeunesse africaine à travers l'innovation et la culture." },
+  { title: "2021", content: "Fondation et Structure. Immatriculation officielle de La Trouvaille et inauguration de notre premier hub créatif, un espace de synergie pour les talents émergents." },
+  { title: "2022", content: "Lancement de 'Youth Voices'. Un programme d'envergure qui a permis de cartographier et d'amplifier les initiatives à fort impact social à travers l'Afrique de l'Ouest." },
+  { title: "2023", content: "Sommet de l'Excellence. Organisation de notre premier forum panafricain réunissant décideurs, artistes et entrepreneurs pour redéfinir l'architecture du futur africain." },
+  { title: "2024", content: "L'Échelle Continentale. Expansion stratégique dans 10 pays, consolidant notre position de leader dans l'accompagnement des leaders responsables de demain." },
+]
+
+export default function AboutPage() {
+  const { data: timelineData } = useTimelineEntries()
+  const containerRef = useRef(null)
+
+  // Timeline Data Adapté - Typographie Éditoriale
+  const displayTimelineData = (timelineData || []).length > 0
+    ? (timelineData || []).map((entry: any) => ({
+      title: entry.year || entry.title || "",
+      content: (
+        <div className="space-y-6">
+          <h3 className="text-3xl md:text-5xl font-black text-[#0A1128] dark:text-white uppercase tracking-tighter leading-none">{entry.title}</h3>
+          <p className="text-xl md:text-2xl font-serif italic text-[#0A1128]/80 dark:text-white/80 leading-relaxed max-w-2xl">{entry.content}</p>
         </div>
-        <div className="container relative z-10 max-w-4xl">
-          <motion.h1 variants={itemVariants} className="text-5xl md:text-6xl font-bold mb-6 leading-tight">
-            La plateforme où chaque idée de jeunesse devient une <span className="text-[#FFD700]">réalité tangible</span>
-          </motion.h1>
-          <motion.p variants={itemVariants} className="text-xl text-white/85 mb-8 max-w-2xl mx-auto">
-            Depuis 2021, La Trouvaille fédère des milliers de jeunes Africains pour imaginer, co-construire
-            et mettre en œuvre des solutions concrètes au service du continent.
-          </motion.p>
-          <motion.div variants={itemVariants} className="flex flex-wrap gap-4 justify-center">
-            <Link href="/contact">
-              <motion.button whileHover={{ y: -3 }} whileTap={{ scale: 0.95 }} className="px-8 py-3 bg-[#FFD700] text-[#0A1128] rounded-lg font-semibold hover:bg-[#E6C200] transition-all">
-                Nous contacter
-              </motion.button>
-            </Link>
-            <Link href="/events">
-              <motion.button whileHover={{ y: -3 }} whileTap={{ scale: 0.95 }} className="px-8 py-3 border-2 border-white/35 text-white rounded-lg font-semibold hover:bg-white/10 hover:border-white transition-all">
-                Découvrir nos actions
-              </motion.button>
-            </Link>
+      )
+    }))
+    : fallbackTimelineData.map(item => ({
+      title: item.title,
+      content: (
+        <div className="space-y-6">
+          <h3 className="text-3xl md:text-5xl font-black text-[#0A1128] dark:text-white uppercase tracking-tighter leading-none">{item.title === "2021" ? "Genèse" : "Expansion"}</h3>
+          <p className="text-xl md:text-2xl font-serif italic text-[#0A1128]/80 dark:text-white/80 leading-relaxed max-w-2xl">{item.content}</p>
+        </div>
+      )
+    }))
+
+  return (
+    <div ref={containerRef} className="bg-white dark:bg-[#050A15] text-[#0A1128] dark:text-white selection:bg-[#FFD700] selection:text-[#0A1128] overflow-x-hidden">
+
+      {/* 1. HERO SECTION - EFFET TEXTE MASSIF */}
+      <section className="relative h-screen min-h-[700px] flex items-center justify-center overflow-hidden">
+        <div className="absolute inset-0 w-full h-full bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-[#0A1128]/5 via-transparent to-transparent opacity-50" />
+
+        <div className="container mx-auto px-4 z-10 text-center">
+          <motion.div
+            initial={{ opacity: 0, y: 100 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 1, ease: [0.16, 1, 0.3, 1] }} // Courbe "Apple"
+          >
+            <h1 className="text-[14vw] md:text-[11rem] font-black leading-[0.8] tracking-[-0.05em] uppercase mix-blend-difference text-[#0A1128] dark:text-white">
+              Audace<span className="text-[#FFD700] text-[1.5rem] md:text-[3rem] align-top relative top-4 md:top-8 font-serif italic lowercase tracking-normal">et</span>
+              <br />
+              Impact
+            </h1>
           </motion.div>
-        </div>
-      </motion.section>
 
-      {/* Mission Section */}
-      <motion.section
-        className="py-20"
-        initial="hidden"
-        whileInView="visible"
-        viewport={{ once: true, amount: 0.3 }}
-        variants={sectionVariants}
-      >
-        <div className="container">
-          <div className="grid md:grid-cols-2 gap-12 items-center">
-            <motion.div variants={itemVariants} className="relative rounded-2xl overflow-hidden shadow-2xl">
-              <Image src="https://images.unsplash.com/photo-1517245386807-bb43f82c33c4?auto=format&fit=crop&w=1200&q=80" alt="Jeunes réunis" width={1200} height={800} className="w-full h-full object-cover" />
-              <div className="absolute bottom-6 left-6 flex items-center gap-3 bg-[#0A1128]/80 backdrop-blur-sm text-white px-4 py-3 rounded-lg">
-                <Globe size={28} />
-                <div>
-                  <p className="text-sm">Présence sur</p>
-                  <strong className="text-[#FFD700]">5 pays africains</strong>
-                </div>
-              </div>
-            </motion.div>
-
-            <motion.div variants={itemVariants}>
-              <h2 className="text-4xl font-bold mb-6">Une organisation portée par la jeunesse africaine</h2>
-              <p className="text-lg text-muted-foreground mb-8">
-                La Trouvaille est née de l&apos;impulsion de jeunes passionnés qui refusent de laisser les défis du continent
-                sans réponses. Notre communauté accompagne la jeunesse à chaque étape : idéation, structuration, financement
-                et déploiement de projets à impact.
-              </p>
-              <div className="space-y-4">
-                {pillars.map((pillar) => (
-                  <motion.div variants={itemVariants} key={pillar.title} className="flex items-start gap-4 bg-gray-50 rounded-xl p-4 border">
-                    <span className="flex items-center justify-center w-11 h-11 rounded-lg bg-[#0A1128] text-[#FFD700] flex-shrink-0">
-                      {pillar.icon}
-                    </span>
-                    <div>
-                      <h3 className="font-bold text-lg mb-1">{pillar.title}</h3>
-                      <p className="text-sm text-muted-foreground">{pillar.text}</p>
-                    </div>
-                  </motion.div>
-                ))}
-              </div>
-            </motion.div>
-          </div>
-        </div>
-      </motion.section>
-
-      {/* Stats Section */}
-      <motion.section
-        className="py-16 bg-gray-50"
-        initial="hidden"
-        whileInView="visible"
-        viewport={{ once: true, amount: 0.3 }}
-        variants={sectionVariants}
-      >
-        <div className="container">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            {stats.map((stat) => (
-              <motion.div
-                variants={itemVariants}
-                whileHover={{ y: -5, boxShadow: "0 10px 15px -3px rgba(0, 0, 0, 0.1)" }}
-                key={stat.label}
-                className="bg-white rounded-xl p-6 border"
-              >
-                <div className="flex justify-between items-center mb-3">
-                  <span className="text-[#FFD700]">{stat.icon}</span>
-                  <span className="text-4xl font-bold text-[#0A1128]">{stat.value}</span>
-                </div>
-                <h3 className="font-bold text-lg mb-2">{stat.label}</h3>
-                <p className="text-sm text-muted-foreground">{stat.description}</p>
-              </motion.div>
-            ))}
-          </div>
-        </div>
-      </motion.section>
-
-      {/* Specialities Section */}
-      <motion.section
-        className="py-20"
-        initial="hidden"
-        whileInView="visible"
-        viewport={{ once: true, amount: 0.3 }}
-        variants={sectionVariants}
-      >
-        <div className="container">
-          <motion.div variants={itemVariants} className="text-center mb-12 max-w-3xl mx-auto">
-            <span className="inline-block px-4 py-1 bg-[#0A1128]/5 text-[#0A1128] rounded-full text-sm font-semibold mb-4">Nos expertises</span>
-            <h2 className="text-4xl font-bold mb-4">Ce que nous faisons au quotidien</h2>
-            <p className="text-lg text-muted-foreground">
-              Au-delà des discours, nous accompagnons les jeunes leaders avec des programmes pragmatiques, une communauté bienveillante
-              et un réseau d&apos;experts mobilisés.
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.5, duration: 1 }}
+            className="mt-12 flex flex-col items-center gap-6"
+          >
+            <p className="max-w-md mx-auto text-sm md:text-base font-bold uppercase tracking-[0.2em] text-[#0A1128]/40 dark:text-white/40">
+              L'architecture du futur africain
             </p>
           </motion.div>
+        </div>
+      </section>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            {specialities.map((speciality) => (
+      {/* 2. STORY SECTION */}
+      <section className="py-24 md:py-40">
+        <div className="container mx-auto px-4">
+
+          {/* Main Manifeste Reveal - Row 1 */}
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-16 md:gap-24 items-start mb-16 lg:mb-0">
+            <div className="lg:col-span-6 lg:sticky lg:top-32 h-fit">
+              <SectionTitle subtitle="Le Manifeste">
+                Bâtir le <span className="text-[#FFD700] italic font-serif lowercase">monde</span> de demain.
+              </SectionTitle>
+
+              <ScrollRevealParagraph className="text-3xl md:text-5xl lg:text-6xl font-black text-[#0A1128] dark:text-white uppercase tracking-tighter leading-[0.9]">
+                Nous ne sommes pas de simples spectateurs des mutations de l'Afrique. Nous sommes les architectes de sa renaissance. Chaque projet est une brique, chaque idée est un moteur.
+              </ScrollRevealParagraph>
+            </div>
+
+            <div className="lg:col-span-6 lg:mt-32">
+              <div className="aspect-[3/4] relative w-full">
+                <ParallaxImage
+                  src="https://images.unsplash.com/photo-1542601906990-b4d3fb778b09?q=80&w=2574"
+                  alt="African Leadership"
+                  className="rounded-[2.5rem]"
+                />
+              </div>
+            </div>
+          </div>
+
+          {/* Mission/Vision + Small Photo Aligned - Row 2 */}
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-16 md:gap-24 mt-20 lg:mt-32 relative z-20">
+            {/* L'Engagement & L'Horizon - Now stays below the text without overlap */}
+            <div className="lg:col-span-7 xl:col-span-8 order-2 lg:order-1 self-end">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-12 border-t border-[#0A1128]/10 dark:border-white/10 pt-12">
+                <div>
+                  <h4 className="text-[10px] font-black uppercase tracking-[0.4em] mb-4 text-[#FFD700]">L'Engagement / Mission</h4>
+                  <p className="text-xl md:text-2xl font-serif italic text-[#0A1128] dark:text-white leading-[1.2] tracking-tight">
+                    Propulser l'excellence africaine en bâtissant l'infrastructure qui transforme chaque talent brut en un leader d'impact mondial.
+                  </p>
+                </div>
+                <div>
+                  <h4 className="text-[10px] font-black uppercase tracking-[0.4em] mb-4 text-[#FFD700]">L'Horizon / Vision</h4>
+                  <p className="text-xl md:text-2xl font-serif italic text-[#0A1128] dark:text-white leading-[1.2] tracking-tight">
+                    Voir une jeunesse africaine unie, souveraine et maîtresse de sa destinée, au cœur des innovations qui façonneront le siècle.
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            {/* Overlapping Small Photo - Negative margin only on this column */}
+            <div className="lg:col-span-5 xl:col-span-4 order-1 lg:order-2 flex justify-end lg:-mt-[25rem]">
+              <div className="aspect-square relative w-full border-8 border-white dark:border-[#050A15] rounded-[2.5rem] overflow-hidden shadow-2xl transition-transform hover:scale-[1.02] duration-700">
+                <ParallaxImage src="https://images.unsplash.com/photo-1517486808906-6ca8b3f04846?w=800" alt="Team work" />
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </section>
+
+      {/* 3. FULL PARALLAX QUOTE - Seamless Transition */}
+      <section className="pt-20 md:pt-32 pb-0 bg-gradient-to-b from-white via-white to-[#0A1128] dark:from-[#050A15] dark:via-[#050A15] dark:to-[#0A1128] transition-colors duration-500">
+        <div className="w-full h-[70vh] md:h-[90vh] relative overflow-hidden rounded-t-[3rem] md:rounded-t-[10rem] bg-[#0A1128] shadow-2xl">
+          <div className="absolute inset-0 z-0">
+            <ParallaxImage src="https://images.unsplash.com/photo-1531482615713-2afd69097998?w=2000" alt="Crowd" />
+          </div>
+          {/* Dégradé progressif vers le bleu profond pour fusionner avec la section suivante */}
+          <div className="absolute inset-0 bg-gradient-to-b from-transparent via-[#0A1128]/60 to-[#0A1128] z-10" />
+
+          <div className="relative z-20 h-full flex items-center justify-center p-6 md:p-24 text-center">
+            <ScrollRevealParagraph className="text-3xl md:text-7xl lg:text-[7.5rem] font-black text-white uppercase tracking-[-0.04em] justify-center text-center leading-[0.8] max-w-[90vw]">
+              "L'avenir appartient à ceux qui voient des solutions là où les autres voient des problèmes."
+            </ScrollRevealParagraph>
+          </div>
+        </div>
+      </section>
+
+      {/* 4. EXPERTISE - Seamlessly connected */}
+      <section className="pt-24 md:pt-40 pb-32 md:pb-48 bg-[#0A1128] text-white rounded-b-[3rem] md:rounded-b-[10rem]">
+        <div className="container mx-auto px-4">
+          <SectionTitle subtitle="Savoir-Faire" dark>Nos Leviers.</SectionTitle>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-16">
+            {[
+              { icon: Globe, title: "Tribune d'Exode", desc: "Amplification médiatique des voix émergentes." },
+              { icon: Zap, title: "Impact Labs", desc: "Incubateur de solutions concrètes et locales." },
+              { icon: Users, title: "Ponts Décisifs", desc: "Mentorat stratégique intergénérationnel." }
+            ].map((item, i) => (
               <motion.div
-                variants={itemVariants}
-                whileHover={{ y: -8, boxShadow: "0 20px 25px -5px rgba(0, 0, 0, 0.1)" }}
-                key={speciality.title}
-                className="text-center bg-white rounded-xl p-8 border shadow-lg"
+                key={i}
+                initial={{ opacity: 0, y: 50 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ delay: i * 0.1, duration: 0.6 }}
+                className="group p-10 bg-white/5 border border-white/10 rounded-[2rem] hover:bg-[#FFD700] hover:text-[#0A1128] transition-all duration-500 cursor-pointer"
               >
-                <span className="inline-flex items-center justify-center w-14 h-14 rounded-lg bg-gradient-to-br from-[#FFD700] to-[#FFD700] text-[#0A1128] mb-6">
-                  {speciality.icon}
-                </span>
-                <h3 className="text-xl font-bold mb-3">{speciality.title}</h3>
-                <p className="text-muted-foreground">{speciality.description}</p>
+                <item.icon className="w-10 h-10 mb-8 opacity-50 group-hover:opacity-100 transition-opacity" />
+                <h3 className="text-2xl font-black uppercase mb-4 tracking-tight">{item.title}</h3>
+                <p className="text-sm font-medium opacity-60 group-hover:opacity-90">{item.desc}</p>
               </motion.div>
             ))}
           </div>
         </div>
-      </motion.section>
+      </section>
 
-      {/* Timeline Section */}
-      <section className="py-0 bg-white overflow-hidden">
-        <div className="w-full">
+      <section className="py-24 bg-white dark:bg-[#050A15]">
+        <div className="container mx-auto px-4">
           <Timeline data={displayTimelineData} />
         </div>
       </section>
 
-      {/* Team CTA Section */}
-      <motion.section
-        className="py-20"
-        initial="hidden"
-        whileInView="visible"
-        viewport={{ once: true, amount: 0.4 }}
-        variants={sectionVariants}
-      >
-        <div className="container">
-          <motion.div variants={itemVariants} className="relative bg-[#0A1128] text-white rounded-2xl p-12 md:p-16 overflow-hidden shadow-2xl">
-            <div className="absolute top-0 right-0 w-1/2 h-full bg-gradient-to-l from-[#FFD700]/10 to-transparent pointer-events-none" />
-            <div className="relative z-10 grid md:grid-cols-2 gap-8 items-center">
-              <div>
-                <h2 className="text-4xl font-bold mb-4">Des talents engagés au service de la jeunesse</h2>
-                <p className="text-white/80 text-lg">
-                  La Trouvaille réunit des profils variés, tous partageant la même
-                  envie d&apos;accompagner la relève africaine et de créer des opportunités durables.
-                </p>
-              </div>
-              <div className="flex flex-wrap gap-4">
-                <Link href="/team" className="flex-1 min-w-[200px]">
-                  <motion.button whileHover={{ y: -3 }} whileTap={{ scale: 0.95 }} className="w-full px-6 py-3 bg-[#FFD700] text-[#0A1128] rounded-lg font-semibold hover:bg-[#E6C200] transition-all flex items-center justify-center gap-2">
-                    <Users size={18} /> Découvrir notre collectif
-                  </motion.button>
+      <section className="py-24 px-4">
+        <div className="container mx-auto">
+          <div className="relative rounded-[3rem] bg-[#FFD700] p-12 md:p-32 overflow-hidden text-[#0A1128] text-center">
+            <div className="relative z-10 max-w-3xl mx-auto space-y-8">
+              <h2 className="text-5xl md:text-8xl font-black uppercase tracking-[-0.05em] leading-[0.85]">
+                Rejoignez le <br /> mouvement.
+              </h2>
+              <div className="flex justify-center gap-4 pt-8">
+                <Link href="/contact" className="px-8 py-4 bg-[#0A1128] text-white font-bold rounded-full hover:scale-105 transition-transform flex items-center gap-2">
+                  Agir maintenant <ArrowRight size={18} />
                 </Link>
-                <Link href="/about" className="flex-1 min-w-[200px]">
-                  <motion.button whileHover={{ y: -3 }} whileTap={{ scale: 0.95 }} className="w-full px-6 py-3 border-2 border-white/35 text-white rounded-lg font-semibold hover:bg-white/10 hover:border-white transition-all">
-                    En savoir plus
-                  </motion.button>
+                <Link href="/team" className="px-8 py-4 border-2 border-[#0A1128] text-[#0A1128] font-bold rounded-full hover:bg-[#0A1128] hover:text-white transition-colors flex items-center gap-2">
+                  L'équipe <Ticket size={18} />
                 </Link>
               </div>
             </div>
-          </motion.div>
+          </div>
         </div>
-      </motion.section>
+      </section>
+
     </div>
   )
 }

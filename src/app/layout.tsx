@@ -6,6 +6,7 @@ import Header from "./landing-page/components/Header";
 import { PointerProvider } from "@/components/pointer-provider";
 import Footer from "./landing-page/components/Footer";
 import { Toaster } from "sonner";
+import ParallaxLayout from "@/components/parallax-layout";
 
 const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://trouvaille-frontend-zeta.vercel.app'
 const ogImageUrl = `${siteUrl}/images/la_trouvaille.png`
@@ -93,7 +94,7 @@ export default function RootLayout({
   return (
     <html lang="fr" suppressHydrationWarning>
       <body
-        className="antialiased"
+        className="antialiased  "
       >
         <QueryProvider>
           <ThemeProvider
@@ -104,14 +105,15 @@ export default function RootLayout({
           >
             <div className="dark-gradient" />
             <PointerProvider>
-              <div className="content-wrapper flex min-h-screen flex-col">
+              <div className="content-wrapper">
                 <Header />
-
                 <Toaster richColors position="top-right" />
 
-                <main className="flex-grow">{children}</main>
-
-                <Footer />
+                <ParallaxLayout footer={<Footer />}>
+                  <main className="relative z-20 bg-white dark:bg-[#050A15] ">
+                    {children}
+                  </main>
+                </ParallaxLayout>
               </div>
             </PointerProvider>
           </ThemeProvider>

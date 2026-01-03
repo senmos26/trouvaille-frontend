@@ -1,229 +1,229 @@
 "use client"
 
+import { useState } from "react"
 import Link from "next/link"
 import Image from "next/image"
-import { motion } from "framer-motion"
-import { MapPin, Clock, UserCheck, ArrowRight } from "lucide-react"
-import { sectionVariants, itemVariants } from "@/lib/animations"
+import { motion, AnimatePresence } from "framer-motion"
+import { MapPin, Calendar, ArrowUpRight, Users, Sparkles } from "lucide-react"
 import { useEvents } from "@/lib/hooks/use-events"
+import { cn } from "@/lib/utils"
+
+// 1. Loading Skeleton Premium (Pour ne pas briser l'immersion pendant le fetch)
+const EventSkeleton = () => (
+  <div className="group relative flex flex-col overflow-hidden rounded-[2rem] bg-gray-100 dark:bg-gray-800/50">
+    <div className="aspect-[4/3] w-full animate-pulse bg-gray-200 dark:bg-gray-700" />
+    <div className="p-6 space-y-4">
+      <div className="h-4 w-1/3 rounded bg-gray-200 dark:bg-gray-700 animate-pulse" />
+      <div className="h-8 w-3/4 rounded bg-gray-200 dark:bg-gray-700 animate-pulse" />
+      <div className="flex gap-2 pt-2">
+        <div className="h-10 w-10 rounded-full bg-gray-200 dark:bg-gray-700 animate-pulse" />
+        <div className="h-10 w-10 rounded-full bg-gray-200 dark:bg-gray-700 animate-pulse" />
+      </div>
+    </div>
+  </div>
+)
+
+// Helper to strip HTML tags for clean preview
+const stripHtml = (html: string) => {
+  return html?.replace(/<[^>]*>?/gm, '') || '';
+};
 
 export default function EventsSection() {
   const { data: eventsData, isLoading } = useEvents({ limit: 3 })
-  
-  // Utiliser uniquement les données Supabase
   const displayEvents = eventsData?.data || []
-  
-  if (isLoading) {
-    return (
-      <section className="py-20 bg-white">
-        <div className="container text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#FFD700] mx-auto"></div>
-        </div>
-      </section>
-    )
-  }
-  
+  const [hoveredId, setHoveredId] = useState<string | null>(null)
+
   return (
-    <motion.section 
-      variants={sectionVariants} 
-      initial="hidden" 
-      whileInView="visible" 
-      viewport={{ once: true, amount: 0.2 }} 
-      className="py-20 bg-white dark:bg-gray-900"
-    >
-      <div className="container">
-        <motion.div variants={itemVariants} className="text-center mb-12">
-          <h2 className="text-4xl md:text-5xl font-bold mb-4">Prochains Rendez-vous</h2>
-          <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-            Participez à nos événements et rejoignez une communauté dynamique de jeunes leaders africains.
-          </p>
-        </motion.div>
+    <section className="relative py-24 bg-white dark:bg-[#0A1128] overflow-hidden">
 
-        {displayEvents.length === 0 ? (
-          <motion.div
-            variants={itemVariants}
-            className="mx-auto max-w-2xl rounded-2xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 p-10 text-center shadow-sm"
-          >
-            <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-[#0A1128]/5 dark:bg-[#FFD700]/10">
-              <MapPin size={24} className="text-[#0A1128]" />
-            </div>
-            <h3 className="text-2xl font-bold text-[#0A1128] dark:text-white mb-2">
-              Aucun événement pour le moment
-            </h3>
-            <p className="text-muted-foreground mb-6">
-              Revenez bientôt ou consultez la liste complète des événements.
-            </p>
-            <Link
-              href="/events"
-              className="inline-flex items-center gap-2 px-8 py-4 bg-[#FFD700] text-[#0A1128] font-bold rounded-xl shadow-lg hover:bg-[#E6C200] hover:shadow-xl hover:-translate-y-1 transition-all dark:shadow-[#FFD700]/20"
+      {/* Background Decoratif Subtil */}
+      <div className="absolute top-0 left-0 w-full h-px bg-gradient-to-r from-transparent via-gray-200 dark:via-white/10 to-transparent" />
+
+      <div className="container relative z-10">
+
+        {/* Header de section: Editorial Style */}
+        <div className="flex flex-col md:flex-row md:items-end justify-between mb-16 gap-6">
+          <div className="space-y-4 max-w-2xl">
+
+            <motion.h2
+              initial={{ opacity: 0, y: 30 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              className="text-5xl md:text-6xl lg:text-7xl font-black text-[#0A1128] dark:text-white leading-[0.9] tracking-[-0.04em] uppercase"
             >
-              Voir tous les événements
-              <ArrowRight size={20} />
+              Nos <br className="hidden md:block" />
+              <span className="text-[#FFD700] lowercase italic font-serif">prochaines</span> Escales.
+            </motion.h2>
+          </div>
+
+          <div className="mb-2">
+            <Link href="/events" className="group flex items-center gap-4 text-[#0A1128] dark:text-white font-black text-sm uppercase tracking-[0.2em] border-b-2 border-[#FFD700] pb-2 transition-all hover:gap-6">
+              Explorer l'agenda
+              <ArrowUpRight className="w-5 h-5 transition-transform group-hover:-translate-y-1 group-hover:translate-x-1" />
             </Link>
-          </motion.div>
-        ) : (
-          <>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-12">
-              {displayEvents.map((event) => (
-                <motion.div 
-                  key={event.id} 
-                  variants={itemVariants} 
-                  className="bg-white dark:bg-gray-800 rounded-2xl overflow-hidden shadow-lg border border-gray-200 dark:border-gray-700 hover:shadow-2xl hover:-translate-y-2 transition-all duration-300"
-                >
-              {/* Image */}
-              <div className="relative h-56 overflow-hidden bg-gradient-to-br from-[#0A1128] to-[#1a2a4a]">
-                {event.image && event.image.trim() ? (
-                  <Image 
-                    src={event.image} 
-                    alt={event.title}
-                    width={400}
-                    height={224}
-                    className="w-full h-full object-cover"
-                    unoptimized={event.image.includes('supabase.co/storage') || event.image.includes('storage/v1/object/public')}
-                    onError={(e) => {
-                      // Si l'image ne charge pas, masquer l'image et afficher le fallback
-                      const target = e.target as HTMLImageElement
-                      target.style.display = 'none'
-                      const fallback = target.parentElement?.querySelector('.image-fallback') as HTMLElement
-                      if (fallback) fallback.style.display = 'flex'
-                    }}
-                  />
-                ) : null}
-                {/* Fallback si pas d'image ou erreur de chargement */}
-                <div 
-                  className={`image-fallback w-full h-full flex items-center justify-center bg-gradient-to-br from-[#FFD700]/20 to-[#FFC107]/20 ${event.image && event.image.trim() ? 'hidden' : ''}`}
-                >
-                  <div className="text-center text-white/80">
-                    <MapPin size={48} className="mx-auto mb-2 opacity-50" />
-                    <p className="text-sm font-medium">Image à venir</p>
-                  </div>
-                </div>
-                <div className="absolute inset-0 bg-gradient-to-t from-[#0A1128]/60 to-transparent pointer-events-none" />
-                <div className="absolute top-4 left-4 flex gap-2">
-                  <span className="px-3 py-1 bg-[#FFD700] text-[#0A1128] rounded-full text-xs font-bold">
-                    {event.category?.name}
-                  </span>
-                  {event.category?.name === "Webinaire" && event.rubrique?.name && (
-                    <span className="px-3 py-1 bg-[#0A1128] text-white rounded-full text-xs font-bold">
-                      {event.rubrique.name}
-                    </span>
-                  )}
-                </div>
-                {/* Date badge */}
-                <div className="absolute top-4 right-4 bg-white rounded-lg p-2 text-center shadow-lg">
-                  <div className="text-2xl font-bold text-[#0A1128] leading-none">
-                    {new Date(event.date).getDate()}
-                  </div>
-                  <div className="text-xs font-semibold text-gray-600 uppercase">
-                    {new Date(event.date).toLocaleDateString('fr-FR', { month: 'short' })}
-                  </div>
-                </div>
-              </div>
+          </div>
+        </div>
 
-              {/* Contenu */}
-              <div className="p-6">
-                {/* Titre */}
-                <h3 className="text-xl font-bold text-[#0A1128] dark:text-white mb-3 line-clamp-2">
-                  {event.title}
-                </h3>
-                
-                {/* Thèmes (pour les webinaires) */}
-                {event.category?.name === "Webinaire" && event.themes && (
-                  <div className="mb-3">
-                    <h4 className="text-xs font-bold text-[#0A1128] mb-1">Thèmes :</h4>
-                    <p className="text-sm text-muted-foreground line-clamp-2">{event.themes}</p>
-                  </div>
-                )}
+        {/* LOADING STATE */}
+        {isLoading && (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            {[1, 2, 3].map((i) => <EventSkeleton key={i} />)}
+          </div>
+        )}
 
-                {/* Intervenants (pour les webinaires) */}
-                {event.category?.name === "Webinaire" && event.speakers && event.speakers.length > 0 && (
-                  <div className="mb-3">
-                    <h4 className="text-xs font-bold text-[#0A1128] mb-1">Intervenants :</h4>
-                    <div className="flex flex-wrap gap-1">
-                      {event.speakers.slice(0, 2).map((speaker: { name: string }, idx: number) => (
-                        <span key={idx} className="text-xs bg-gray-100 px-2 py-1 rounded">
-                          {speaker.name}
-                        </span>
-                      ))}
-                      {event.speakers.length > 2 && (
-                        <span className="text-xs text-[#FFD700] font-semibold">
-                          +{event.speakers.length - 2}
-                        </span>
-                      )}
+        {/* CONTENT STATE */}
+        {!isLoading && displayEvents.length > 0 && (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            {displayEvents.map((event) => (
+              <Link
+                key={event.id}
+                href={`/event/${event.id}`}
+                className="block h-full"
+                onMouseEnter={() => setHoveredId(event.id)}
+                onMouseLeave={() => setHoveredId(null)}
+              >
+                <motion.article
+                  initial={{ opacity: 0, y: 20 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  className="group relative flex flex-col h-full overflow-hidden rounded-[2rem] border border-gray-200 dark:border-white/10 bg-white dark:bg-white/5 shadow-sm hover:shadow-2xl hover:shadow-[#FFD700]/10 transition-all duration-500"
+                >
+
+                  {/* 1. IMAGE AREA - Aspect Ratio Cinematic 4:3 */}
+                  <div className="relative aspect-[4/3] overflow-hidden">
+                    {event.image ? (
+                      <Image
+                        src={event.image}
+                        alt={event.title}
+                        fill
+                        className="object-cover transition-transform duration-700 ease-out group-hover:scale-110"
+                        sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                      />
+                    ) : (
+                      <div className="absolute inset-0 bg-gradient-to-br from-[#0A1128] to-[#1a2a4a] flex items-center justify-center">
+                        <MapPin className="text-white/20 w-16 h-16" />
+                      </div>
+                    )}
+
+                    {/* Overlay Gradient pour lisibilité des badges */}
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-60" />
+
+                    {/* Badge Catégorie Flottant */}
+                    <div className="absolute top-4 left-4">
+                      <span className="px-4 py-2 bg-white/90 dark:bg-black/80 backdrop-blur-md text-[#0A1128] dark:text-white text-xs font-bold uppercase tracking-wide rounded-full shadow-lg">
+                        {event.category?.name || "Événement"}
+                      </span>
+                    </div>
+
+                    {/* Date "Ticket" Style - Très visuel */}
+                    <div className="absolute top-4 right-4 flex flex-col items-center bg-[#FFD700] text-[#0A1128] rounded-xl p-3 min-w-[70px] shadow-xl text-center leading-none">
+                      <span className="text-2xl font-black">{new Date(event.date).getDate()}</span>
+                      <span className="text-xs font-bold uppercase tracking-tighter">
+                        {new Date(event.date).toLocaleDateString('fr-FR', { month: 'short' })}
+                      </span>
                     </div>
                   </div>
-                )}
 
-                {/* Modérateurs (pour les webinaires) */}
-                {event.category?.name === "Webinaire" && event.moderators && event.moderators.length > 0 && (
-                  <div className="mb-4">
-                    <h4 className="text-xs font-bold text-[#0A1128] mb-1">Modérateurs :</h4>
-                    <p className="text-xs text-muted-foreground">{event.moderators.map((mod: { name: string }) => mod.name).join(", ")}</p>
+                  {/* 2. CONTENT AREA */}
+                  <div className="flex flex-col flex-grow p-8 relative">
+
+                    {/* Metadata Line - Redesigned for cleanliness and legibility */}
+                    <div className="flex items-center gap-4 mb-5">
+                      <div className="flex items-center gap-2 text-xs font-bold text-[#0A1128] dark:text-white/90 uppercase tracking-widest">
+                        <MapPin size={15} className="text-[#FFD700]" />
+                        <span className="truncate max-w-[140px]">{event.location}</span>
+                      </div>
+
+                      <div className="h-4 w-px bg-gray-200 dark:bg-white/10" />
+
+                      <div className="flex items-center gap-2 text-xs font-bold text-[#0A1128]/70 dark:text-white/70 uppercase tracking-widest">
+                        <Users size={15} className="text-[#FFD700]" />
+                        <span>{event.participants || 0} Places</span>
+                      </div>
+                    </div>
+
+                    {/* Title */}
+                    <h3 className="text-2xl font-black text-[#0A1128] dark:text-white mb-4 line-clamp-2 leading-tight uppercase tracking-tighter group-hover:text-[#FFD700] transition-colors">
+                      {event.title}
+                    </h3>
+
+                    {/* Description courte */}
+                    <p className="text-[#0A1128]/70 dark:text-gray-400 line-clamp-2 text-sm font-medium leading-relaxed mb-6 flex-grow italic">
+                      {stripHtml(event.description)}
+                    </p>
+
+                    {/* Bottom Action Area */}
+                    <div className="flex items-center justify-between pt-6 border-t border-gray-100 dark:border-white/10 mt-auto">
+
+                      {/* Speaker Avatars Stack */}
+                      <div className="flex items-center -space-x-3">
+                        {event.speakers && event.speakers.length > 0 ? (
+                          event.speakers.slice(0, 3).map((speaker: any, idx: number) => (
+                            <div key={idx} className="h-8 w-8 rounded-full border-2 border-white dark:border-[#0A1128] bg-gray-200 flex items-center justify-center text-[10px] font-bold text-gray-600 overflow-hidden relative" title={speaker.name}>
+                              {/* Si tu as une image speaker, mets la ici, sinon Initiales */}
+                              <span className="z-10">{speaker.name.charAt(0)}</span>
+                            </div>
+                          ))
+                        ) : (
+                          <div className="flex items-center gap-2 text-xs font-medium text-gray-500">
+                            <Sparkles size={14} className="text-[#FFD700]" />
+                            <span>La Trouvaille</span>
+                          </div>
+                        )}
+                        {event.speakers && event.speakers.length > 3 && (
+                          <div className="h-8 w-8 rounded-full border-2 border-white dark:border-[#0A1128] bg-[#0A1128] text-white flex items-center justify-center text-[10px] font-bold z-10">
+                            +{event.speakers.length - 3}
+                          </div>
+                        )}
+                      </div>
+
+                      {/* Animated CTA Button */}
+                      <div className="relative overflow-hidden rounded-full p-2">
+                        <div className={cn(
+                          "flex items-center justify-center h-10 w-10 rounded-full bg-[#0A1128] dark:bg-white text-white dark:text-[#0A1128] transition-all duration-300",
+                          hoveredId === event.id ? "w-28" : "w-10"
+                        )}>
+                          <ArrowUpRight size={20} className={cn("transition-transform", hoveredId === event.id && "translate-x-8 opacity-0 absolute")} />
+                          <span className={cn(
+                            "absolute text-xs font-bold whitespace-nowrap opacity-0 transition-all duration-300",
+                            hoveredId === event.id && "opacity-100"
+                          )}>
+                            S'inscrire
+                          </span>
+                        </div>
+                      </div>
+
+                    </div>
                   </div>
-                )}
-
-                {/* Description (pour les non-webinaires) */}
-                {event.category?.name !== "Webinaire" && (
-                  <p className="text-muted-foreground mb-4 line-clamp-2">
-                    {event.description}
-                  </p>
-                )}
-
-                {/* Détails */}
-                <div className="space-y-2 mb-4 pt-3 border-t">
-                  <div className="flex items-center gap-2 text-sm text-gray-600">
-                    <MapPin size={16} className="text-[#0A1128]" />
-                    <span>{event.location}</span>
-                  </div>
-                  <div className="flex items-center gap-2 text-sm text-gray-600">
-                    <Clock size={16} className="text-[#0A1128]" />
-                    <span>{event.time}</span>
-                  </div>
-                  <div className="flex items-center gap-2 text-sm text-gray-600">
-                    <UserCheck size={16} className="text-[#0A1128]" />
-                    <span>{event.participants} inscrits</span>
-                  </div>
-                </div>
-
-                {/* Tags */}
-                {event.tags && event.tags.length > 0 && (
-                  <div className="flex flex-wrap gap-2 mb-4">
-                    {event.tags.slice(0, 3).map((tag: { tag?: { name: string }; name?: string }, idx: number) => (
-                      <Link
-                        key={idx}
-                        href={`/events?tag=${encodeURIComponent(tag.tag?.name || tag.name || '')}`}
-                        className="px-2 py-1 bg-[#0A1128]/5 text-[#0A1128] text-xs font-medium rounded hover:bg-[#0A1128] hover:text-white transition-all"
-                      >
-                        #{tag.tag?.name || tag.name || ''}
-                      </Link>
-                    ))}
-                  </div>
-                )}
-
-                {/* Bouton */}
-                <Link 
-                  href={`/event/${event.id}`}
-                  className="flex items-center justify-center gap-2 w-full py-3 bg-[#FFD700] text-[#0A1128] font-bold rounded-xl hover:bg-[#E6C200] transition-all hover:scale-105"
-                >
-                  S&apos;inscrire maintenant
-                  <ArrowRight size={18} />
-                </Link>
-              </div>
-            </motion.div>
-          ))}
-            </div>
-
-            <motion.div variants={itemVariants} className="text-center">
-              <Link href="/events">
-                <button className="inline-flex items-center gap-2 px-8 py-4 bg-[#FFD700] text-[#0A1128] font-bold rounded-xl shadow-lg hover:bg-[#E6C200] hover:shadow-xl hover:-translate-y-1 transition-all dark:shadow-[#FFD700]/20">
-                  Voir tous les événements
-                  <ArrowRight size={20} />
-                </button>
+                </motion.article>
               </Link>
-            </motion.div>
-          </>
+            ))}
+          </div>
         )}
+
+        {/* EMPTY STATE - Illustration Design */}
+        {!isLoading && displayEvents.length === 0 && (
+          <motion.div
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+            className="flex flex-col items-center justify-center text-center py-20 px-4 rounded-[2.5rem] bg-gray-50 dark:bg-white/5 border border-dashed border-gray-300 dark:border-white/20"
+          >
+            <div className="h-24 w-24 rounded-full bg-[#FFD700]/10 flex items-center justify-center mb-6 text-[#FFD700]">
+              <Calendar size={40} />
+            </div>
+            <h3 className="text-3xl font-black text-[#0A1128] dark:text-white mb-4 uppercase tracking-tighter">
+              Le silence avant <span className="text-[#FFD700]">l'impact</span>.
+            </h3>
+            <p className="text-gray-500 dark:text-gray-400 max-w-md mb-8 italic font-medium leading-relaxed">
+              Nous préparons actuellement de nouvelles expériences immersives pour la jeunesse. <br /> Soyez prêts pour le prochain chapitre.
+            </p>
+            <Link href="/contact" className="px-10 py-5 bg-[#0A1128] dark:bg-white text-white dark:text-black font-black text-lg uppercase tracking-tighter transition-all hover:scale-105 active:scale-95 shadow-2xl">
+              Rester informé
+            </Link>
+          </motion.div>
+        )}
+
       </div>
-    </motion.section>
+    </section>
   )
 }

@@ -1,418 +1,289 @@
 "use client"
 
-import { useState, useEffect, useId, useRef, useCallback } from "react"
+import { useState, useEffect, useId, useRef, useCallback, use } from "react"
 import Link from "next/link"
 import Image from "next/image"
 import { motion, AnimatePresence } from "framer-motion"
-import { Calendar, MapPin, Users, X, ArrowLeft, ChevronLeft, ChevronRight, Camera, Grid3x3, Grid2x2 } from "lucide-react"
+import { Calendar, MapPin, Users, X, ArrowLeft, ChevronLeft, ChevronRight, Camera, Grid3x3, Grid2x2, Sparkles, LayoutGrid } from "lucide-react"
 import { useOutsideClick } from "@/hooks/use-outside-click"
-import { useEvent } from "../../../../lib/hooks/use-events"
+import { useEvent } from "@/lib/hooks/use-events"
+import { cn } from "@/lib/utils"
 
-export default function EventGalleryPage({ params }: { params: { id: string } }) {
-  const { data: eventData, isLoading, error } = useEvent(params.id)
+export default function EventGalleryPage({ params }: { params: Promise<{ id: string }> }) {
+  const { id: eventId } = use(params)
+  const { data: eventData, isLoading, error } = useEvent(eventId)
   const [activePhotoIndex, setActivePhotoIndex] = useState<number | null>(null)
   const [gridSize, setGridSize] = useState<"2" | "3" | "4">("4")
   const ref = useRef<HTMLDivElement | null>(null)
   const id = useId()
 
-  // Type pour les événements avec toutes les propriétés nécessaires
-  type GalleryEventItem = {
-    id: string | number
-    title: string
-    photos?: Array<{ id: string; image_url: string; alt_text?: string }> | string[]
-    event_images?: Array<{ id: string; image_url: string; alt_text?: string }>
-    gallery?: Array<{ id: string; image_url: string; alt_text?: string | null }>
-    category?: string | { name: string }
-    rubrique?: string | { name: string }
-    created_at?: string
-    date?: string
-    location?: string
-    participants?: number
-  }
-
-  // Données d'événements (à synchroniser avec gallery/page.tsx)
-  const galleryEvents: GalleryEventItem[] = []
-
-  // Utiliser les données Supabase ou les données de fallback
-  const eventItem: GalleryEventItem | undefined = eventData || galleryEvents.find(e => e.id === parseInt(params.id))
-  
-  // Helper functions pour accéder aux données de manière sécurisée
-  const getPhotos = useCallback((item: GalleryEventItem | undefined): Array<{ id: string; image_url: string; alt_text?: string }> => {
+  const getPhotos = useCallback((item: any): Array<{ id: string; image_url: string; alt_text?: string }> => {
     if (!item) return []
-
-    if (Array.isArray(item.gallery) && item.gallery.length > 0) {
-      return item.gallery.map((p) => ({
-        id: p.id,
-        image_url: p.image_url,
-        alt_text: p.alt_text ?? undefined,
-      }))
-    }
-    
-    // Si photos est un tableau de strings (données de fallback)
-    if (Array.isArray(item.photos) && item.photos.length > 0 && typeof item.photos[0] === 'string') {
-      return (item.photos as string[]).map((url, index) => ({
-        id: `fallback-${index}`,
-        image_url: url,
-        alt_text: `${item.title} - Photo ${index + 1}`
-      }))
-    }
-    
-    // Si photos est un tableau d'objets (données Supabase)
-    return (item.photos as Array<{ id: string; image_url: string; alt_text?: string }>) || item.event_images || []
+    const rawPhotos = item.gallery || item.photos || item.event_images || []
+    return rawPhotos.map((p: any, idx: number) => ({
+      id: p.id || `photo-${idx}`,
+      image_url: typeof p === 'string' ? p : p.image_url,
+      alt_text: p.alt_text || ''
+    }))
   }, [])
-  const getCategoryName = (item: GalleryEventItem | undefined) => {
-    if (!item?.category) return ''
-    return typeof item.category === 'string' ? item.category : item.category.name || ''
-  }
-  const getRubriqueName = (item: GalleryEventItem | undefined) => {
-    if (!item?.rubrique) return ''
-    return typeof item.rubrique === 'string' ? item.rubrique : item.rubrique.name || ''
-  }
-  const getDate = (item: GalleryEventItem | undefined) => item?.created_at || item?.date || ''
 
-  // Navigation avec clavier et gestion du scroll
+  const getCategoryName = (item: any) => typeof item?.category === 'string' ? item.category : item?.category?.name || ''
+  const getRubriqueName = (item: any) => typeof item?.rubrique === 'string' ? item.rubrique : item?.rubrique?.name || ''
+
   useEffect(() => {
     function onKeyDown(e: KeyboardEvent) {
-      if (e.key === "Escape") {
-        setActivePhotoIndex(null)
-      } else if (e.key === "ArrowLeft" && activePhotoIndex !== null && activePhotoIndex > 0) {
-        setActivePhotoIndex(activePhotoIndex - 1)
-      } else if (e.key === "ArrowRight" && activePhotoIndex !== null && eventItem && activePhotoIndex < getPhotos(eventItem).length - 1) {
-        setActivePhotoIndex(activePhotoIndex + 1)
-      }
+      if (e.key === "Escape") setActivePhotoIndex(null)
+      else if (e.key === "ArrowLeft" && activePhotoIndex !== null && activePhotoIndex > 0) setActivePhotoIndex(activePhotoIndex - 1)
+      else if (e.key === "ArrowRight" && activePhotoIndex !== null && eventData && activePhotoIndex < getPhotos(eventData).length - 1) setActivePhotoIndex(activePhotoIndex + 1)
     }
-
-    if (activePhotoIndex !== null) {
-      document.body.style.overflow = "hidden"
-    } else {
-      document.body.style.overflow = "auto"
-    }
-
+    document.body.style.overflow = activePhotoIndex !== null ? "hidden" : "auto"
     window.addEventListener("keydown", onKeyDown)
     return () => window.removeEventListener("keydown", onKeyDown)
-  }, [activePhotoIndex, eventItem, getPhotos])
+  }, [activePhotoIndex, eventData, getPhotos])
 
   useOutsideClick(ref, () => setActivePhotoIndex(null))
 
-  // Gestion des états de chargement et d'erreur
-  if (isLoading) {
-    return (
-      <div className="bg-white min-h-screen flex items-center justify-center">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#FFD700] mx-auto mb-4"></div>
-          <p className="text-[#0A1128]">Chargement de la galerie...</p>
-        </div>
+  if (isLoading) return (
+    <div className="bg-white dark:bg-[#0A1128] min-h-screen flex items-center justify-center">
+      <div className="flex flex-col items-center gap-4">
+        <div className="w-12 h-12 border-4 border-[#FFD700] border-t-transparent rounded-full animate-spin" />
+        <p className="text-sm font-black uppercase tracking-widest text-[#FFD700]">Révélation en cours...</p>
       </div>
-    )
-  }
+    </div>
+  )
 
-  if (error || !eventItem) {
-    return (
-      <div className="bg-white min-h-screen flex items-center justify-center">
-        <div className="text-center">
-          <p className="text-red-500 mb-4">Galerie non trouvée</p>
-          <p className="text-gray-600 mb-6">La galerie que vous recherchez n&apos;existe pas</p>
-          <Link href="/gallery" className="px-6 py-3 bg-[#FFD700] text-[#0A1128] rounded-lg font-semibold hover:bg-[#E6C200] transition-all">
-            Retour à la galerie
-          </Link>
-        </div>
+  if (error || !eventData) return (
+    <div className="bg-white dark:bg-[#0A1128] min-h-screen flex items-center justify-center p-4">
+      <div className="text-center max-w-md">
+        <h2 className="text-4xl font-black uppercase tracking-tighter mb-4 text-[#0A1128] dark:text-white">Relique égarée.</h2>
+        <p className="text-gray-500 mb-8 font-medium">Cette galerie semble avoir disparu des archives du temps.</p>
+        <Link href="/gallery" className="inline-flex items-center gap-2 px-8 py-4 bg-[#FFD700] text-[#0A1128] font-black uppercase tracking-widest text-xs rounded-full hover:scale-105 transition-transform">
+          <ArrowLeft size={16} /> Retour à l'exposition
+        </Link>
       </div>
-    )
-  }
+    </div>
+  )
 
+  const photos = getPhotos(eventData)
 
   return (
-    <div className="min-h-screen bg-white">
-      {/* Hero Section */}
-      <section className="relative bg-gradient-to-br from-[#0A1128] to-[#172B4D] text-white py-16">
-        <div className="container">
-          <Link 
-            href="/gallery"
-            className="inline-flex items-center gap-2 px-4 py-2 bg-white/10 hover:bg-white/20 rounded-lg transition-all mb-6 backdrop-blur-sm"
-          >
-            <ArrowLeft size={18} />
-            Retour à la galerie
+    <div className="min-h-screen bg-white dark:bg-[#0A1128] selection:bg-[#FFD700] selection:text-[#0A1128]">
+
+      {/* 1. IMMERSIVE HERO */}
+      <section className="relative h-[60vh] flex items-end overflow-hidden">
+        {/* Blurred Background from first image */}
+        <div className="absolute inset-0 z-0">
+          <Image
+            src={photos[0]?.image_url || '/images/placeholder.jpg'}
+            alt="" fill className="object-cover scale-110 blur-2xl opacity-20 dark:opacity-40"
+          />
+          <div className="absolute inset-0 bg-gradient-to-t from-white dark:from-[#0A1128] via-transparent to-transparent" />
+          <div className="absolute inset-0 bg-[url('/noise.png')] opacity-[0.03] pointer-events-none" />
+        </div>
+
+        <div className="container mx-auto max-w-7xl px-4 pb-16 relative z-10">
+          <Link href="/gallery" className="group inline-flex items-center gap-3 text-xs font-black uppercase tracking-widest text-[#0A1128] dark:text-white/60 mb-12 hover:text-[#FFD700] transition-colors">
+            <div className="w-10 h-10 rounded-full border border-gray-100 dark:border-white/10 flex items-center justify-center group-hover:border-[#FFD700] transition-all">
+              <ArrowLeft size={16} className="group-hover:-translate-x-1 transition-transform" />
+            </div>
+            Retour à l'agenda
           </Link>
 
           <motion.div
-            initial={{ opacity: 0, y: 20 }}
+            initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6 }}
+            transition={{ duration: 0.8 }}
           >
-            <div className="flex items-center gap-3 mb-4 flex-wrap">
-              <span className="px-3 py-1.5 bg-[#FFD700] text-[#0A1128] rounded-full font-semibold text-sm">
-                {getCategoryName(eventItem)}
-              </span>
-              {getCategoryName(eventItem) === "Webinaire" && getRubriqueName(eventItem) && (
-                <span className="px-3 py-1.5 bg-white/20 text-white rounded-full font-semibold text-sm backdrop-blur-sm">
-                  {getRubriqueName(eventItem)}
-                </span>
-              )}
-             
+            <div className="flex items-center gap-3 mb-6">
+              <span className="text-[#FFD700] lowercase italic font-serif text-2xl">{getCategoryName(eventData)}</span>
+              <div className="w-12 h-px bg-[#FFD700]/30" />
             </div>
 
-            <h1 className="text-4xl md:text-5xl font-bold mb-6">{eventItem.title}</h1>
-            
-            <div className="flex flex-wrap gap-6 text-white/90">
-              <div className="flex items-center gap-2">
-                <Calendar size={20} />
-                <span>{new Date(getDate(eventItem)).toLocaleDateString('fr-FR', { 
-                  day: 'numeric', 
-                  month: 'long', 
-                  year: 'numeric' 
-                })}</span>
+            <h1 className="text-5xl md:text-7xl font-black text-[#0A1128] dark:text-white tracking-tight uppercase leading-[0.9] mb-8">
+              {eventData.title}
+            </h1>
+
+            <div className="flex flex-wrap gap-8 items-center border-t border-gray-100 dark:border-white/10 pt-8 mt-8">
+              <div className="flex items-center gap-3 text-xs font-black uppercase tracking-widest text-gray-500">
+                <Calendar size={18} className="text-[#FFD700]" />
+                <span className="dark:text-white/80">{new Date(eventData.created_at || eventData.date).toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' })}</span>
               </div>
-              <div className="flex items-center gap-2">
-                <MapPin size={20} />
-                <span>{eventItem.location}</span>
+              <div className="flex items-center gap-3 text-xs font-black uppercase tracking-widest text-gray-500">
+                <MapPin size={18} className="text-[#FFD700]" />
+                <span className="dark:text-white/80">{eventData.location}</span>
               </div>
-              <div className="flex items-center gap-2">
-                <Users size={20} />
-                <span>{eventItem.participants || 0} participants</span>
+              <div className="flex items-center gap-3 text-xs font-black uppercase tracking-widest text-gray-500">
+                <Users size={18} className="text-[#FFD700]" />
+                <span className="dark:text-white/80">{eventData.participants || 0} Témoins</span>
               </div>
             </div>
           </motion.div>
         </div>
       </section>
 
-      {/* Options et compteur */}
-      <section className="py-6 bg-gray-50 border-b border-gray-200">
-        <div className="container">
-          <div className="flex gap-4 flex-wrap items-center justify-between">
-            {/* Compteur de photos */}
-            <div className="flex items-center gap-3">
-              <div className="flex items-center gap-2 text-[#0A1128]">
-               
-                
-                  <div className="text-2xl font-bold">{getPhotos(eventItem).length}</div>
-                  <div className="text-xl font-bold">Photos</div>
-              
-              </div>
-            </div>
-
-            {/* Taille de grille */}
-            <div className="flex items-center gap-3">
-              <span className="text-sm font-semibold text-gray-700 hidden sm:block">
-                Affichage :
-              </span>
-              <div className="flex gap-2 bg-white rounded-xl p-1 border-2 border-gray-200">
-                <button
-                  onClick={() => setGridSize("2")}
-                  className={`p-2 rounded-lg transition-all ${
-                    gridSize === "2" ? 'bg-[#0A1128] text-white' : 'text-gray-600 hover:bg-gray-100'
-                  }`}
-                  title="Grille 2 colonnes"
-                >
-                  <Grid2x2 size={20} />
-                </button>
-                <button
-                  onClick={() => setGridSize("3")}
-                  className={`p-2 rounded-lg transition-all ${
-                    gridSize === "3" ? 'bg-[#0A1128] text-white' : 'text-gray-600 hover:bg-gray-100'
-                  }`}
-                  title="Grille 3 colonnes"
-                >
-                  <Grid3x3 size={20} />
-                </button>
-                <button
-                  onClick={() => setGridSize("4")}
-                  className={`p-2 rounded-lg transition-all ${
-                    gridSize === "4" ? 'bg-[#0A1128] text-white' : 'text-gray-600 hover:bg-gray-100'
-                  }`}
-                  title="Grille 4 colonnes"
-                >
-                  <Camera size={20} />
-                </button>
-              </div>
-            </div>
+      {/* 2. STICKY CONTROLS */}
+      <section className="sticky top-[72px] z-30 bg-white/80 dark:bg-[#0A1128]/90 backdrop-blur-xl border-y border-gray-100 dark:border-white/5 py-6">
+        <div className="container mx-auto max-w-7xl px-4 flex items-center justify-between">
+          <div className="flex items-baseline gap-2">
+            <span className="text-3xl font-black text-[#0A1128] dark:text-white">{photos.length}</span>
+            <span className="text-[10px] font-black uppercase tracking-widest text-gray-400">Captures</span>
           </div>
-        </div>
-      </section>
 
-      {/* Photos Grid */}
-      <section className="py-12">
-        <div className="container">
-          <div className={`grid gap-4 ${
-            gridSize === "2" ? "grid-cols-2" : 
-            gridSize === "3" ? "grid-cols-2 md:grid-cols-3" : 
-            "grid-cols-2 md:grid-cols-3 lg:grid-cols-4"
-          }`}>
-            {getPhotos(eventItem).map((photo: { id: string; image_url: string; alt_text?: string }, index: number) => (
-              <motion.div
-                layoutId={`photo-${index}-${id}`}
-                key={index}
-                initial={{ opacity: 0, scale: 0.9 }}
-                animate={{ opacity: 1, scale: 1 }}
-                transition={{ duration: 0.3, delay: index * 0.05 }}
-                className="relative group cursor-pointer overflow-hidden rounded-xl aspect-square"
-                onClick={() => setActivePhotoIndex(index)}
+          <div className="flex items-center gap-2 bg-gray-50 dark:bg-white/5 p-1.5 rounded-2xl border border-gray-100 dark:border-white/10">
+            {(["2", "3", "4"] as const).map((size) => (
+              <button
+                key={size}
+                onClick={() => setGridSize(size)}
+                className={cn(
+                  "w-12 h-12 rounded-xl flex items-center justify-center transition-all",
+                  gridSize === size
+                    ? "bg-[#FFD700] text-[#0A1128] shadow-lg shadow-[#FFD700]/20"
+                    : "text-gray-400 hover:text-[#0A1128] dark:hover:text-white"
+                )}
               >
-                <motion.img 
-                  layoutId={`image-${index}-${id}`}
-                  src={photo.image_url} 
-                  alt={`${eventItem.title} - Photo ${index + 1}`}
-                  className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-110"
-                />
-                <div className="absolute inset-0 bg-[#0A1128]/0 group-hover:bg-[#0A1128]/40 transition-colors duration-300 flex items-center justify-center">
-                  <div className="opacity-0 group-hover:opacity-100 transition-opacity bg-white/90 backdrop-blur-sm rounded-full px-4 py-2 text-[#0A1128] font-semibold text-sm">
-                    Voir
-                  </div>
-                </div>
-              </motion.div>
+                {size === "2" ? <Grid2x2 size={20} /> : size === "3" ? <Grid3x3 size={20} /> : <LayoutGrid size={20} />}
+              </button>
             ))}
           </div>
         </div>
       </section>
 
-      {/* Expandable Photo Modal */}
+      {/* 3. PHOTO GRID */}
+      <section className="py-24 container mx-auto max-w-7xl px-4">
+        <motion.div
+          layout
+          className={cn(
+            "grid gap-4 md:gap-8",
+            gridSize === "2" ? "grid-cols-1 md:grid-cols-2" :
+              gridSize === "3" ? "grid-cols-2 md:grid-cols-3" :
+                "grid-cols-2 md:grid-cols-3 lg:grid-cols-4"
+          )}
+        >
+          {photos.map((photo, index) => (
+            <motion.div
+              layout
+              initial={{ opacity: 0, scale: 0.9 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ duration: 0.5, delay: index * 0.05 }}
+              key={photo.id}
+              className="group relative cursor-pointer overflow-hidden rounded-[2rem] aspect-[4/5] md:aspect-square bg-gray-50 dark:bg-white/5 border border-gray-100 dark:border-white/5"
+              onClick={() => setActivePhotoIndex(index)}
+            >
+              <Image
+                src={photo.image_url}
+                alt=""
+                fill
+                className="object-cover transition-all duration-700 grayscale group-hover:grayscale-0 group-hover:scale-110"
+              />
+              <div className="absolute inset-0 bg-[#0A1128]/40 opacity-0 group-hover:opacity-100 transition-all duration-500 flex items-center justify-center">
+                <div className="w-14 h-14 rounded-full bg-white dark:bg-[#FFD700] text-[#0A1128] flex items-center justify-center scale-75 group-hover:scale-100 transition-transform">
+                  <Camera size={24} />
+                </div>
+              </div>
+            </motion.div>
+          ))}
+        </motion.div>
+      </section>
+
+      {/* --- 4. PREMIUM LIGHTBOX --- */}
       <AnimatePresence>
         {activePhotoIndex !== null && (
-          <>
-            {/* Background Overlay */}
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              className="fixed inset-0 bg-black/20 h-full w-full z-[100]"
-            />
-            
-            {/* Modal Container */}
-            <div className="fixed inset-0 grid place-items-center z-[100]">
-              {/* Close Button (Mobile) */}
-              <motion.button
-                key={`button-${activePhotoIndex}-${id}`}
-                layout
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                exit={{ opacity: 0, transition: { duration: 0.05 } }}
-                className="flex absolute top-4 right-4 lg:hidden items-center justify-center bg-white rounded-full h-10 w-10 shadow-lg z-10"
-                onClick={() => setActivePhotoIndex(null)}
-              >
-                <X size={20} className="text-[#0A1128]" />
-              </motion.button>
+          <div className="fixed inset-0 z-[100] flex flex-col md:flex-row items-center justify-center bg-black/95 backdrop-blur-3xl overflow-hidden p-4 md:p-8">
 
-              {/* Expandable Card */}
-              <motion.div
-                layoutId={`photo-${activePhotoIndex}-${id}`}
-                ref={ref}
-                className="w-full max-w-5xl h-full md:h-fit md:max-h-[90%] flex flex-col bg-white sm:rounded-3xl overflow-hidden mx-4 shadow-2xl"
+            {/* Minimalist Sidebar (Mobile: Bottom bar) */}
+            <motion.div
+              initial={{ opacity: 0, x: -50 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: -50 }}
+              className="order-2 md:order-1 flex md:flex-col justify-between w-full md:w-32 py-12 border-t md:border-t-0 md:border-r border-white/10"
+            >
+              <div className="flex md:flex-col items-center gap-12">
+                <div className="flex flex-col items-center gap-1">
+                  <span className="text-4xl font-black text-[#FFD700] leading-none">{activePhotoIndex + 1}</span>
+                  <div className="h-0.5 w-6 bg-white/20" />
+                  <span className="text-[10px] font-black uppercase tracking-widest text-white/40">{photos.length}</span>
+                </div>
+
+                <div className="hidden md:flex flex-col gap-8 text-white/30">
+                  <Camera size={20} />
+                  <Sparkles size={20} />
+                </div>
+              </div>
+
+              <button
+                onClick={() => setActivePhotoIndex(null)}
+                className="w-16 h-16 rounded-full border border-white/20 flex items-center justify-center text-white hover:bg-white hover:text-[#0A1128] transition-all"
               >
-                {/* Photo */}
-                <motion.div 
-                  layoutId={`image-${activePhotoIndex}-${id}`}
-                  className="relative"
+                <X size={24} />
+              </button>
+            </motion.div>
+
+            {/* Immersive Photo Viewer */}
+            <div className="order-1 md:order-2 flex-1 relative h-full w-full flex items-center justify-center">
+
+              {/* Navigation Controls */}
+              <div className="absolute inset-x-0 top-1/2 -translate-y-1/2 flex justify-between px-4 z-10 pointer-events-none">
+                <button
+                  onClick={(e) => { e.stopPropagation(); if (activePhotoIndex > 0) setActivePhotoIndex(activePhotoIndex - 1); }}
+                  className={cn(
+                    "w-16 h-16 rounded-full bg-white/5 border border-white/10 flex items-center justify-center text-white backdrop-blur-xl pointer-events-auto transition-all hover:bg-[#FFD700] hover:text-[#0A1128] disabled:opacity-0",
+                    activePhotoIndex === 0 && "invisible"
+                  )}
+                >
+                  <ChevronLeft size={28} />
+                </button>
+                <button
+                  onClick={(e) => { e.stopPropagation(); if (activePhotoIndex < photos.length - 1) setActivePhotoIndex(activePhotoIndex + 1); }}
+                  className={cn(
+                    "w-16 h-16 rounded-full bg-white/5 border border-white/10 flex items-center justify-center text-white backdrop-blur-xl pointer-events-auto transition-all hover:bg-[#FFD700] hover:text-[#0A1128] disabled:opacity-0",
+                    activePhotoIndex === photos.length - 1 && "invisible"
+                  )}
+                >
+                  <ChevronRight size={28} />
+                </button>
+              </div>
+
+              {/* Main Image */}
+              <AnimatePresence mode="wait">
+                <motion.div
+                  key={activePhotoIndex}
+                  initial={{ opacity: 0, scale: 0.95, y: 20 }}
+                  animate={{ opacity: 1, scale: 1, y: 0 }}
+                  exit={{ opacity: 0, scale: 1.05, y: -20 }}
+                  transition={{ type: "spring", damping: 25, stiffness: 150 }}
+                  className="relative w-full h-[70vh] md:h-[85vh] group"
                 >
                   <Image
-                    src={getPhotos(eventItem)[activePhotoIndex]?.image_url || ''}
-                    alt={`${eventItem.title} - Photo ${activePhotoIndex + 1}`}
-                    width={800}
-                    height={600}
-                    className="w-full h-[50vh] md:h-[60vh] lg:h-[70vh] sm:rounded-tr-3xl sm:rounded-tl-3xl object-contain bg-gray-100"
+                    src={photos[activePhotoIndex].image_url}
+                    alt=""
+                    fill
+                    className="object-contain"
+                    priority
                   />
-                  
-                  {/* Navigation Buttons */}
-                  {activePhotoIndex > 0 && (
-                    <button
-                      onClick={(e) => {
-                        e.stopPropagation()
-                        setActivePhotoIndex(activePhotoIndex - 1)
-                      }}
-                      className="absolute left-4 top-1/2 -translate-y-1/2 p-3 bg-white/90 hover:bg-white rounded-full transition-all shadow-lg"
-                    >
-                      <ChevronLeft size={24} className="text-[#0A1128]" />
-                    </button>
-                  )}
-                  
-                  {activePhotoIndex < getPhotos(eventItem).length - 1 && (
-                    <button
-                      onClick={(e) => {
-                        e.stopPropagation()
-                        setActivePhotoIndex(activePhotoIndex + 1)
-                      }}
-                      className="absolute right-4 top-1/2 -translate-y-1/2 p-3 bg-white/90 hover:bg-white rounded-full transition-all shadow-lg"
-                    >
-                      <ChevronRight size={24} className="text-[#0A1128]" />
-                    </button>
-                  )}
                 </motion.div>
+              </AnimatePresence>
 
-                {/* Info Section */}
-                <div className="p-6 bg-white">
-                  <div className="flex justify-between items-start mb-4">
-                    <div className="flex-1">
-                      <motion.h3
-                        layout
-                        initial={{ opacity: 0 }}
-                        animate={{ opacity: 1 }}
-                        exit={{ opacity: 0 }}
-                        className="text-2xl font-bold text-[#0A1128] mb-2"
-                      >
-                        {eventItem.title}
-                      </motion.h3>
-                      <motion.p
-                        layout
-                        initial={{ opacity: 0 }}
-                        animate={{ opacity: 1 }}
-                        exit={{ opacity: 0 }}
-                        className="text-muted-foreground mb-3"
-                      >
-                        Photo {activePhotoIndex + 1} sur {getPhotos(eventItem).length}
-                      </motion.p>
-                      <div className="flex flex-wrap gap-2 items-center">
-                        <span className="px-3 py-1.5 bg-[#FFD700] text-[#0A1128] rounded-full font-semibold text-sm">
-                          {getCategoryName(eventItem)}
-                        </span>
-                        {getCategoryName(eventItem) === "Webinaire" && getRubriqueName(eventItem) && (
-                          <span className="px-3 py-1.5 bg-[#0A1128] text-white rounded-full font-semibold text-sm">
-                            {getRubriqueName(eventItem)}
-                          </span>
-                        )}
-                      </div>
-                    </div>
-                    
-                    {/* Close Button (Desktop) */}
-                    <button
-                      onClick={() => setActivePhotoIndex(null)}
-                      className="hidden lg:flex items-center justify-center p-2 hover:bg-gray-100 rounded-full transition-all"
-                    >
-                      <X size={24} className="text-[#0A1128]" />
-                    </button>
+              {/* Info Overlay */}
+              <motion.div
+                initial={{ opacity: 0, y: 30 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="absolute bottom-12 inset-x-12 hidden md:block"
+              >
+                <div className="max-w-xl bg-white/5 backdrop-blur-2xl border border-white/10 rounded-[2.5rem] p-10">
+                  <div className="flex items-center gap-3 mb-4">
+                    <span className="text-[#FFD700] italic font-serif text-xl">{getCategoryName(eventData)}</span>
+                    <div className="h-px flex-1 bg-white/10" />
                   </div>
-
-                  {/* Event Details */}
-                  <motion.div
-                    layout
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    exit={{ opacity: 0 }}
-                    className="flex flex-wrap gap-4 text-sm text-muted-foreground"
-                  >
-                    <div className="flex items-center gap-2">
-                      <Calendar size={16} className="text-[#0A1128]" />
-                      <span>{new Date(getDate(eventItem)).toLocaleDateString('fr-FR', { 
-                        day: 'numeric', 
-                        month: 'long', 
-                        year: 'numeric' 
-                      })}</span>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <MapPin size={16} className="text-[#0A1128]" />
-                      <span>{eventItem.location}</span>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <Users size={16} className="text-[#0A1128]" />
-                      <span>{eventItem.participants || 0} participants</span>
-                    </div>
-                  </motion.div>
-
-                  {/* Keyboard Hint */}
-                  <div className="mt-4 pt-4 border-t border-gray-200 text-center text-xs text-muted-foreground">
-                    Utilisez ← → pour naviguer • ESC pour fermer • Cliquez en dehors pour fermer
-                  </div>
+                  <h3 className="text-3xl font-black text-white uppercase tracking-tight leading-none mb-6">
+                    {eventData.title}
+                  </h3>
+                  <p className="text-white/40 text-xs font-black uppercase tracking-[0.3em]">
+                    Archives Secrètes de La Trouvaille • {new Date(eventData.created_at || eventData.date).getFullYear()}
+                  </p>
                 </div>
               </motion.div>
             </div>
-          </>
+          </div>
         )}
       </AnimatePresence>
     </div>

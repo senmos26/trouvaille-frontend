@@ -50,10 +50,19 @@ export async function createRegistration(data: EventRegistrationFormData): Promi
     return { data: registration, success: true }
   } catch (error) {
     console.error('Error creating event registration:', error)
-    return { 
-      data: null, 
-      error: (error as Error).message, 
-      success: false 
+    console.error('Full error object:', JSON.stringify(error, null, 2))
+
+    // Extract more detailed error information
+    const errorMessage = error instanceof Error
+      ? error.message
+      : typeof error === 'object' && error !== null && 'message' in error
+        ? String(error.message)
+        : 'Une erreur est survenue lors de l\'inscription'
+
+    return {
+      data: null,
+      error: errorMessage,
+      success: false
     }
   }
 }

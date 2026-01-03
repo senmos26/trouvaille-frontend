@@ -2,8 +2,10 @@
 
 import { useState } from "react"
 import { motion } from "framer-motion"
-import { Mail, Phone, MapPin, Users, Send, MessageCircle, User, BookText, MessageSquare, Clock, Globe } from "lucide-react"
+import { Mail, Phone, MapPin, Users, Send, MessageCircle, User, BookText, MessageSquare, Clock, Globe, ArrowUpRight, Sparkles } from "lucide-react"
 import { createContact } from "@/lib/actions/contacts"
+import { toast } from "sonner"
+import { cn } from "@/lib/utils"
 
 export default function ContactPage() {
   const [formData, setFormData] = useState({
@@ -13,304 +15,246 @@ export default function ContactPage() {
     message: ""
   })
   const [isSubmitting, setIsSubmitting] = useState(false)
-  const [submitted, setSubmitted] = useState(false)
+  const [isHovered, setIsHovered] = useState(false)
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setIsSubmitting(true)
-    setSubmitted(false)
 
     try {
       const result = await createContact(formData)
-
       if (!result.success) {
-        alert(`Erreur lors de l'envoi du message : ${result.error || "Veuillez réessayer plus tard."}`)
+        toast.error(`Erreur lors de l'envoi : ${result.error || "Veuillez réessayer."}`)
         return
       }
-
-      setSubmitted(true)
+      toast.success("Message envoyé !", { description: "Nous vous répondrons sous 24h." })
       setFormData({ name: "", email: "", subject: "", message: "" })
-
-      setTimeout(() => setSubmitted(false), 5000)
     } catch (error) {
-      console.error("Erreur lors de l'envoi du message de contact :", error)
-      alert("Une erreur est survenue lors de l'envoi du message. Veuillez réessayer.")
+      toast.error("Une erreur est survenue. Veuillez réessayer.")
     } finally {
       setIsSubmitting(false)
     }
   }
 
   return (
-    <div className="bg-white">
-      {/* Hero */}
-      <section className="relative min-h-[60vh] flex items-center justify-center bg-gradient-to-br from-[#0A1128] via-[#1a2851] to-[#0A1128] text-white overflow-hidden">
-        {/* Animated background elements */}
-        <div className="absolute inset-0">
-          <div className="absolute inset-0 opacity-10">
-            <div className="absolute top-20 left-10 w-72 h-72 bg-[#FFD700] rounded-full blur-[120px] animate-pulse" />
-            <div className="absolute bottom-20 right-10 w-96 h-96 bg-[#FFD700] rounded-full blur-[140px] animate-pulse" style={{ animationDelay: '1s' }} />
-          </div>
-          <div className="absolute inset-0 opacity-5" style={{ backgroundImage: 'radial-gradient(circle, #FFD700 1px, transparent 1px)', backgroundSize: '40px 40px' }} />
+    <div className="min-h-screen bg-white dark:bg-[#0A1128] text-[#0A1128] dark:text-white font-sans selection:bg-[#FFD700] selection:text-[#0A1128]">
+
+      {/* 1. CINEMATIC HERO */}
+      <section className="relative pt-32 pb-16 px-4 overflow-hidden border-b border-gray-100 dark:border-transparent">
+        <div className="absolute inset-0 z-0">
+          <div className="absolute top-0 right-0 w-[600px] h-[600px] bg-blue-500/5 dark:bg-blue-500/10 blur-[120px] rounded-full mix-blend-multiply dark:mix-blend-screen opacity-50 dark:opacity-100" />
+          <div className="absolute inset-0 bg-[url('/noise.png')] opacity-[0.02] dark:opacity-[0.03] mix-blend-overlay pointer-events-none" />
         </div>
 
-        <div className="container relative z-10 text-center py-24 max-w-4xl">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6 }}
-            className="inline-flex items-center gap-2 px-5 py-2.5 bg-[#FFD700] text-[#0A1128] rounded-full font-bold mb-8 shadow-lg"
-          >
-            <MessageCircle size={18} />
-            Parlons de votre projet
-          </motion.div>
-          
-          <motion.h1
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.2 }}
-            className="text-5xl md:text-7xl font-extrabold mb-6 leading-tight"
-          >
-            Transformons vos
-            <span className="block bg-gradient-to-r from-[#FFD700] via-[#FFC107] to-[#FFD700] bg-clip-text text-transparent animate-gradient">
-              Idées en Réalité
-            </span>
-          </motion.h1>
-          
-          <motion.p
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.4 }}
-            className="text-xl md:text-2xl text-white/90 max-w-2xl mx-auto leading-relaxed"
-          >
-            Votre voix compte. Partagez vos questions, vos idées ou rejoignez notre mouvement pour bâtir un avenir meilleur ensemble.
-          </motion.p>
+        <div className="container mx-auto max-w-7xl relative z-10">
+          <div className="flex flex-col gap-6">
+            <motion.div
+              initial={{ opacity: 0, y: 30 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.8 }}
+              className="max-w-4xl"
+            >
+              <div className="flex items-center gap-3 mb-4">
+                <div className="w-12 h-px bg-[#FFD700]" />
+                <span className="text-[#FFD700] font-black uppercase tracking-[0.3em] text-[10px]">Service d'Excellence</span>
+              </div>
 
-          {/* Quick stats */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.6 }}
-            className="mt-12 flex flex-wrap justify-center gap-8"
-          >
-            <div className="flex items-center gap-2 text-white/80">
-              <Clock className="text-[#FFD700]" size={20} />
-              <span className="text-sm font-medium">Réponse sous 24h</span>
-            </div>
-            <div className="flex items-center gap-2 text-white/80">
-              <Users className="text-[#FFD700]" size={20} />
-              <span className="text-sm font-medium">5000+ membres</span>
-            </div>
-            <div className="flex items-center gap-2 text-white/80">
-              <Globe className="text-[#FFD700]" size={20} />
-              <span className="text-sm font-medium">Présence internationale</span>
-            </div>
-          </motion.div>
+              <h1 className="text-5xl md:text-7xl lg:text-[5.5rem] font-black tracking-tighter leading-[0.9] uppercase mb-6">
+                Contactez-<br />
+                <span className="text-[#FFD700] lowercase italic font-serif">nous.</span>
+              </h1>
+            </motion.div>
+
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 0.5, duration: 1 }}
+              className="flex justify-between items-end border-t border-gray-100 dark:border-white/10 pt-8"
+            >
+              <p className="max-w-md text-sm md:text-base font-light leading-relaxed text-gray-500 dark:text-gray-300 italic font-serif">
+                "Une question, un partenariat ou simplement l'envie de rejoindre l'aventure ? Nos équipes vous écoutent."
+              </p>
+              <div className="hidden md:flex flex-col items-end gap-1">
+                <span className="text-[9px] uppercase tracking-[0.4em] font-black text-gray-400 dark:text-white/40">Disponibilité</span>
+                <span className="text-2xl font-black text-[#FFD700]">Lundi - Samedi</span>
+              </div>
+            </motion.div>
+          </div>
         </div>
       </section>
 
-      {/* Contact Form & Info */}
-      <section className="py-20 bg-gray-50">
-        <div className="container">
-          <div className="grid lg:grid-cols-[3fr_2fr] gap-12">
-            {/* Form */}
-            <motion.div
-              initial={{ opacity: 0, x: -20 }}
-              whileInView={{ opacity: 1, x: 0 }}
-              transition={{ duration: 0.6 }}
-              viewport={{ once: true }}
-              className="bg-white rounded-3xl p-10 shadow-2xl border border-gray-100"
-            >
-              <div className="mb-8">
-                <div className="inline-block p-3 bg-[#FFD700]/10 rounded-xl mb-4">
-                  <MessageSquare className="text-[#FFD700]" size={28} />
-                </div>
-                <h2 className="text-4xl font-extrabold text-[#0A1128] mb-3">Envoyez-nous un message</h2>
-                <p className="text-[#0A1128]/60 text-lg">Remplissez le formulaire ci-dessous et notre équipe vous répondra rapidement.</p>
-              </div>
+      {/* 2. CONTACT SECTION */}
+      <section className="py-24 container mx-auto max-w-7xl px-4">
+        <div className="grid lg:grid-cols-12 gap-16">
 
-              <form onSubmit={handleSubmit} className="space-y-6">
-                <div className="group">
-                  <label className="block text-sm font-bold text-[#0A1128] mb-3">Nom complet</label>
-                  <div className="relative">
-                    <div className="absolute left-4 top-1/2 -translate-y-1/2 p-2 bg-[#FFD700]/10 rounded-lg group-focus-within:bg-[#FFD700]/20 transition-colors">
-                      <User size={18} className="text-[#0A1128]/60 group-focus-within:text-[#0A1128]" />
+          {/* LEFT: FORM */}
+          <motion.div
+            initial={{ opacity: 0, x: -30 }}
+            whileInView={{ opacity: 1, x: 0 }}
+            viewport={{ once: true }}
+            className="lg:col-span-7"
+          >
+            <div className="bg-white dark:bg-white/5 p-10 md:p-14 rounded-[2.5rem] border border-gray-100 dark:border-white/5 shadow-sm hover:shadow-2xl hover:shadow-[#FFD700]/5 transition-all duration-700">
+              <h2 className="text-3xl font-black uppercase tracking-tighter mb-10 flex items-center gap-4">
+                <MessageSquare className="text-[#FFD700]" size={24} />
+                Laissez une trace
+              </h2>
+
+              <form onSubmit={handleSubmit} className="space-y-8">
+                <div className="grid md:grid-cols-2 gap-8">
+                  <div className="space-y-2">
+                    <label className="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] ml-1">votre nom</label>
+                    <div className="relative group">
+                      <User className="absolute left-6 top-1/2 -translate-y-1/2 text-gray-300 dark:text-white/20 group-focus-within:text-[#FFD700] transition-colors" size={18} />
+                      <input
+                        required
+                        type="text"
+                        placeholder="John Doe"
+                        className="w-full h-16 pl-14 pr-6 rounded-2xl bg-gray-50 dark:bg-white/5 border border-gray-100 dark:border-white/10 focus:border-[#FFD700]/50 text-[#0A1128] dark:text-white outline-none transition-all font-bold"
+                        value={formData.name}
+                        onChange={e => setFormData({ ...formData, name: e.target.value })}
+                      />
                     </div>
-                    <input
-                      type="text"
-                      value={formData.name}
-                      onChange={(e) => setFormData({...formData, name: e.target.value})}
-                      placeholder="Votre nom et prénom"
-                      className="w-full pl-16 pr-4 py-4 border-2 border-gray-200 rounded-xl focus:outline-none focus:border-[#FFD700] focus:ring-4 focus:ring-[#FFD700]/10 transition-all text-[#0A1128]"
-                      required
-                    />
+                  </div>
+                  <div className="space-y-2">
+                    <label className="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] ml-1">votre email</label>
+                    <div className="relative group">
+                      <Mail className="absolute left-6 top-1/2 -translate-y-1/2 text-gray-300 dark:text-white/20 group-focus-within:text-[#FFD700] transition-colors" size={18} />
+                      <input
+                        required
+                        type="email"
+                        placeholder="john@example.com"
+                        className="w-full h-16 pl-14 pr-6 rounded-2xl bg-gray-50 dark:bg-white/5 border border-gray-100 dark:border-white/10 focus:border-[#FFD700]/50 text-[#0A1128] dark:text-white outline-none transition-all font-bold"
+                        value={formData.email}
+                        onChange={e => setFormData({ ...formData, email: e.target.value })}
+                      />
+                    </div>
                   </div>
                 </div>
 
-                <div className="group">
-                  <label className="block text-sm font-bold text-[#0A1128] mb-3">Adresse Email</label>
-                  <div className="relative">
-                    <div className="absolute left-4 top-1/2 -translate-y-1/2 p-2 bg-[#FFD700]/10 rounded-lg group-focus-within:bg-[#FFD700]/20 transition-colors">
-                      <Mail size={18} className="text-[#0A1128]/60 group-focus-within:text-[#0A1128]" />
-                    </div>
+                <div className="space-y-2">
+                  <label className="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] ml-1">sujet</label>
+                  <div className="relative group">
+                    <BookText className="absolute left-6 top-1/2 -translate-y-1/2 text-gray-300 dark:text-white/20 group-focus-within:text-[#FFD700] transition-colors" size={18} />
                     <input
-                      type="email"
-                      value={formData.email}
-                      onChange={(e) => setFormData({...formData, email: e.target.value})}
-                      placeholder="votre.email@exemple.com"
-                      className="w-full pl-16 pr-4 py-4 border-2 border-gray-200 rounded-xl focus:outline-none focus:border-[#FFD700] focus:ring-4 focus:ring-[#FFD700]/10 transition-all text-[#0A1128]"
                       required
-                    />
-                  </div>
-                </div>
-
-                <div className="group">
-                  <label className="block text-sm font-bold text-[#0A1128] mb-3">Sujet</label>
-                  <div className="relative">
-                    <div className="absolute left-4 top-1/2 -translate-y-1/2 p-2 bg-[#FFD700]/10 rounded-lg group-focus-within:bg-[#FFD700]/20 transition-colors">
-                      <BookText size={18} className="text-[#0A1128]/60 group-focus-within:text-[#0A1128]" />
-                    </div>
-                    <input
                       type="text"
+                      placeholder="Comment pouvons-nous vous aider ?"
+                      className="w-full h-16 pl-14 pr-6 rounded-2xl bg-gray-50 dark:bg-white/5 border border-gray-100 dark:border-white/10 focus:border-[#FFD700]/50 text-[#0A1128] dark:text-white outline-none transition-all font-bold"
                       value={formData.subject}
-                      onChange={(e) => setFormData({...formData, subject: e.target.value})}
-                      placeholder="L'objet de votre message"
-                      className="w-full pl-16 pr-4 py-4 border-2 border-gray-200 rounded-xl focus:outline-none focus:border-[#FFD700] focus:ring-4 focus:ring-[#FFD700]/10 transition-all text-[#0A1128]"
-                      required
+                      onChange={e => setFormData({ ...formData, subject: e.target.value })}
                     />
                   </div>
                 </div>
 
-                <div className="group">
-                  <label className="block text-sm font-bold text-[#0A1128] mb-3">Message</label>
-                  <div className="relative">
-                    <div className="absolute left-4 top-5 p-2 bg-[#FFD700]/10 rounded-lg group-focus-within:bg-[#FFD700]/20 transition-colors">
-                      <MessageSquare size={18} className="text-[#0A1128]/60 group-focus-within:text-[#0A1128]" />
-                    </div>
+                <div className="space-y-2">
+                  <label className="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] ml-1">votre message</label>
+                  <div className="relative group">
+                    <MessageCircle className="absolute left-6 top-8 text-gray-300 dark:text-white/20 group-focus-within:text-[#FFD700] transition-colors" size={18} />
                     <textarea
-                      value={formData.message}
-                      onChange={(e) => setFormData({...formData, message: e.target.value})}
-                      placeholder="Écrivez votre message ici..."
-                      rows={6}
-                      className="w-full pl-16 pr-4 py-4 border-2 border-gray-200 rounded-xl focus:outline-none focus:border-[#FFD700] focus:ring-4 focus:ring-[#FFD700]/10 transition-all resize-none text-[#0A1128]"
                       required
+                      rows={6}
+                      placeholder="Écrivez votre projet ici..."
+                      className="w-full pl-14 pr-6 py-6 rounded-2xl bg-gray-50 dark:bg-white/5 border border-gray-100 dark:border-white/10 focus:border-[#FFD700]/50 text-[#0A1128] dark:text-white outline-none transition-all font-bold resize-none"
+                      value={formData.message}
+                      onChange={e => setFormData({ ...formData, message: e.target.value })}
                     />
                   </div>
                 </div>
 
                 <button
-                  type="submit"
                   disabled={isSubmitting}
-                  className="w-full py-4 bg-gradient-to-r from-[#0A1128] to-[#1a2851] text-white font-bold text-lg rounded-xl hover:shadow-2xl hover:scale-[1.02] transition-all flex items-center justify-center gap-3 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100 group"
+                  onMouseEnter={() => setIsHovered(true)}
+                  onMouseLeave={() => setIsHovered(false)}
+                  className="w-full py-6 bg-[#0A1128] dark:bg-white text-white dark:text-[#0A1128] font-black text-xl uppercase tracking-tighter rounded-2xl shadow-xl hover:scale-[1.02] active:scale-[0.98] transition-all flex items-center justify-center gap-4 overflow-hidden relative group/btn"
                 >
                   {isSubmitting ? (
-                    <div className="w-6 h-6 border-3 border-white/30 border-t-white rounded-full animate-spin" />
+                    <div className="w-6 h-6 border-4 border-[#FFD700] border-t-transparent rounded-full animate-spin" />
                   ) : (
                     <>
-                      <span>Envoyer le message</span>
-                      <Send size={20} className="group-hover:translate-x-1 transition-transform" />
+                      <motion.span
+                        animate={{ x: isHovered ? -10 : 0 }}
+                      >
+                        Envoyer le message
+                      </motion.span>
+                      <ArrowUpRight
+                        size={24}
+                        className={cn(
+                          "transition-all duration-300",
+                          isHovered ? "translate-x-2 -translate-y-2 text-[#FFD700]" : ""
+                        )}
+                      />
                     </>
                   )}
                 </button>
-
-                {submitted && (
-                  <motion.div
-                    initial={{ opacity: 0, scale: 0.9 }}
-                    animate={{ opacity: 1, scale: 1 }}
-                    className="p-5 bg-gradient-to-r from-green-50 to-emerald-50 border-2 border-green-200 text-green-800 rounded-xl flex items-center gap-4 shadow-lg"
-                  >
-                    <div className="w-8 h-8 bg-green-500 rounded-full flex items-center justify-center text-white font-bold flex-shrink-0 shadow-md">✓</div>
-                    <div>
-                      <p className="font-bold">Message envoyé avec succès !</p>
-                      <p className="text-sm text-green-700">Nous vous répondrons dans les plus brefs délais.</p>
-                    </div>
-                  </motion.div>
-                )}
               </form>
-            </motion.div>
+            </div>
+          </motion.div>
 
-            {/* Contact Info */}
-            <motion.div
-              initial={{ opacity: 0, x: 20 }}
-              whileInView={{ opacity: 1, x: 0 }}
-              transition={{ duration: 0.6 }}
-              viewport={{ once: true }}
-              className="space-y-6"
-            >
-              <div>
-                <div className="inline-block p-3 bg-[#FFD700]/10 rounded-xl mb-4">
-                  <Phone className="text-[#FFD700]" size={28} />
+          {/* RIGHT: INFO */}
+          <motion.div
+            initial={{ opacity: 0, x: 30 }}
+            whileInView={{ opacity: 1, x: 0 }}
+            viewport={{ once: true }}
+            className="lg:col-span-5 space-y-10"
+          >
+            <div className="space-y-4">
+              <h2 className="text-4xl font-black uppercase tracking-tighter">Nos coordonnées.</h2>
+              <p className="text-gray-400 font-medium">Une équipe dédiée pour vous accompagner dans votre ascension.</p>
+            </div>
+
+            <div className="space-y-6">
+              {[
+                { icon: Mail, label: "Email", value: "club.latrouvaille@gmail.com", href: "mailto:club.latrouvaille@gmail.com" },
+                { icon: Phone, label: "Téléphone", value: "+212 600 850 149", href: "tel:+212600850149" },
+                { icon: MapPin, label: "Localisation", value: "Casablanca, Maroc", href: "#" },
+              ].map((item, idx) => (
+                <motion.a
+                  key={idx}
+                  href={item.href}
+                  className="group block p-8 rounded-[2rem] bg-gray-50 dark:bg-white/5 border border-gray-100 dark:border-white/5 hover:border-[#FFD700]/30 transition-all duration-500"
+                >
+                  <div className="flex items-center gap-6">
+                    <div className="w-14 h-14 rounded-2xl bg-white dark:bg-white/10 flex items-center justify-center text-[#FFD700] shadow-sm transition-transform group-hover:scale-110 group-hover:bg-[#FFD700] group-hover:text-white">
+                      <item.icon size={24} />
+                    </div>
+                    <div>
+                      <p className="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] mb-1">{item.label}</p>
+                      <p className="text-lg font-black text-[#0A1128] dark:text-white uppercase tracking-tighter transition-colors group-hover:text-[#FFD700]">{item.value}</p>
+                    </div>
+                  </div>
+                </motion.a>
+              ))}
+
+              <div className="p-8 rounded-[2rem] bg-[#0A1128] border border-white/5 shadow-2xl relative overflow-hidden group">
+                <div className="absolute inset-0 bg-gradient-to-tr from-[#FFD700]/10 to-transparent" />
+                <div className="relative z-10 flex items-center gap-6">
+                  <div className="w-14 h-14 rounded-2xl bg-[#FFD700] flex items-center justify-center text-[#0A1128] shadow-lg">
+                    <Users size={24} />
+                  </div>
+                  <div>
+                    <h4 className="text-white font-black uppercase tracking-tighter text-xl mb-1">Communauté</h4>
+                    <p className="text-white/50 text-xs font-medium uppercase tracking-widest flex items-center gap-2">
+                      <Sparkles size={12} className="text-[#FFD700]" />
+                      5000+ Ambassadeurs
+                    </p>
+                  </div>
                 </div>
-                <h2 className="text-4xl font-extrabold text-[#0A1128] mb-3">Nos Coordonnées</h2>
-                <p className="text-[#0A1128]/60 text-lg">Contactez-nous directement ou retrouvez-nous sur nos réseaux.</p>
               </div>
+            </div>
 
-              <div className="space-y-4">
-                <motion.a
-                  href="mailto:club.latrouvaille@gmail.com"
-                  whileHover={{ scale: 1.02, y: -2 }}
-                  className="group relative flex items-start gap-5 p-6 bg-white border-2 border-gray-200 rounded-2xl hover:border-[#FFD700] hover:shadow-xl transition-all overflow-hidden"
-                >
-                  <div className="absolute inset-0 bg-gradient-to-r from-[#FFD700]/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
-                  <div className="relative w-16 h-16 bg-gradient-to-br from-[#FFD700] to-[#FFC107] rounded-2xl flex items-center justify-center flex-shrink-0 shadow-lg group-hover:scale-110 transition-transform">
-                    <Mail className="text-[#0A1128]" size={24} />
-                  </div>
-                  <div className="relative">
-                    <h3 className="font-bold text-[#0A1128] mb-2 text-lg">Email</h3>
-                    <p className="text-[#0A1128]/70 group-hover:text-[#0A1128] transition-colors break-all">
-                      club.latrouvaille@gmail.com
-                    </p>
-                  </div>
-                </motion.a>
-
-                <motion.a
-                  href="tel:+212600850149"
-                  whileHover={{ scale: 1.02, y: -2 }}
-                  className="group relative flex items-start gap-5 p-6 bg-white border-2 border-gray-200 rounded-2xl hover:border-[#FFD700] hover:shadow-xl transition-all overflow-hidden"
-                >
-                  <div className="absolute inset-0 bg-gradient-to-r from-[#FFD700]/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
-                  <div className="relative w-16 h-16 bg-gradient-to-br from-[#FFD700] to-[#FFC107] rounded-2xl flex items-center justify-center flex-shrink-0 shadow-lg group-hover:scale-110 transition-transform">
-                    <Phone className="text-[#0A1128]" size={24} />
-                  </div>
-                  <div className="relative">
-                    <h3 className="font-bold text-[#0A1128] mb-2 text-lg">Téléphone</h3>
-                    <p className="text-[#0A1128]/70 group-hover:text-[#0A1128] transition-colors">
-                      +212 600 850 149
-                    </p>
-                  </div>
-                </motion.a>
-
-                <motion.div
-                  whileHover={{ scale: 1.02, y: -2 }}
-                  className="group relative flex items-start gap-5 p-6 bg-white border-2 border-gray-200 rounded-2xl hover:border-[#FFD700] hover:shadow-xl transition-all overflow-hidden"
-                >
-                  <div className="absolute inset-0 bg-gradient-to-r from-[#FFD700]/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
-                  <div className="relative w-16 h-16 bg-gradient-to-br from-[#FFD700] to-[#FFC107] rounded-2xl flex items-center justify-center flex-shrink-0 shadow-lg group-hover:scale-110 transition-transform">
-                    <MapPin className="text-[#0A1128]" size={24} />
-                  </div>
-                  <div className="relative">
-                    <h3 className="font-bold text-[#0A1128] mb-2 text-lg">Localisation</h3>
-                    <p className="text-[#0A1128]/70">Casablanca, Maroc</p>
-                  </div>
-                </motion.div>
-
-                <motion.div
-                  whileHover={{ scale: 1.02, y: -2 }}
-                  className="group relative flex items-start gap-5 p-6 bg-gradient-to-br from-[#0A1128] to-[#1a2851] border-2 border-[#0A1128] rounded-2xl shadow-xl overflow-hidden"
-                >
-                  <div className="absolute inset-0 bg-gradient-to-r from-[#FFD700]/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
-                  <div className="relative w-16 h-16 bg-[#FFD700] rounded-2xl flex items-center justify-center flex-shrink-0 shadow-lg group-hover:scale-110 transition-transform">
-                    <Users className="text-[#0A1128]" size={24} />
-                  </div>
-                  <div className="relative">
-                    <h3 className="font-bold text-white mb-2 text-lg">Rejoignez-nous</h3>
-                    <p className="text-white/80 group-hover:text-white transition-colors">Une communauté de 5000+ membres passionnés</p>
-                  </div>
-                </motion.div>
+            {/* Timings */}
+            <div className="p-8 border-t border-gray-100 dark:border-white/10 flex items-center gap-6 opacity-60">
+              <Clock size={20} className="text-[#FFD700]" />
+              <div className="text-xs font-black uppercase tracking-[0.2em] text-gray-400">
+                Temps de réponse moyen : <span className="text-[#0A1128] dark:text-white">Moins de 24h</span>
               </div>
-            </motion.div>
-          </div>
+            </div>
+          </motion.div>
+
         </div>
       </section>
+
     </div>
   )
 }

@@ -1,443 +1,364 @@
 "use client"
 
-import { useState, useEffect, Suspense } from "react"
+import { useState, Suspense } from "react"
 import Link from "next/link"
 import Image from "next/image"
-import { useSearchParams } from "next/navigation"
-import { motion } from "framer-motion"
-import { ArrowRight, MapPin, Clock, UserCheck, Search, Filter, Calendar, CalendarX, ChevronDown } from "lucide-react"
+import { motion, AnimatePresence } from "framer-motion"
+import {
+  Search, Calendar, MapPin, ArrowUpRight,
+  ChevronDown, SlidersHorizontal, Users, Filter, X,
+  Clock, Bookmark, Sparkles
+} from "lucide-react"
 import { useEvents } from "@/lib/hooks/use-events"
-import { useEventCategories, useEventRubriques } from "@/lib/hooks/use-categories"
+import { useEventCategories } from "@/lib/hooks/use-categories"
+import { cn } from "@/lib/utils"
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select"
 
-function EventsPageContent() {
-  const searchParams = useSearchParams()
-  const tagFromUrl = searchParams.get('tag')
+// --- HELPERS ---
+const stripHtml = (html: string) => {
+  return html?.replace(/<[^>]*>?/gm, '') || '';
+};
 
-  const [selectedCategory, setSelectedCategory] = useState<string>("")
-  const [selectedCategoryId, setSelectedCategoryId] = useState<string>("")
-  const [selectedRubrique, setSelectedRubrique] = useState<string>("Toutes")
-  const [selectedRubriqueId, setSelectedRubriqueId] = useState<string>("")
-  const [selectedTag, setSelectedTag] = useState<string>(tagFromUrl || "")
-  const [searchQuery, setSearchQuery] = useState<string>("")
-  const [sortBy, setSortBy] = useState<string>("date")
-  const [displayCount, setDisplayCount] = useState(6)
-  const [showSortPopover, setShowSortPopover] = useState(false)
-
-  // Hooks Supabase
-  const { data: eventsData, isLoading: eventsLoading, error: eventsError } = useEvents({
-    limit: displayCount,
-    category_id: selectedCategoryId || undefined,
-    rubrique_id: selectedRubriqueId || undefined,
-    search: searchQuery || undefined
-  })
-
-  const { data: categoriesData } = useEventCategories()
-  const { data: rubriquesData } = useEventRubriques()
-
-  // Mettre à jour selectedTag quand l'URL change
-  useEffect(() => {
-    if (tagFromUrl) {
-      setSelectedTag(tagFromUrl)
-    }
-  }, [tagFromUrl])
-
-  const categories = categoriesData || []
-  const rubriques = ["Toutes", ...(rubriquesData?.map((rubrique: { name: string }) => rubrique.name) || [])]
-
-  // Type pour les événements avec propriétés étendues
-  type EventWithTime = {
-    id: string
-    title?: string
-    description?: string
-    image?: string
-    location?: string
-    participants?: number
-    time?: string
-    date?: string
-    category?: { name: string } | string
-    rubrique?: { name: string } | string
-    tags?: Array<{ name?: string; tag?: { name: string } } | string>
-    [key: string]: unknown
-  }
-
-  // Helper functions pour accéder aux propriétés de manière sécurisée
-  const getCategoryName = (category?: { name: string } | string) => {
-    return typeof category === 'string' ? category : category?.name || ''
-  }
-
-  const getRubriqueName = (rubrique?: { name: string } | string) => {
-    return typeof rubrique === 'string' ? rubrique : rubrique?.name || ''
-  }
-
-  // Filtrer les événements
-  const filteredEvents = eventsData?.data?.filter((event: EventWithTime) => {
-    const matchesCategory = !selectedCategory || getCategoryName(event.category) === selectedCategory
-    const matchesRubrique = selectedRubrique === "Toutes" || getRubriqueName(event.rubrique) === selectedRubrique
-    const matchesTag = !selectedTag || event.tags?.some((tag: { name?: string; tag?: { name: string } } | string) => {
-      const tagName = typeof tag === 'string' ? tag : (tag.tag?.name || tag.name || '')
-      return tagName.toLowerCase().includes(selectedTag.toLowerCase())
-    })
-    const matchesSearch = !searchQuery || 
-      event.title?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      event.description?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      event.location?.toLowerCase().includes(searchQuery.toLowerCase())
-
-    return matchesCategory && matchesRubrique && matchesTag && matchesSearch
-  }) || []
-
-  // Trier les événements
-  const sortedEvents = [...filteredEvents].sort((a: EventWithTime, b: EventWithTime) => {
-    switch (sortBy) {
-      case "date":
-        return new Date(a.date || '').getTime() - new Date(b.date || '').getTime()
-      case "participants":
-        return (b.participants || 0) - (a.participants || 0)
-      case "title":
-        return (a.title || '').localeCompare(b.title || '')
-      default:
-        return 0
-    }
-  })
-
-  // Gestion des états de chargement et d'erreur
-  if (eventsLoading) {
-    return (
-      <div className="min-h-screen bg-white">
-        <div className="container mx-auto px-4 py-20">
-          <div className="flex items-center justify-center">
-            <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-[#FFD700]"></div>
-          </div>
+// --- LOADING SKELETON ---
+const SkeletonCard = () => (
+  <div className="group relative flex flex-col overflow-hidden rounded-[2.5rem] bg-gray-50 dark:bg-gray-800/50 border border-gray-100 dark:border-white/5 h-[600px]">
+    <div className="aspect-[4/3] w-full animate-pulse bg-gray-200 dark:bg-gray-700" />
+    <div className="p-8 space-y-4">
+      <div className="h-4 w-1/3 rounded bg-gray-200 dark:bg-gray-700 animate-pulse" />
+      <div className="h-8 w-3/4 rounded bg-gray-200 dark:bg-gray-700 animate-pulse" />
+      <div className="h-20 w-full rounded bg-gray-200 dark:bg-gray-700 animate-pulse" />
+      <div className="flex justify-between items-center pt-6">
+        <div className="flex -space-x-3">
+          {[1, 2, 3].map(i => <div key={i} className="h-8 w-8 rounded-full bg-gray-200 dark:bg-gray-700 animate-pulse border-2 border-white dark:border-[#0A1128]" />)}
         </div>
+        <div className="h-10 w-10 rounded-full bg-gray-200 dark:bg-gray-700 animate-pulse" />
       </div>
-    )
-  }
+    </div>
+  </div>
+)
 
-  if (eventsError) {
-    return (
-      <div className="min-h-screen bg-white">
-        <div className="container mx-auto px-4 py-20">
-          <div className="text-center">
-            <h2 className="text-2xl font-bold text-[#0A1128] mb-4">Erreur de chargement</h2>
-            <p className="text-gray-600">Impossible de charger les événements. Veuillez réessayer plus tard.</p>
-          </div>
-        </div>
-      </div>
-    )
-  }
+// --- EVENT CARD COMPONENT ---
+const EventCard = ({ event, index }: { event: any; index: number }) => {
+  const [isHovered, setIsHovered] = useState(false);
+  const eventDate = new Date(event.date);
 
   return (
-    <div className="min-h-screen bg-white">
-      {/* Hero Section */}
-      <section className="relative min-h-[60vh] flex items-center justify-center bg-[#0A1128] text-white overflow-hidden">
-        <div className="absolute inset-0 opacity-10">
-          <div className="absolute inset-0" style={{ backgroundImage: 'radial-gradient(#FFD700 1px, transparent 1px)', backgroundSize: '20px 20px' }} />
+    <motion.div
+      layout
+      initial={{ opacity: 0, y: 20 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true }}
+      transition={{ duration: 0.5, delay: index * 0.1 }}
+      className="group w-full h-[600px]"
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => setIsHovered(false)}
+    >
+      <Link href={`/event/${event.id}`} className="block h-full w-full">
+        <article className="relative h-full w-full rounded-[2.5rem] overflow-hidden border border-gray-100 dark:border-white/5 bg-white dark:bg-white/5 shadow-sm hover:shadow-2xl hover:shadow-[#FFD700]/10 transition-all duration-700">
+
+          {/* 1. IMAGE AREA - Aspect Ratio Cinematic 4:3 */}
+          <div className="relative h-[55%] w-full overflow-hidden">
+            <Image
+              src={event.image || '/images/placeholder.jpg'}
+              alt={event.title}
+              fill
+              className="object-cover transition-all duration-1000 ease-out grayscale group-hover:grayscale-0 group-hover:scale-110"
+              unoptimized={event.image?.includes('supabase')}
+            />
+            {/* Overlay Gradient */}
+            <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-60 group-hover:opacity-20 transition-opacity duration-700" />
+
+            {/* Category Badge */}
+            <div className="absolute top-6 left-6">
+              <span className="px-4 py-2 bg-white/90 dark:bg-black/80 backdrop-blur-md text-[#0A1128] dark:text-white text-[10px] font-black uppercase tracking-[0.2em] rounded-full shadow-lg border border-white/20">
+                {event.category?.name || "Événement"}
+              </span>
+            </div>
+
+            {/* Date Sticker (Luxury Style) */}
+            <div className="absolute top-4 right-4 flex flex-col items-center bg-[#FFD700] text-[#0A1128] rounded-xl p-3 min-w-[70px] shadow-xl text-center leading-none border border-white/20">
+              <span className="text-2xl font-black">{eventDate.getDate()}</span>
+              <span className="text-[10px] font-black uppercase tracking-widest mt-1">
+                {eventDate.toLocaleDateString('fr-FR', { month: 'short' })}
+              </span>
+            </div>
+          </div>
+
+          {/* 2. CONTENT AREA */}
+          <div className="flex flex-col p-8 h-[45%] transition-colors duration-500">
+            {/* Metadata Line */}
+            <div className="flex items-center gap-4 mb-5">
+              <div className="flex items-center gap-2 text-[10px] font-black text-[#0A1128]/60 dark:text-white/60 uppercase tracking-widest">
+                <MapPin size={15} className="text-[#FFD700]" />
+                <span className="truncate max-w-[120px]">{event.location}</span>
+              </div>
+
+              <div className="h-4 w-px bg-gray-200 dark:bg-white/10" />
+
+              <div className="flex items-center gap-2 text-[10px] font-black text-[#0A1128]/60 dark:text-white/60 uppercase tracking-widest">
+                <Users size={15} className="text-[#FFD700]" />
+                <span>{event.participants || 0} Places</span>
+              </div>
+            </div>
+
+            {/* Title */}
+            <h3 className="text-2xl font-black text-[#0A1128] dark:text-white mb-4 line-clamp-2 leading-[1.1] uppercase tracking-tighter group-hover:text-[#FFD700] transition-colors">
+              {event.title}
+            </h3>
+
+            {/* Description */}
+            <p className="text-[#0A1128]/70 dark:text-gray-400 line-clamp-2 text-sm font-medium leading-relaxed italic mb-8">
+              {stripHtml(event.description)}
+            </p>
+
+            {/* Call to Action */}
+            <div className="mt-auto flex items-center justify-between pt-6 border-t border-gray-100 dark:border-white/10">
+              <div className="flex -space-x-3">
+                {event.speakers && event.speakers.length > 0 ? (
+                  event.speakers.slice(0, 3).map((speaker: any, idx: number) => (
+                    <div key={idx} className="h-8 w-8 rounded-full border-2 border-white dark:border-[#0A1128] bg-gray-200 flex items-center justify-center text-[10px] font-bold text-gray-600 overflow-hidden relative" title={speaker.name}>
+                      <span className="z-10">{speaker.name.charAt(0)}</span>
+                    </div>
+                  ))
+                ) : (
+                  <div className="flex items-center gap-2 text-xs font-medium text-gray-500">
+                    <Sparkles size={14} className="text-[#FFD700]" />
+                    <span>La Trouvaille</span>
+                  </div>
+                )}
+              </div>
+
+              {/* Animated CTA Button */}
+              <div className="relative overflow-hidden rounded-full p-2">
+                <div className={cn(
+                  "flex items-center justify-center h-10 w-10 rounded-full bg-[#0A1128] dark:bg-white text-white dark:text-[#0A1128] transition-all duration-300",
+                  isHovered ? "w-28" : "w-10"
+                )}>
+                  <ArrowUpRight size={20} className={cn("transition-transform", isHovered && "translate-x-8 opacity-0 absolute")} />
+                  <span className={cn(
+                    "absolute text-xs font-bold whitespace-nowrap opacity-0 transition-all duration-300",
+                    isHovered && "opacity-100"
+                  )}>
+                    S'inscrire
+                  </span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </article>
+      </Link>
+    </motion.div>
+  );
+};
+
+// --- MAIN PAGE CONTENT ---
+function EventsPageContent() {
+  const [selectedCategory, setSelectedCategory] = useState("Tout")
+  const [selectedSort, setSelectedSort] = useState("date-asc")
+  const [searchQuery, setSearchQuery] = useState("")
+
+  // Hook Data
+  const { data: eventsData, isLoading } = useEvents({ limit: 100 })
+  const { data: categoriesData } = useEventCategories()
+
+  // Data processing
+  const allEventsRaw = eventsData?.data || []
+  const today = new Date().setHours(0, 0, 0, 0)
+
+  // Only future events for this page
+  const upcomingEvents = allEventsRaw.filter((e: any) => new Date(e.date).getTime() >= today)
+  const categories = ["Tout", ...(categoriesData?.map((c: any) => c.name) || [])]
+
+  const filteredEvents = upcomingEvents
+    .filter((event: any) => {
+      const matchCat = selectedCategory === "Tout" || event.category?.name === selectedCategory
+      const matchSearch = !searchQuery ||
+        event.title?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        event.location?.toLowerCase().includes(searchQuery.toLowerCase())
+      return matchCat && matchSearch
+    })
+    .sort((a: any, b: any) => {
+      if (selectedSort === 'date-asc') return new Date(a.date).getTime() - new Date(b.date).getTime()
+      if (selectedSort === 'date-desc') return new Date(b.date).getTime() - new Date(a.date).getTime()
+      if (selectedSort === 'participants') return (b.participants || 0) - (a.participants || 0)
+      return 0
+    })
+
+  return (
+    <div className="min-h-screen bg-white dark:bg-[#0A1128] text-[#0A1128] dark:text-white font-sans selection:bg-[#FFD700] selection:text-[#0A1128]">
+
+      {/* --- 1. CINEMATIC HERO SECTION --- */}
+      <section className="relative pt-28 pb-4 px-4 overflow-hidden border-b border-gray-100 dark:border-transparent">
+        {/* Background Effects */}
+        <div className="absolute inset-0 z-0">
+          <div className="absolute bottom-0 left-0 w-[500px] h-[500px] bg-blue-500/5 dark:bg-blue-500/10 blur-[120px] rounded-full mix-blend-multiply dark:mix-blend-screen opacity-50 dark:opacity-100" />
+          <div className="absolute inset-0 bg-[url('/noise.png')] opacity-[0.02] dark:opacity-[0.03] mix-blend-overlay pointer-events-none" />
         </div>
-        <div className="container relative z-10 text-center py-20">
-          <h1 className="text-5xl md:text-6xl font-bold mb-6">
-            Nos <span className="text-[#FFD700]">Événements</span>
-          </h1>
-          <p className="text-xl text-white/90 max-w-3xl mx-auto">
-            Découvrez nos formations, conférences et ateliers conçus pour développer vos compétences et élargir votre réseau professionnel.
-          </p>
+
+        <div className="container mx-auto max-w-7xl relative z-10">
+          <div className="flex flex-col gap-4">
+            <motion.div
+              initial={{ opacity: 0, y: 30 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.8, ease: "easeOut" }}
+              className="max-w-4xl"
+            >
+              <div className="flex items-center gap-3 mb-2">
+                <div className="w-12 h-px bg-[#FFD700]" />
+                <span className="text-[#FFD700] font-black uppercase tracking-[0.3em] text-[10px]">Agenda d'Excellence</span>
+              </div>
+
+              <h1 className="text-5xl md:text-6xl lg:text-7xl font-black text-[#0A1128] dark:text-white leading-[0.9] tracking-[-0.04em] uppercase mb-2">
+                Nos <br />
+                <span className="text-[#FFD700] lowercase italic font-serif">prochaines</span> Escales.
+              </h1>
+            </motion.div>
+
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 0.5, duration: 1 }}
+              className="flex justify-between items-end border-t border-gray-100 dark:border-white/10 pt-4"
+            >
+              <p className="max-w-md text-sm md:text-base font-light leading-relaxed text-gray-500 dark:text-gray-300 italic font-serif">
+                "Des moments d'exception pour forger des alliances et célébrer l'innovation africaine."
+              </p>
+              <div className="hidden md:flex flex-col items-end gap-1">
+                <span className="text-[9px] uppercase tracking-[0.4em] font-black text-gray-400 dark:text-white/40">Rencontres Prévues</span>
+                <span className="text-2xl font-black text-[#FFD700]">{upcomingEvents.length}</span>
+              </div>
+            </motion.div>
+          </div>
         </div>
       </section>
 
-      {/* Filtres et recherche */}
-      <section className="py-12 bg-gray-50">
-        <div className="container mx-auto px-4">
-          <div className="max-w-6xl mx-auto">
-            {/* Barre de recherche */}
-            <div className="relative mb-8">
-              <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400" size={20} />
+      {/* --- 2. SELECTOR BAR (Sticky Glassmorphism) --- */}
+      <div className="sticky top-0 z-40 bg-white/90 dark:bg-[#0A1128]/95 backdrop-blur-2xl border-y border-gray-100 dark:border-white/5 py-8 transition-colors duration-500">
+        <div className="container mx-auto max-w-7xl px-4">
+          <div className="flex flex-col lg:flex-row gap-8 items-center justify-between">
+
+            {/* Premium Search Interface */}
+            <div className="relative w-full lg:max-w-md group">
+              <div className="absolute left-6 top-1/2 -translate-y-1/2 text-[#FFD700] pointer-events-none group-focus-within:scale-110 transition-transform">
+                <Search size={20} strokeWidth={2.5} />
+              </div>
               <input
                 type="text"
                 placeholder="Rechercher un événement..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full pl-12 pr-4 py-4 border border-gray-300 rounded-xl focus:ring-2 focus:ring-[#FFD700] focus:border-transparent text-lg"
+                className="w-full h-16 pl-16 pr-12 bg-gray-50 dark:bg-white/5 border border-gray-100 dark:border-white/10 rounded-2xl focus:outline-none focus:border-[#FFD700]/50 focus:bg-white dark:focus:bg-white/10 transition-all font-bold text-base text-[#0A1128] dark:text-white placeholder:text-gray-300 dark:placeholder:text-white/20 shadow-sm focus:shadow-xl"
               />
-            </div>
-
-            {/* Filtres */}
-            <div className="flex flex-wrap gap-4 mb-8">
-              {/* Filtre par catégorie */}
-              <div className="relative">
+              {searchQuery && (
                 <button
-                  onClick={() => setShowSortPopover(!showSortPopover)}
-                  className="flex items-center gap-2 px-4 py-2 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-all"
+                  onClick={() => setSearchQuery("")}
+                  className="absolute right-4 top-1/2 -translate-y-1/2 p-2 hover:bg-gray-100 dark:hover:bg-white/10 rounded-full transition-colors"
                 >
-                  <Filter size={18} />
-                  <span>Catégorie</span>
-                  <ChevronDown size={16} />
+                  <X size={16} className="text-gray-400 dark:text-white/40" />
                 </button>
-                {showSortPopover && (
-                  <div className="absolute top-full left-0 mt-2 w-48 bg-white border border-gray-300 rounded-lg shadow-lg z-10">
-                    <div className="p-2">
-                      <button
-                        onClick={() => {
-                          setSelectedCategory("")
-                          setSelectedCategoryId("")
-                          setShowSortPopover(false)
-                        }}
-                        className={`w-full text-left px-3 py-2 rounded-lg hover:bg-gray-100 transition-all ${
-                          !selectedCategory ? 'bg-[#FFD700]/20 text-[#0A1128]' : ''
-                        }`}
-                      >
-                        Toutes les catégories
-                      </button>
-                      {categories.map((category: { id: string; name: string }) => (
-                        <button
-                          key={category.id}
-                          onClick={() => {
-                            setSelectedCategory(category.name)
-                            setSelectedCategoryId(category.id)
-                            setShowSortPopover(false)
-                          }}
-                          className={`w-full text-left px-3 py-2 rounded-lg hover:bg-gray-100 transition-all ${
-                            selectedCategory === category.name ? 'bg-[#FFD700]/20 text-[#0A1128]' : ''
-                          }`}
-                        >
-                          {category.name}
-                        </button>
-                      ))}
+              )}
+            </div>
+
+            {/* Filter Interface */}
+            <div className="flex w-full lg:w-auto items-center gap-4 overflow-x-auto no-scrollbar pb-1">
+
+              <div className="flex flex-col min-w-[200px]">
+                <label className="text-[10px] font-black uppercase tracking-[0.4em] text-gray-400 dark:text-white/30 mb-2 ml-1">Type</label>
+                <Select value={selectedCategory} onValueChange={setSelectedCategory}>
+                  <SelectTrigger className="h-16 px-6 bg-gray-50 dark:bg-white/5 border border-gray-100 dark:border-white/10 rounded-2xl font-black text-sm text-[#0A1128] dark:text-white shadow-sm hover:border-[#FFD700]/50 transition-all">
+                    <div className="flex items-center gap-3">
+                      <Filter size={16} className="text-[#FFD700]" strokeWidth={2.5} />
+                      <SelectValue placeholder="Catégorie" />
                     </div>
-                  </div>
-                )}
+                  </SelectTrigger>
+                  <SelectContent className="bg-white dark:bg-[#050A15] border-gray-200 dark:border-white/10 rounded-2xl shadow-2xl z-50">
+                    {categories.map(cat => (
+                      <SelectItem key={cat} value={cat} className="font-bold py-4 text-[#0A1128] dark:text-white focus:bg-gray-100 dark:focus:bg-white/10 cursor-pointer">
+                        {cat}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
               </div>
 
-              {/* Filtre par rubrique */}
-              <div className="flex gap-2">
-                {rubriques.map((rubrique: string) => (
-                  <button
-                    key={rubrique}
-                    onClick={() => {
-                      setSelectedRubrique(rubrique)
-                      setSelectedRubriqueId(rubrique === "Toutes" ? "" : rubrique)
-                    }}
-                    className={`px-4 py-2 rounded-lg transition-all ${
-                      selectedRubrique === rubrique
-                        ? 'bg-[#FFD700] text-[#0A1128] font-semibold'
-                        : 'bg-white text-gray-700 hover:bg-gray-100'
-                    }`}
-                  >
-                    {rubrique}
-                  </button>
-                ))}
+              <div className="flex flex-col min-w-[200px]">
+                <label className="text-[10px] font-black uppercase tracking-[0.4em] text-gray-400 dark:text-white/30 mb-2 ml-1">Ordre</label>
+                <Select value={selectedSort} onValueChange={setSelectedSort}>
+                  <SelectTrigger className="h-16 px-6 bg-gray-50 dark:bg-white/5 border border-gray-100 dark:border-white/10 rounded-2xl font-black text-sm text-[#0A1128] dark:text-white shadow-sm hover:border-[#FFD700]/50 transition-all">
+                    <div className="flex items-center gap-3">
+                      <SlidersHorizontal size={16} className="text-[#FFD700]" strokeWidth={2.5} />
+                      <SelectValue placeholder="Trier par" />
+                    </div>
+                  </SelectTrigger>
+                  <SelectContent className="bg-white dark:bg-[#050A15] border-gray-200 dark:border-white/10 rounded-2xl shadow-2xl z-50">
+                    <SelectItem value="date-asc" className="font-bold py-4 text-[#0A1128] dark:text-white focus:bg-gray-100 dark:focus:bg-white/10 cursor-pointer text-sm">Plus proche</SelectItem>
+                    <SelectItem value="date-desc" className="font-bold py-4 text-[#0A1128] dark:text-white focus:bg-gray-100 dark:focus:bg-white/10 cursor-pointer text-sm">Plus éloigné</SelectItem>
+                    <SelectItem value="participants" className="font-bold py-4 text-[#0A1128] dark:text-white focus:bg-gray-100 dark:focus:bg-white/10 cursor-pointer text-sm">Popularité</SelectItem>
+                  </SelectContent>
+                </Select>
               </div>
 
-              {/* Tri */}
-              <div className="flex items-center gap-2">
-                <span className="text-gray-600">Trier par:</span>
-                <select
-                  value={sortBy}
-                  onChange={(e) => setSortBy(e.target.value)}
-                  className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#FFD700] focus:border-transparent"
+              {/* Reset Button */}
+              {(selectedCategory !== "Tout" || searchQuery) && (
+                <button
+                  onClick={() => { setSelectedCategory("Tout"); setSearchQuery("") }}
+                  className="h-16 px-6 mt-6 flex items-center justify-center gap-2 text-sm font-black text-[#FFD700] hover:bg-gray-50 dark:hover:bg-white/5 rounded-2xl transition-all border border-gray-100 dark:border-white/10"
                 >
-                  <option value="date">Date</option>
-                  <option value="participants">Participants</option>
-                  <option value="title">Titre</option>
-                </select>
-              </div>
+                  <X size={16} />
+                  Réinitialiser
+                </button>
+              )}
             </div>
 
-            {/* Résultats */}
-            <div className="text-center mb-8">
-              <p className="text-gray-600">
-                {sortedEvents.length} événement{sortedEvents.length > 1 ? 's' : ''} trouvé{sortedEvents.length > 1 ? 's' : ''}
-              </p>
-            </div>
           </div>
         </div>
-      </section>
+      </div>
 
-      {/* Liste des événements */}
-      <section className="py-20">
-        <div className="container mx-auto px-4">
-          <div className="max-w-6xl mx-auto">
-            {sortedEvents.length === 0 ? (
-              <div className="text-center py-20">
-                <CalendarX size={64} className="mx-auto text-gray-400 mb-4" />
-                <h3 className="text-2xl font-bold text-[#0A1128] mb-2">Aucun événement trouvé</h3>
-                <p className="text-gray-600 mb-6">Essayez de modifier vos critères de recherche.</p>
-                <button
-                  onClick={() => {
-                    setSearchQuery("")
-                    setSelectedCategory("")
-                    setSelectedCategoryId("")
-                    setSelectedRubrique("Toutes")
-                    setSelectedRubriqueId("")
-                    setSelectedTag("")
-                  }}
-                  className="px-6 py-3 bg-[#FFD700] text-[#0A1128] rounded-lg font-semibold hover:bg-[#E6C200] transition-all"
-                >
-                  Réinitialiser les filtres
-                </button>
-              </div>
-            ) : (
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                {sortedEvents.map((event: EventWithTime) => (
-                  <motion.div
-                    key={event.id}
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.5 }}
-                    className="bg-white rounded-xl overflow-hidden shadow-md hover:shadow-xl transition-all duration-300 hover:-translate-y-2 flex flex-col h-full"
-                  >
-                    <div className="relative h-48 overflow-hidden group">
-                      <Image 
-                        src={event.image || '/images/placeholder-event.jpg'}
-                        alt={event.title || 'Événement'} 
-                        width={400}
-                        height={192}
-                        className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
-                        unoptimized={!!(event.image && (event.image.includes('supabase.co/storage') || event.image.includes('storage/v1/object/public')))}
-                      />
-                      <div className="absolute inset-0 bg-gradient-to-t from-[#0A1128]/80 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-                      <div className="absolute top-4 left-4 right-4 flex justify-between items-start">
-                        <span className="px-3 py-1 bg-[#FFD700] text-[#0A1128] text-sm font-semibold rounded-full">
-                          {getCategoryName(event.category)}
-                        </span>
-                        <span className="px-3 py-1 bg-white/90 text-[#0A1128] text-sm font-semibold rounded-full">
-                          {getRubriqueName(event.rubrique)}
-                        </span>
-                      </div>
-                    </div>
-                    
-                    <div className="p-6 flex flex-col flex-1">
-                      <h3 className="text-xl font-bold text-[#0A1128] mb-2 line-clamp-2">
-                        {event.title}
-                      </h3>
-                      <p className="text-gray-600 mb-4 line-clamp-3 flex-1">
-                        {event.description}
-                      </p>
-                      
-                      <div className="space-y-2 mb-4">
-                        <div className="flex items-center gap-2 text-sm text-gray-600">
-                          <Calendar size={16} />
-                          <span>
-                            {new Date(event.date || '').toLocaleDateString('fr-FR', { 
-                              weekday: 'long', 
-                              year: 'numeric', 
-                              month: 'long', 
-                              day: 'numeric' 
-                            })}
-                          </span>
-                        </div>
-                        <div className="flex items-center gap-2 text-sm text-gray-600">
-                          <Clock size={16} />
-                          <span>{(event as EventWithTime).time || 'À confirmer'}</span>
-                        </div>
-                        <div className="flex items-center gap-2 text-sm text-gray-600">
-                          <MapPin size={16} />
-                          <span>{event.location || 'Lieu à confirmer'}</span>
-                        </div>
-                        <div className="flex items-center gap-2 text-sm text-gray-600">
-                          <UserCheck size={16} />
-                          <span>{event.participants || 0} participants</span>
-                        </div>
-                      </div>
-
-                      {/* Tags */}
-                      {event.tags && event.tags.length > 0 && (
-                        <div className="flex flex-wrap gap-1 mb-4">
-                          {event.tags.slice(0, 3).map((tag: { name?: string; tag?: { name: string } } | string, index: number) => {
-                            const tagName = typeof tag === 'string' ? tag : (tag.tag?.name || tag.name || '')
-                            return (
-                              <span 
-                                key={index}
-                                className="px-2 py-1 bg-gray-100 text-gray-600 text-xs rounded-full"
-                              >
-                                {tagName}
-                              </span>
-                            )
-                          })}
-                        </div>
-                      )}
-
-                      <div className="mt-auto pt-4">
-                        <Link 
-                          href={`/event/${event.id}`}
-                          className="w-full inline-flex items-center justify-center gap-2 px-6 py-3 bg-[#FFD700] text-[#0A1128] font-semibold rounded-lg hover:bg-[#E6C200] transition-all hover:scale-105"
-                        >
-                          Voir les détails
-                          <ArrowRight size={16} />
-                        </Link>
-                      </div>
-                    </div>
-                  </motion.div>
-                ))}
-              </div>
-            )}
-
-            {/* Bouton "Voir plus" */}
-            {sortedEvents.length >= displayCount && (
-              <div className="text-center mt-12">
-                <button
-                  onClick={() => setDisplayCount(prev => prev + 6)}
-                  className="px-8 py-3 bg-[#FFD700] text-[#0A1128] rounded-lg font-semibold hover:bg-[#E6C200] transition-all hover:scale-105"
-                >
-                  Voir plus d&apos;événements
-                </button>
-              </div>
-            )}
+      {/* --- 3. THE GRID --- */}
+      <section className="container mx-auto max-w-7xl px-4 py-24 pb-48">
+        {isLoading ? (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-12">
+            {[1, 2, 3, 4, 5, 6].map((i) => <SkeletonCard key={i} />)}
           </div>
-        </div>
-      </section>
-
-      {/* Section événements passés */}
-      {sortedEvents.length > 0 && (
-        <section className="py-20 bg-gray-50">
-          <div className="container mx-auto px-4">
-            <div className="max-w-6xl mx-auto">
-              <h2 className="text-3xl font-bold text-[#0A1128] text-center mb-12">
-                Événements Récents
-              </h2>
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                {sortedEvents.slice(0, 4).map((event: EventWithTime) => (
-                  <div key={event.id} className="bg-white rounded-lg overflow-hidden shadow-md hover:shadow-lg transition-all">
-                    <div className="relative h-32 overflow-hidden">
-                      <Image 
-                        src={event.image || '/images/placeholder-event.jpg'}
-                        unoptimized={!!(event.image && (event.image.includes('supabase.co/storage') || event.image.includes('storage/v1/object/public')))} 
-                        alt={event.title || 'Événement'} 
-                        width={300}
-                        height={128}
-                        className="w-full h-full object-cover"
-                      />
-                    </div>
-                    <div className="p-4">
-                      <h3 className="font-semibold text-[#0A1128] mb-2 line-clamp-2">
-                        {event.title}
-                      </h3>
-                      <p className="text-sm text-gray-600 mb-2">
-                        {new Date((event as EventWithTime).date || '').toLocaleDateString('fr-FR')}
-                      </p>
-                      <p className="text-sm text-gray-500">
-                        {getCategoryName((event as EventWithTime).category) || 'Événement'}
-                      </p>
-                    </div>
-                  </div>
-                ))}
+        ) : filteredEvents.length === 0 ? (
+          <motion.div
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+            className="flex flex-col items-center justify-center py-48 text-center"
+          >
+            <div className="relative w-32 h-32 mb-10 group">
+              <div className="absolute inset-0 bg-[#FFD700] rounded-full blur-[40px] opacity-20 group-hover:opacity-40 transition-opacity" />
+              <div className="relative w-full h-full bg-white dark:bg-[#050A15] rounded-full flex items-center justify-center border border-gray-100 dark:border-white/10 shadow-2xl">
+                <Calendar size={48} className="text-[#FFD700]" strokeWidth={1.5} />
               </div>
             </div>
+            <h3 className="text-4xl font-black uppercase tracking-tighter mb-4 text-[#0A1128] dark:text-white">Le silence est d'or.</h3>
+            <p className="text-gray-400 dark:text-gray-400 max-w-xs text-lg font-medium leading-relaxed">Aucun événement ne correspond pour le moment. Essayez d'élargir votre horizon.</p>
+          </motion.div>
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-x-12 gap-y-20">
+            <AnimatePresence mode="popLayout">
+              {filteredEvents.map((event: any, idx: number) => (
+                <EventCard key={event.id} event={event} index={idx} />
+              ))}
+            </AnimatePresence>
           </div>
-        </section>
-      )}
+        )}
+      </section>
+
     </div>
   )
 }
 
 export default function EventsPageClient() {
   return (
-    <Suspense fallback={
-      <div className="min-h-screen bg-white">
-        <div className="container mx-auto px-4 py-20">
-          <div className="flex items-center justify-center">
-            <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-[#FFD700]"></div>
-          </div>
-        </div>
-      </div>
-    }>
+    <Suspense fallback={<div className="min-h-screen bg-white" />}>
       <EventsPageContent />
     </Suspense>
   )

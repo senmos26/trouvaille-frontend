@@ -3,9 +3,7 @@
 @custom-variant dark (&:is(.dark *));
 
 /* Force Helvetica globally */
-* {
-  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif !important;
-}
+
 
 :root {
   /* Couleurs La Trouvaille */
@@ -211,6 +209,7 @@ body {
     opacity: 0;
     transform: translateY(30px);
   }
+
   to {
     opacity: 1;
     transform: translateY(0);
@@ -218,12 +217,16 @@ body {
 }
 
 @keyframes float {
-  0%, 100% {
+
+  0%,
+  100% {
     transform: translateY(0px) rotate(0deg);
   }
+
   33% {
     transform: translateY(-10px) rotate(1deg);
   }
+
   66% {
     transform: translateY(-5px) rotate(-1deg);
   }
@@ -233,6 +236,7 @@ body {
   0% {
     background-position: -200px 0;
   }
+
   100% {
     background-position: calc(200px + 100%) 0;
   }
@@ -310,6 +314,7 @@ body {
   * {
     @apply border-border outline-ring/50;
   }
+
   body {
     @apply bg-background text-foreground;
     font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
@@ -318,9 +323,17 @@ body {
 
 
 @keyframes gradient-x {
-  0%, 100% { background-position: 0% 50%; }
-  50% { background-position: 100% 50%; }
+
+  0%,
+  100% {
+    background-position: 0% 50%;
+  }
+
+  50% {
+    background-position: 100% 50%;
+  }
 }
+
 .animate-gradient-x {
   background-size: 200% auto;
   animation: gradient-x 4s linear infinite;
@@ -522,7 +535,7 @@ body {
   color: var(--navy);
   border-left-width: 0.25rem;
   border-left-color: var(--gold);
-  quotes: "\201C""\201D""\2018""\2019";
+  quotes: "\201C" "\201D" "\2018" "\2019";
   margin-top: 1.6em;
   margin-bottom: 1.6em;
   padding-left: 1em;

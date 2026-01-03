@@ -1,6 +1,6 @@
 "use client"
 
-import { useMemo, useState, useEffect } from "react"
+import { useMemo, useState, useEffect, use } from "react"
 import Link from "next/link"
 import Image from "next/image"
 import { useRouter } from "next/navigation"
@@ -173,11 +173,12 @@ function buildShareUrl(id: string) {
   return `https://la-trouvaille.com/blog/${id}`
 }
 
-export default function BlogDetailPage({ params }: { params: { id: string } }) {
+export default function BlogDetailPage({ params }: { params: Promise<{ id: string }> }) {
+  const { id } = use(params)
   const router = useRouter()
-  const numericId = Number(params.id)
-  const { data: post, isLoading, error } = useBlogPost(params.id)
-  const { data: comments = [], isLoading: commentsLoading } = useBlogComments(params.id)
+  const numericId = Number(id)
+  const { data: post, isLoading, error } = useBlogPost(id)
+  const { data: comments = [], isLoading: commentsLoading } = useBlogComments(id)
   const addCommentMutation = useAddComment()
   const [showSharePopup, setShowSharePopup] = useState(false)
   const [copied, setCopied] = useState(false)
@@ -187,10 +188,10 @@ export default function BlogDetailPage({ params }: { params: { id: string } }) {
   const [showCommentForm, setShowCommentForm] = useState(false)
   const [isSubmittingComment, setIsSubmittingComment] = useState(false)
   const [commentMessage, setCommentMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null)
-  
+
   // Utiliser les données Supabase ou les données de fallback
   const displayPost = post || blogPosts.find((item) => item.id === numericId)
-  
+
   // Helper functions pour accéder aux données de manière sécurisée
   const getCategoryName = (item: { category?: string | { name: string } }) => typeof item?.category === 'string' ? item.category : item?.category?.name || ''
   const getAuthorName = (item: { author_name?: string; author?: string }) => item?.author_name || item?.author || ''
@@ -253,7 +254,7 @@ export default function BlogDetailPage({ params }: { params: { id: string } }) {
     if (!newComment.name || !newComment.content || !displayPost) return
 
     setIsSubmittingComment(true)
-    
+
     try {
       const result = await addCommentMutation.mutateAsync({
         postId: String(displayPost.id),
@@ -287,7 +288,7 @@ export default function BlogDetailPage({ params }: { params: { id: string } }) {
   const heroImage = displayPost.image || HERO_PLACEHOLDER
   const readingTime = computeReadingTime(displayPost.content ?? displayPost.excerpt ?? "")
   const highlights = extractHighlights(displayPost.content ?? displayPost.excerpt ?? "", getCategoryName(displayPost), getAuthorName(displayPost))
-  const shareUrl = buildShareUrl(params.id)
+  const shareUrl = buildShareUrl(id)
   const shareText = `Lisez cet article : "${displayPost.title}"`
 
   const handleCopyLink = () => {
@@ -334,7 +335,7 @@ export default function BlogDetailPage({ params }: { params: { id: string } }) {
         }}
       >
         <div className="absolute inset-0 bg-gradient-to-t from-[#0A1128]/85 via-[#0A1128]/45 to-transparent" />
-        
+
         {/* Boutons retour et partage */}
         <div className="absolute top-6 left-6 right-6 flex justify-between items-center z-20">
           <Link
@@ -344,7 +345,7 @@ export default function BlogDetailPage({ params }: { params: { id: string } }) {
             <ArrowLeft size={18} />
             Retour au blog
           </Link>
-          
+
           <button
             onClick={() => setShowSharePopup(true)}
             className="inline-flex items-center gap-2 px-4 py-2 bg-white/90 text-[#0A1128] rounded-lg font-medium hover:bg-white transition-all backdrop-blur-sm hover:scale-105"
@@ -395,7 +396,7 @@ export default function BlogDetailPage({ params }: { params: { id: string } }) {
 
       {/* Main content */}
       <section className="py-20 bg-gray-50">
-      <div className="container">
+        <div className="container">
           <div className="grid lg:grid-cols-[2fr_1fr] gap-12 items-start">
             <motion.article
               initial={{ opacity: 0, y: 20 }}
@@ -541,11 +542,10 @@ export default function BlogDetailPage({ params }: { params: { id: string } }) {
               <div className="flex items-center gap-6">
                 <button
                   onClick={handleLike}
-                  className={`flex items-center gap-2 px-6 py-3 rounded-xl font-semibold transition-all ${
-                    liked
+                  className={`flex items-center gap-2 px-6 py-3 rounded-xl font-semibold transition-all ${liked
                       ? 'bg-[#FFD700] text-[#0A1128]'
                       : 'bg-gray-100 text-gray-700 hover:bg-[#FFD700]/20'
-                  }`}
+                    }`}
                 >
                   <ThumbsUp size={20} className={liked ? 'fill-current' : ''} />
                   <span>J&apos;aime ({likeCount})</span>
@@ -594,11 +594,10 @@ export default function BlogDetailPage({ params }: { params: { id: string } }) {
                   initial={{ opacity: 0, y: -10 }}
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0, y: -10 }}
-                  className={`mb-6 p-4 rounded-xl border-2 ${
-                    commentMessage.type === 'success' 
-                      ? 'bg-green-50 border-green-200 text-green-800' 
+                  className={`mb-6 p-4 rounded-xl border-2 ${commentMessage.type === 'success'
+                      ? 'bg-green-50 border-green-200 text-green-800'
                       : 'bg-red-50 border-red-200 text-red-800'
-                  }`}
+                    }`}
                 >
                   <div className="flex items-center gap-2">
                     {commentMessage.type === 'success' ? (
@@ -694,18 +693,16 @@ export default function BlogDetailPage({ params }: { params: { id: string } }) {
                         initial={{ opacity: 0, y: 20 }}
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ duration: 0.3, delay: idx * 0.1 }}
-                        className={`flex gap-4 p-5 rounded-xl border transition-all ${
-                          isPending 
-                            ? 'bg-yellow-50 border-yellow-200 hover:shadow-md' 
+                        className={`flex gap-4 p-5 rounded-xl border transition-all ${isPending
+                            ? 'bg-yellow-50 border-yellow-200 hover:shadow-md'
                             : 'bg-gray-50 border-gray-200 hover:shadow-md'
-                        }`}
+                          }`}
                       >
                         <div className="flex-shrink-0">
-                          <div className={`w-12 h-12 rounded-full flex items-center justify-center font-bold text-lg ${
-                            isPending 
-                              ? 'bg-yellow-400 text-yellow-900' 
+                          <div className={`w-12 h-12 rounded-full flex items-center justify-center font-bold text-lg ${isPending
+                              ? 'bg-yellow-400 text-yellow-900'
                               : 'bg-[#FFD700] text-[#0A1128]'
-                          }`}>
+                            }`}>
                             {avatar}
                           </div>
                         </div>
@@ -721,9 +718,8 @@ export default function BlogDetailPage({ params }: { params: { id: string } }) {
                               {new Date(comment.created_at).toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' })}
                             </span>
                           </div>
-                          <p className={`leading-relaxed ${
-                            isPending ? 'text-yellow-800' : 'text-gray-700'
-                          }`}>
+                          <p className={`leading-relaxed ${isPending ? 'text-yellow-800' : 'text-gray-700'
+                            }`}>
                             {comment.content}
                           </p>
                           {isPending && (
@@ -779,7 +775,7 @@ export default function BlogDetailPage({ params }: { params: { id: string } }) {
               {/* QR Code */}
               <div className="flex flex-col items-center mb-6">
                 <div className="bg-white p-3 rounded-xl shadow-md border-2 border-[#FFD700]/20 mb-3">
-                  <Image 
+                  <Image
                     src={`https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${encodeURIComponent(shareUrl)}`}
                     alt="QR Code"
                     width={150}
@@ -789,13 +785,13 @@ export default function BlogDetailPage({ params }: { params: { id: string } }) {
                 </div>
                 <p className="text-xs text-muted-foreground text-center">
                   Scannez ce code QR pour accéder à l&apos;article
-        </p>
-      </div>
+                </p>
+              </div>
 
               {/* Share Options */}
               <div className="space-y-3">
                 <h4 className="font-bold text-base mb-3">Partager via</h4>
-                
+
                 <div className="grid grid-cols-2 gap-2">
                   {/* WhatsApp */}
                   <a
